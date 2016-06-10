@@ -38,9 +38,9 @@
 			<template is="dom-repeat" items=[[_getListItems(category.items)]] as="items">
 				<template is="dom-repeat" items=[[_toArray(items.cofferGroup)]] as="group">
 					<div class="tile__list">
-						<template is="dom-repeat" items=[[_toArray(group.value.unit)]] as="list">
+						<template is="dom-repeat" items=[[_toImageArray(group.value.unit)]] as="list">
 							<a href$="[[_getItemHref(list.value)]]">
-								<iron-image src="[[list.value.image]]"></iron-image>
+								<iron-image src="[[list.value]]"></iron-image>
 							</a>
 						</template>
 					</div>
@@ -174,7 +174,25 @@
             };
           });
         }
-        
+      },
+
+      _toImageArray: function(obj) {
+        var arr = [];
+        if(obj != null) {
+          if(obj.length > 2) {
+            for(var i = 0 ; i < 2 ; i++) {
+              console.log(obj[i]);
+              arr.push({value: obj[i].image});
+
+            }
+          } else {
+            for(var i = 0 ; i < obj.length ; i++) {
+              console.log(obj[i]);
+              arr.push({value: obj[i].image});
+            }
+          }
+        }
+        return arr;
       }
 
     });
