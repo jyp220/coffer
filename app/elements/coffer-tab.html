@@ -1,0 +1,41 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="coffer-ripple-container.html">
+
+<dom-module id="coffer-tab">
+  <template strip-whitespace>
+    <style>
+      [hidden] {
+        display: none !important;
+      }
+
+      :host {
+        display: inline-block;
+        position: relative;
+      }
+
+      #overlay {
+        pointer-events: none;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        @apply(--coffer-tab-overlay);
+      }
+
+      :host(.coffer-tabs-overlay-static-above) #overlay {
+        display: block;
+      }
+    </style>
+    <div id="overlay"></div>
+    <coffer-ripple-container>
+      <content></content>
+    </coffer-ripple-container>
+  </template>
+  <script>
+    Polymer({
+      is: 'coffer-tab'
+    });
+  </script>
+</dom-module>

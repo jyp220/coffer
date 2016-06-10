@@ -1,0 +1,87 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+
+<dom-module id="coffer-timeline-localstorage-data">
+
+  <template>
+    <iron-localstorage
+        name="coffer-timeline-localstorage-data"
+        value="{{timeline}}"
+        on-iron-localstorage-load-empty="_initializeTimeline"></iron-localstorage>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-timeline-localstorage-data',
+
+      properties: {
+
+        unitName: String,
+
+        timeline: {
+          type: Array,
+          notify: true
+        },
+
+        timelineArr: {
+          type: Array,
+          notify: true,
+          computed: '_computeTimelineArr(unitName)'
+        }
+
+      },
+
+      _computeTimelineArr: function(unitName) {
+        var arr = [];
+        if(this.timeline != null) {
+          for(var i = 0 ; i < this.timeline.length ; i++) {
+            if(this.timeline[i].unitName === unitName) {
+              arr.push(this.timeline[i])
+            }
+          }
+        }
+
+        return arr;
+      },
+
+      addItem: function(detail) {
+        this.setItem(detail);
+      },
+
+      setItem: function(detail) {
+        this.push('timeline', detail);
+      },
+
+      _initializeTimeline: function() {
+        this.clearTimeline();
+      },
+
+      clearTimeline: function() {
+        this.timeline = [];
+      },
+
+      refresh: function(unitName) {
+        
+        return this.reload(unitName);
+      },
+
+      reload: function(unitName) {
+        var arr = [];
+        if(this.timeline != null) {
+          for(var i = 0 ; i < this.timeline.length ; i++) {
+            if(this.timeline[i].unitName === unitName) {
+              arr.push(this.timeline[i])
+            }
+          }
+        }
+
+        return arr;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

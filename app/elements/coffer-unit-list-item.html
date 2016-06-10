@@ -1,0 +1,88 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+
+<dom-module id="coffer-unit-list-item">
+
+  <template>
+
+    <style>
+
+      :host {
+        @apply(--layout-vertical);
+        @apply(--layout-center-justified);
+        text-align: center;
+        margin: 0 48px;
+      }
+
+      .title {
+        color: var(--app-primary-color);
+        font-weight: bold;
+      }
+
+      .price {
+        color: var(--app-secondary-color);
+      }
+
+      @media (max-width: 767px) {
+        :host {
+          margin: 0 12px;
+        }
+      }
+
+      paper-card.rate { 
+        @apply(--layout-horizontal); 
+        padding: 20px;
+        border-radius: 8px;
+        background-color: white;
+        border: 1px solid #ddd;
+        max-width: 800px;
+        margin: 16px auto 0 auto;
+      }
+      .rate-image {
+        width: 100px;
+        height: 150px;
+        border-radius: 20px;
+        box-sizing: border-box;
+        background-color: #DDD;
+      }
+      .rate-content {
+        padding: 0 16px;
+        @apply(--layout-flex);
+        float: left;
+      }
+
+    </style>
+
+    <paper-card class="rate">
+      <iron-image class="rate-image" sizing="contain" src="[[item.image]]" alt="[[item.title]]"></iron-image>
+      <div class="rate-content">
+        <div class="card-content">
+          <div class="rate-header">[[item.title]]</div>
+          <div class="rate-name">[[item.description]]</div>
+        </div>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-unit-list-item',
+
+      properties: {
+
+        item: Object
+
+      },
+
+      _formatPrice: function(price) {
+        return price ? '$' + price.toFixed(2) : '';
+      }
+
+    });
+
+  </script>
+
+</dom-module>

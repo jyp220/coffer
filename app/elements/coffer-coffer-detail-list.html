@@ -1,0 +1,197 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="coffer-category-data.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="coffer-unit-list-item.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+
+<dom-module id="coffer-coffer-detail-list">
+
+  <template>
+
+    <style>
+      paper-fab {
+        position: fixed;
+        bottom: 15px;
+        right: 16px;
+      }
+      paper-fullscreen-dialog{
+        height:80% !important;
+        margin-top:9%;
+        overflow:hidden;
+      }
+
+    </style>
+
+    <!--
+      app-route provides the name of the category.
+    -->
+    <app-route
+        route="[[route]]"
+        pattern="/:category/:category/:cofferGroup"
+        data="{{routeData}}"></app-route>
+
+    <!--
+      shop-category-data provides the item data for a given category and item name.
+    -->
+    <coffer-category-data
+        id="categoryData"
+        category-name="[[routeData.category]]"
+        category="{{category}}"
+        item-name="[[routeData.category]]"
+        item="{{item}}"
+        group-name="[[routeData.cofferGroup]]"
+        coffer-group="{{coffer-group}}"
+        failure="{{failure}}"></coffer-category-data>
+
+    <header>
+      <h1>Coffer Title : [[coffer-group.groupTitle]]</h1>
+      <h1>Unit Count : [[coffer-group.totalCount]]</h1>
+      <h1>Coffer Description : [[coffer-group.description]]</h1>
+      <h1>Create Date : [[coffer-group.createdAt]]</h1>
+    </header>
+
+    <ul>
+      <template is="dom-repeat" items="[[_getListItems(coffer-group.items)]]">
+        <li>
+          <coffer-unit-list-item item="[[item]]"></coffer-unit-list-item>
+        </li>
+      </template>
+
+      <template is="dom-repeat" items="[[unit]]" as="entry">
+        <template is="dom-if" if=[[_showGroup(routeData.cofferGroup,entry)]]>
+          <li>
+            <coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item>
+          </li>
+        </template>
+      </template>
+
+      <paper-fab noink id="add-unit" icon="add" title="add unit"></paper-fab>
+      <paper-fullscreen-dialog id="new-unit">
+        <h2>New Unit</h2>
+        <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
+        <coffer-unit-new id="new-unit-data" groups="[[_cofferList()]]"></coffer-unit-new>
+      </paper-fullscreen-dialog>
+    </ul>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-coffer-detail-list',
+
+      properties: {
+
+        category: Object,
+
+        route: Object,
+
+        routeData: Object,
+
+        visible: Boolean,
+
+        offline: {
+          type: Boolean,
+          observer: '_offlineChanged'
+        },
+
+        failure: Boolean,
+
+        unit: Array
+
+      },
+
+      listeners: {
+        'add-unit.tap': 'onTapAddUnit',
+        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed'
+      },
+
+      observers: [
+        '_categoryChanged(category, visible)'
+      ],
+
+      _getListItems: function(items) {
+        // Return placeholder items when the items haven't loaded yet.
+        return items || [{},{},{},{},{},{},{},{},{},{}];
+      },
+
+      _getItemHref: function(item) {
+        // By returning null when `itemId` is undefined, the href attribute won't be set and
+        // the link will be disabled.
+        return item.name ? ['/detail', this.category.name, item.name].join('/') : null;
+      },
+
+      _getPluralizedQuantity: function(quantity) {
+        if (!quantity) {
+          return '';
+        }
+        var pluralizedQ = quantity === 1 ? 'item' : 'items';
+        return  '(' + quantity + ' ' + pluralizedQ + ')';
+      },
+
+      _categoryChanged: function(category, visible) {
+        if (visible) {
+          this.debounce('change-section', function() {
+            // Notify the category and the page's title
+            this.fire('change-section', {
+              category: category.name,
+              title: category.title
+            });
+          });
+        }
+      },
+
+      _tryReconnect: function() {
+        this.$.categoryData.refresh();
+      },
+
+      _offlineChanged: function(offline) {
+        if (!offline) {
+          this._tryReconnect();
+        }
+      },
+
+      onTapAddUnit: function(e) {
+        this.$["new-unit"].open();
+      },
+
+      createResource: function(data) {
+        this.fire('add-unit-item', {
+          name : data.name,
+          title: data.name,
+          category: this.category.name,
+          description : data.description,
+          group : data.group,
+          image:"/data/images/10-24102A.jpg",
+          largeImage:"/data/images/10-24102B.jpg"
+        });
+      },
+
+      onNewUnitDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+
+        this.createResource(this.$['new-unit-data'].object);
+      },
+
+      _showGroup: function(group, entry) {
+        if(group === entry.group) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+
+      _cofferList: function() {
+        var list = [{'groupTitle':'A'},{'groupTitle':'B'},{'groupTitle':'C'},{'groupTitle':'D'}];
+
+        return list;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

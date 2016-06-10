@@ -1,0 +1,315 @@
+<link rel="import" href="coffer-category-data.html">
+<link rel="import" href="coffer-unit-localstorage-data.html">
+<link rel="import" href="coffer-timeline-localstorage-data.html">
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+
+<dom-module id="coffer-unit-detail-list">
+
+  <template>
+
+    <style>
+
+      :host {
+        display: block;
+      }
+
+      #content {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      iron-image {
+        position: relative;
+        margin: 64px 32px;
+        width: 50%;
+        max-width: 600px;
+        --iron-image-img: {
+          @apply(--layout-fit);
+        };
+      }
+
+      iron-image::before {
+        content: "";
+        display: block;
+        padding-top: 100%;
+      }
+
+      .detail {
+        margin: 64px 32px;
+        width: 50%;
+        max-width: 400px;
+        transition: opacity 0.4s;
+        opacity: 1;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 28px;
+        margin: 0;
+      }
+
+      .price {
+        margin: 16px 0 40px;
+        font-size: 16px;
+        color: var(--app-secondary-color);
+      }
+
+      .description {
+        margin: 32px 0;
+      }
+
+      .description > h2 {
+        margin: 16px 0;
+        font-size: 13px;
+      }
+
+      .description > p {
+        margin: 0;
+        color: var(--app-secondary-color);
+      }
+
+      paper-fab {
+        position: fixed;
+        bottom: 15px;
+        right: 16px;
+      }
+      paper-fullscreen-dialog{
+        height:80% !important;
+        margin-top:9%;
+        overflow:hidden;
+      }
+
+    </style>
+
+    <!--
+      app-route provides the name of the category and the item.
+    -->
+    <app-route
+        route="[[route]]"
+        pattern="/:category/:item"
+        data="{{routeData}}"></app-route>
+
+    <!--
+      shop-category-data provides the item data for a given category and item name.
+    -->
+    <coffer-category-data
+        id="categoryData"
+        category-name="[[routeData.category]]"
+        item-name="[[routeData.item]]"
+        item="{{item}}"
+        failure="{{failure}}"></coffer-category-data>
+
+
+    <coffer-unit-localstorage-data id="unit" item-name="[[routeData.item]]" unit-item="{{test}}"></coffer-unit-localstorage-data>
+    <coffer-timeline-localstorage-data id="timeline" unit-name="[[routeData.item]]" timeline-arr="{{timelineArr}}"></coffer-timeline-localstorage-data>
+
+    <div id="content">
+      <div class="detail">
+        <template is="dom-if" if="{{_showUnit(item)}}">
+          <paper-card heading="Top western road trips" image="[[item.image]]" class="white">
+            <div class="card-actions">
+              <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle" style="float:right;">
+              </paper-icon-button>
+              <iron-collapse id="moreInfo" style="width:100%;">
+                <div class="description">
+                  <h2>Description</h2>
+                  <p>[[item.description]]</p>
+                  <!-- <p id="desc"></p> -->
+                </div>
+              </iron-collapse>
+            </div>
+          </paper-card>
+        </template>
+
+        <template is="dom-if" if="{{_showUnit(test)}}">
+          <paper-card heading="Top western road trips" image="[[test.image]]" class="white">
+            <div class="card-actions">
+              <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggleLocal" style="float:right;">
+              </paper-icon-button>
+              <iron-collapse id="moreInfoLocal" style="width:100%;">
+                <div class="description">
+                  <h2>Description</h2>
+                  <p>[[test.description]]</p>
+                </div>
+              </iron-collapse>
+            </div>
+          </paper-card>
+        </template>
+
+        
+        <br>
+        <br>
+        <br>
+        <br>
+        <template is="dom-repeat" items="{{_toArray(item.details)}}" as="testArr">
+          <a href$="[[_getItemHref(testArr, item)]]">
+            Timeline Title: <span>{{testArr.value.timelineTitle}}</span></a>
+            <br> Timeline Message: <span>{{testArr.value.timelineMessage}}</span>
+            <br>
+            <hr>
+        </template>
+
+        <template is="dom-repeat" items="[[_toArray(timelineArr)]]" as="entry">
+          <a href$="[[_getItemHref(entry, item)]]">
+            Timeline Title: <span>{{entry.value.timelineTitle}}</span></a>
+            <br> Timeline Message: <span>{{entry.value.timelineMessage}}</span>
+            <br>
+            <hr>
+        </template>
+      </div>
+      <paper-fab noink id="add-timeline" icon="add" title="add timeline"></paper-fab>
+      <paper-fullscreen-dialog id="new-timeline">
+        <h2>New Timeline</h2>
+        <paper-button id="create-timeline" affirmative dialog-confirm>create</paper-button>
+        <coffer-unit-timeline-new id="new-timeline-data"></coffer-unit-timeline-new>
+      </paper-fullscreen-dialog>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-unit-detail-list',
+
+      properties: {
+
+        item: Object,
+
+        route: Object,
+
+        routeData: Object,
+
+        visible: Boolean,
+
+        offline: {
+          type: Boolean,
+          observer: '_offlineChanged'
+        },
+
+        failure: Boolean,
+
+        unit: Array,
+
+        timeline: Array,
+
+        timelineArr: Array,
+
+        test: Object
+
+      },
+
+      listeners: {
+        'add-timeline.tap': 'onTapAddTimeline',
+        'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed'
+      },
+
+      observers: [
+        '_itemChanged(item, visible)'
+      ],
+
+      attributeChanged: function() {
+        this.$.unit.reload();
+      },
+
+      _itemChanged: function(item, visible) {
+        if (visible) {
+          this.debounce('item-change', function(e) {
+            // var text = item ? item.description : '';
+            // this.$.desc.innerHTML = this._unescapeText(text);
+
+            this.fire('change-section', {
+              category: item.category,
+              title: item.title
+            });
+          });
+        }
+      },
+
+      _showUnit: function(item) {
+        return item != null;
+      },
+
+      _tryReconnect: function() {
+        this.$.categoryData.refresh();
+      },
+
+      _offlineChanged: function(offline) {
+        if (!offline) {
+          this._tryReconnect();
+        }
+      },
+
+      _toArray: function(obj) {
+        if(obj != null) {
+          return Object.keys(obj).map(function(key) {
+            return {
+              value: obj[key]
+            };
+          });
+        }
+        
+      },
+
+      _toggle: function(e) {
+        var moreInfo = e.currentTarget.parentElement.querySelector('iron-collapse');
+        var iconButton = Polymer.dom(event).localTarget;
+        iconButton.icon = moreInfo.opened ? 'hardware:keyboard-arrow-up'
+                                          : 'hardware:keyboard-arrow-down';
+        moreInfo.toggle();
+      },
+
+      _toggleLocal: function(e) {
+        var moreInfoLocal = e.currentTarget.parentElement.querySelector('iron-collapse');
+        var iconButton = Polymer.dom(event).localTarget;
+        iconButton.icon = moreInfoLocal.opened ? 'hardware:keyboard-arrow-up'
+                                          : 'hardware:keyboard-arrow-down';
+        moreInfoLocal.toggle();
+      },
+
+      onTapAddTimeline: function(e) {
+        this.$["new-timeline"].open();
+      },
+
+      createResource: function(data) {
+        var result = {
+          'unitName' : this.routeData.item,
+          'timelineTitle' : data.title,
+          'timelineMessage' : data.message
+        };
+        this.$.timeline.addItem(result);
+        this.timelineArr = this.$.timeline.refresh(this.routeData.item);
+      },
+
+      onNewTimelineDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+
+        this.createResource(this.$['new-timeline-data'].object);
+      },
+
+      _getItemHref: function(testArr, item) {
+        return item.name ? ['/unit-detail', item.category, item.name, testArr.value.testName].join('/') : null;
+      }
+    });
+
+  </script>
+
+</dom-module>

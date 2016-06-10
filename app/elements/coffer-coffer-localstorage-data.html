@@ -1,0 +1,53 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+
+<dom-module id="coffer-coffer-localstorage-data">
+
+  <template>
+    <iron-localstorage
+        id="cofferLocal"
+        name="coffer-coffer-localstorage-data"
+        value="{{coffer}}"
+        on-iron-localstorage-load-empty="_initializeCoffer"></iron-localstorage>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-coffer-localstorage-data',
+
+      properties: {
+
+        coffer: {
+          type: Array,
+          notify: true
+        }
+
+      },
+
+      addItem: function(detail) {
+        this.setItem(detail);
+      },
+
+      setItem: function(detail) {
+        this.push('coffer', detail);
+      },
+
+      _initializeCoffer: function() {
+        this.clearCoffer();
+      },
+
+      clearCoffer: function() {
+        this.coffer = [];
+      },
+
+      reload: function() {
+        this.$.cofferLocal.reload();
+      }
+
+    });
+
+  </script>
+
+</dom-module>

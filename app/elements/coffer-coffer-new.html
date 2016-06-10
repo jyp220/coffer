@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="coffer-coffer-new">
+  <template>
+
+    <style>
+    </style>
+
+    <paper-input label="name" type="string" value="{{name}}">
+    </paper-input>
+
+    <paper-textarea label="description" type="string" value="{{description}}">
+    </paper-textarea>
+
+    <paper-textarea label="content" value="{{content}}"></paper-textarea>
+    <paper-textarea label="coffer" value="{{coffer}}"></paper-textarea>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-coffer-new',
+
+        properties: {
+          object: {
+            type: Object,
+            value: {},
+            notify: true,
+            computed: '_computeCofferObject(name,description,content,coffer)'
+          }
+        },
+
+        _computeCofferObject(name, description, content, coffer) {
+          return {
+            name: name,
+            description: description,
+            content: content,
+            coffer: coffer
+          }
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

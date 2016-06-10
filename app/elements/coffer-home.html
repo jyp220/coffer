@@ -1,0 +1,136 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/sc-swiper/sc-swiper.html">
+
+<dom-module id="coffer-home">
+
+  <template>
+
+    <style>
+
+      .image-link {
+        outline: none;
+      }
+
+      .image-link > coffer-image::after {
+        display: block;
+        content: '';
+        position: absolute;
+        transition-property: opacity;
+        transition-duration: 0s;
+        transition-delay: 90ms;
+        pointer-events: none;
+        opacity: 0;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        outline: #2196F3 auto 5px;
+        outline: -moz-mac-focusring auto 5px;
+        outline: -webkit-focus-ring-color auto 5px;
+      }
+
+      .image-link:focus > iron-image::after {
+        opacity: 1;
+      }
+
+      .item {
+        display: block;
+        text-decoration: none;
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      paper-card.rate { 
+        @apply(--layout-horizontal); 
+        padding: 20px;
+        border-radius: 8px;
+        background-color: white;
+        border: 1px solid #ddd;
+        max-width: 800px;
+        margin: 16px auto 0 auto;
+      }
+      .rate-image {
+        width: 100px;
+        height: 150px;
+        border-radius: 20px;
+        box-sizing: border-box;
+        background-color: #DDD;
+      }
+      .rate-content {
+        padding: 0 16px;
+        @apply(--layout-flex);
+        float: left;
+      }
+      .rate-header { @apply(--paper-font-headline); }
+      .rate-name { color: var(--paper-grey-600); margin: 10px 0; }
+
+    </style>
+
+    <sc-swiper>
+      <img src="/images/mens_outerwear.jpg">
+      <img src="/images/ladies_outerwear.jpg">
+      <img src="/images/mens_tshirts.jpg">
+    </sc-swiper>
+
+    <template is="dom-repeat" items="[[categories]]" strip-whitespace>
+      <a href$="[[_goLinkTab(item.name)]]">
+        <paper-card class="rate">
+          <iron-image class="rate-image" sizing="contain" src="[[item.image]]"></iron-image>
+          <div class="rate-content">
+            <div class="card-content">
+              <div class="rate-header">[[item.name]]</div>
+              <div class="rate-name">[[item.title]]</div>
+            </div>
+          </div>
+        </paper-card>
+      </a>
+    </template>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-home',
+
+      properties: {
+
+        categories: {
+          type: Array
+        },
+
+        visible: {
+          type: Boolean,
+          observer: '_visibleChanged'
+        }
+
+      },
+
+      _visibleChanged: function(visible) {
+        if (visible) {
+          this.fire('change-section', { title: 'Home' });
+        }
+      },
+
+      _goLinkTab: function(category) {
+        var link = '/home';
+        if(category == 'home') {
+          link = '/home';
+        } else if (category == 'unit') {
+          link = '/unit-list/' + category;
+        } else if (category == 'coffer') {
+          link = '/coffer-list/' + category;
+        } else if (category == 'ladies_tshirts') {
+          link = '/home';
+        }
+        return link;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

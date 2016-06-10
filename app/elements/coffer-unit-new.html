@@ -1,0 +1,76 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+<dom-module id="coffer-unit-new">
+  <template>
+
+    <style>
+    </style>
+
+    <paper-input label="name" type="string" value="{{name}}"></paper-input>
+
+    <paper-textarea label="description" type="string" value="{{description}}"></paper-textarea>
+
+    <paper-dropdown-menu label="group"
+                         value="{{group}}"
+                         vertical-align="top"
+                         horizontal-align="left">
+
+      <paper-menu class="dropdown-content" selected="{{selectedGroup(group)}}">
+        <template is="dom-repeat" items="{{groups}}">
+          <paper-item>{{item.groupTitle}}</paper-item>
+        </template>
+      </paper-menu>
+    </paper-dropdown-menu>
+
+    <paper-textarea label="memo" value="{{memo}}"></paper-textarea>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-unit-new',
+
+        properties: {
+          groups: {
+            notify: true
+          },
+          object: {
+            type: Object,
+            value: {},
+            notify: true,
+            computed: '_computeUnitObject(name,description,group,memo)'
+          }
+        },
+
+        _computeUnitObject(name,description,group,memo) {
+          
+          return {
+            name: name,
+            description: description,
+            group: group,
+            memo: memo
+          }
+        },
+
+        selectedGroup: function(group) {
+          if(!this.groups)
+            return
+
+          for(var i = 0;i < this.groups.length;i++) {
+            if(this.groups[i].groupTitle == group)
+              return i
+          }
+        }
+
+      })
+    })();
+  </script>
+</dom-module>
