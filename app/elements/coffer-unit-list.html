@@ -11,6 +11,8 @@
   <template>
 
     <style>
+      :host{
+      }
       paper-fab {
         position: fixed;
         bottom: 15px;
@@ -21,7 +23,12 @@
         margin-top:9%;
         overflow:hidden;
       }
-
+      header{text-align:right}
+      ul,ol{list-style:none;margin:0;padding:0;}
+      a{text-decoration:none}
+      li:nth-child(even){
+        background-color:rgba(0,0,0,.05);
+      }
     </style>
 
     <!--
@@ -42,7 +49,7 @@
         failure="{{failure}}"></coffer-category-data>
 
     <header>
-      <h1>[[category.title]]</h1>
+      <!-- <h1>[[category.title]]</h1> -->
       <span>[[_getPluralizedQuantity(category.items.length)]]</span>
     </header>
 

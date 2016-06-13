@@ -11,16 +11,6 @@
         @apply(--layout-vertical);
         @apply(--layout-center-justified);
         text-align: center;
-        margin: 0 48px;
-      }
-
-      .title {
-        color: var(--app-primary-color);
-        font-weight: bold;
-      }
-
-      .price {
-        color: var(--app-secondary-color);
       }
 
       @media (max-width: 767px) {
@@ -31,24 +21,48 @@
 
       paper-card.rate { 
         @apply(--layout-horizontal); 
-        padding: 20px;
-        border-radius: 8px;
-        background-color: white;
-        border: 1px solid #ddd;
-        max-width: 800px;
-        margin: 16px auto 0 auto;
       }
       .rate-image {
-        width: 100px;
-        height: 150px;
-        border-radius: 20px;
-        box-sizing: border-box;
-        background-color: #DDD;
+        width: 120px;
+        height: 90px;
+        margin-right:10px;
       }
       .rate-content {
-        padding: 0 16px;
         @apply(--layout-flex);
         float: left;
+      }
+      paper-card{
+        max-width:100%;
+        background-color:transparent;
+        padding:10px 0;
+        border-radius:0px;
+        border:none;
+        box-shadow:none
+      }
+      .card-content{
+        padding:0;
+        text-align:left
+      }
+      .rate-header{
+        font-weight:800;
+        font-size:15px;
+        color:var(--app-primary-color);
+      }
+      .rate-desc{
+        height:40px;
+        overflow:hidden;
+        color:var(--app-primary-text-color);
+      }
+      .rate-info{
+        color:var(--app-primary-text-color);
+        font-size:13px;
+        opacity:.6
+      }
+      .rate-info iron-icon{
+        --iron-icon-width:14px;
+        --iron-icon-height:14px;
+        position:relative;
+        top:-1px;
       }
 
     </style>
@@ -58,7 +72,11 @@
       <div class="rate-content">
         <div class="card-content">
           <div class="rate-header">[[item.title]]</div>
-          <div class="rate-name">[[item.description]]</div>
+          <div class="rate-info">
+            <iron-icon icon="icons:assignment"></iron-icon>[[item.category]]
+            <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
+          </div>
+          <div class="rate-desc">[[item.description]]</div>
         </div>
       </div>
     </paper-card>
