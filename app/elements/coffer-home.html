@@ -94,6 +94,12 @@
       
     </style>
 
+    <coffer-category-data
+      id="categoryData"
+      category-name="unit"
+      category="{{category}}"
+      failure="{{failure}}"></coffer-category-data>
+
     <!-- <sc-swiper>
       <img src="/images/mens_outerwear.jpg">
       <img src="/images/ladies_outerwear.jpg">
@@ -105,7 +111,7 @@
       <a href="#">AMERICAN CLAS..<span>158</span></a>
     </div>
 
-    <template is="dom-repeat" items="[[categories]]" strip-whitespace>
+<!--     <template is="dom-repeat" items="[[categories]]" strip-whitespace>
       <a href$="[[_goLinkTab(item.name)]]">
         <paper-card class="rate">
           <iron-image class="rate-image" sizing="contain" src="[[item.image]]"></iron-image>
@@ -117,7 +123,22 @@
           </div>
         </paper-card>
       </a>
-    </template>
+    </template> -->
+
+    <ul hidden$="[[failure]]">
+      <template is="dom-repeat" items="[[_getListItems(category.items)]]" initial-count="4">
+        <li>
+          <a href$="[[_getItemHref(item)]]"><coffer-unit-list-item item="[[item]]"></coffer-unit-list-item></a>
+        </li>
+      </template>
+
+      <template is="dom-repeat" items="[[unit]]" as="entry">
+        <li>
+          <a href$="[[_getItemHref(entry)]]"><coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item></a>
+        </li>
+        <!-- <p>[[entry]]</p> -->
+      </template>
+    </ul>
 
   </template>
 
@@ -158,6 +179,17 @@
           link = '/home';
         }
         return link;
+      },
+
+      _getListItems: function(items) {
+        // Return placeholder items when the items haven't loaded yet.
+        return items || [{},{},{},{},{},{},{},{},{},{}];
+      },
+
+      _getItemHref: function(item) {
+        // By returning null when `itemId` is undefined, the href attribute won't be set and
+        // the link will be disabled.
+        return item.name ? ['/unit-detail-list', this.category.name, item.name].join('/') : null;
       }
 
     });
