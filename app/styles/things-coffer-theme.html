@@ -10,6 +10,7 @@
     --app-primary50p-color:rgba(208,82,81,.5);
     --app-accent50p-color:rgba(249,187,83,.5);
     color: var(--app-primary-color);
+    --paper-fab-background:var(--app-primary-color);
 
     --things-coffer-title:{
       font-weight:800;
@@ -17,9 +18,20 @@
       color:var(--app-primary-color);
     }
     --things-coffer-desc:{
-      color:var(--app-primary-text-color);
+      opacity:.6;
+      font-weight:400;
       font-size:13px;
-      opacity:.6
+      color:var(--app-primary-text-color);
+    }
+    --things-coffer-fab:{
+      position: fixed;
+      bottom: 15px;
+      right: 16px;
+    }
+    --things-coffer-detail-card:{
+      width:100%;
+      max-height:400px;
+      text-align:center;
     }
   }
 

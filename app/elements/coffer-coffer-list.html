@@ -9,10 +9,8 @@
 <dom-module id="coffer-coffer-list">
 	<template>
 		<style>
-      paper-fab {
-        position: fixed;
-        bottom: 15px;
-        right: 16px;
+      paper-fab{
+        @apply(--things-coffer-fab)
       }
       paper-fullscreen-dialog{
         height:80% !important;
@@ -42,7 +40,8 @@
         @apply(--things-coffer-title)
       }
       .title-name span{
-        @apply(--things-coffer-desc)
+        @apply(--things-coffer-desc);
+        float:right;
       }
     </style>
 
@@ -65,7 +64,7 @@
           <div class="tile__list">
             <div class="tile__name title-name">
               [[group.value.groupTitle]]
-              <span>[[group.value.totalCount]]</span>
+              <span>unit : [[group.value.totalCount]]</span>
             </div>
 						<template is="dom-repeat" items=[[_toImageArray(group.value.unit)]] as="list">
 							<a href$="[[_getItemHref(list.value)]]">

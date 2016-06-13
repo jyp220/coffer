@@ -13,18 +13,23 @@
     <style>
       :host{
       }
-      paper-fab {
-        position: fixed;
-        bottom: 15px;
-        right: 16px;
+      paper-fab{
+        @apply(--things-coffer-fab)
       }
       paper-fullscreen-dialog{
         height:80% !important;
         margin-top:9%;
         overflow:hidden;
       }
-      header{text-align:right}
-      ul,ol{list-style:none;margin:0;padding:0;}
+      header{
+        padding:10px 5px 0 0;
+        text-align:right
+      }
+      ul,ol{
+        list-style:none;
+        margin:0;
+        padding:0;
+      }
       a{text-decoration:none}
       li:nth-child(even){
         background-color:rgba(0,0,0,.05);

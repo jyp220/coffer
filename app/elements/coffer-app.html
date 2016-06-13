@@ -84,6 +84,40 @@
       paper-menu-button paper-icon-button{
         float:right;
       }
+      paper-item{
+        padding:0 5px 0 10px;
+        min-width:120px;
+        font-size:15px;
+        color:var(--app-primary-text-color);
+      }
+      .icon-more{
+        background: url(/images/icon-more.png) 7px 5px no-repeat;
+        text-indent:18px;
+      }
+      .icon-more.createunit{
+        background-position:7px 18px;
+      }
+      .icon-more.createcoffer{
+        background-position:7px -32px;
+      }
+      .icon-more.qrscan{
+        background-position:7px -82px;
+      }
+      .icon-more.search{
+        background-position:7px -132px;
+      }
+      .icon-more.edit{
+        background-position:7px -182px;
+      }
+      .icon-more.delete{
+        background-position:7px -232px;
+      }
+      paper-menu{
+        padding:0;
+      }
+      paper-item[focused]{
+        background-color:#fff;
+      }
 
 
       .left-bar-item {
@@ -210,12 +244,12 @@
           <paper-menu-button class="more-btn">
             <paper-icon-button icon="icons:more-horiz" class="dropdown-trigger"></paper-icon-button>
             <paper-menu class="dropdown-content">
-              <paper-item id="createUnit" on-tap="_moreMenuSelected">Create Unit</paper-item>
-              <paper-item id="creteCoffer" on-tap="_moreMenuSelected">Create Coffer</paper-item>
-              <paper-item id="qrScan" on-tap="_moreMenuSelected">QR Scan</paper-item>
-              <paper-item id="search" on-tap="_moreMenuSelected">Search</paper-item>
-              <paper-item id="edit" on-tap="_moreMenuSelected">Edit</paper-item>
-              <paper-item id="delete" on-tap="_moreMenuSelected">Delete</paper-item>
+              <paper-item id="createUnit" on-tap="_moreMenuSelected" class="icon-more createunit">Create Unit</paper-item>
+              <paper-item id="creteCoffer" on-tap="_moreMenuSelected" class="icon-more createcoffer">Create Coffer</paper-item>
+              <paper-item id="qrScan" on-tap="_moreMenuSelected" class="icon-more qrscan">QR Scan</paper-item>
+              <paper-item id="search" on-tap="_moreMenuSelected" class="icon-more search">Search</paper-item>
+              <paper-item id="edit" on-tap="_moreMenuSelected" class="icon-more edit">Edit</paper-item>
+              <paper-item id="delete" on-tap="_moreMenuSelected" class="icon-more delete">Delete</paper-item>
             </paper-menu>
           </paper-menu-button>
         <!-- </template> -->
