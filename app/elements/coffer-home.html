@@ -32,32 +32,17 @@
         font-size:18px;
         color:var(--app-primary-text-color);
       }
-      
-
-      .image-link {
-        outline: none;
+      ul,ol{
+        list-style:none;
+        margin:0;
+        padding:0;
       }
-
-      .image-link > coffer-image::after {
-        display: block;
-        content: '';
-        position: absolute;
-        transition-property: opacity;
-        transition-duration: 0s;
-        transition-delay: 90ms;
-        pointer-events: none;
-        opacity: 0;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        outline: #2196F3 auto 5px;
-        outline: -moz-mac-focusring auto 5px;
-        outline: -webkit-focus-ring-color auto 5px;
+      ul{margin-top:20px;}
+      a{
+        text-decoration:none
       }
-
-      .image-link:focus > iron-image::after {
-        opacity: 1;
+      li:nth-child(even){
+        background-color:rgba(0,0,0,.05);
       }
 
       .item {

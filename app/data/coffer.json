@@ -2,7 +2,7 @@
   {
     "cofferGroup": [
         {
-            "groupTitle":"A",
+            "groupTitle":"KHAKI FIELD",
             "totalCount":"7",
             "description":"Group A Description",
             "createdAt":"2016-05-31",
@@ -80,7 +80,7 @@
             ]
         },
         {
-            "groupTitle":"B",
+            "groupTitle":"KHAKI AVIATION",
             "totalCount":"13",
             "description":"Group B Description",
             "createdAt":"2016-05-31",
@@ -218,7 +218,7 @@
             ]
         },
         {
-            "groupTitle":"C",
+            "groupTitle":"JAZZMASTER",
             "totalCount":"11",
             "description":"Group C Description",
             "createdAt":"2016-05-31",
@@ -336,7 +336,7 @@
             ]
         },
         {
-            "groupTitle":"D",
+            "groupTitle":"KHAKI NAVY",
             "totalCount":"9",
             "description":"Group D Description",
             "createdAt":"2016-05-31",

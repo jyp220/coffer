@@ -95,6 +95,44 @@
     ]
   },
   {
+    "name":"Hamilton AUTO 40MM",
+    "title":"Hamilton AUTO 40MM",
+    "category":"KHAKI+FIELD",
+    "price":41.60,
+    "description":"Rugged and edgy the Khaki Field Auto line of watches is perfect for the outdoorsmen. Each piece in the line has bold dials with brightly colored indexes and wearers have a choice of leather strap or stainless steel bracelets – each made for working hands. These watches are designed for the adventurous, active wearer.",
+    "image":"/data/images/7.png",
+    "largeImage":"/data/images/10-24102A.jpg",
+    "details":[
+      {
+        "timelineTitle":"test Name 01",
+        "timelineMessage":"test Description 01"
+      },
+      {
+        "timelineTitle":"test Name 01",
+        "timelineMessage":"test Description 01"
+      }
+    ]
+  },
+  {
+    "name":"Hamilton VIEWMATIC SKELETON",
+    "title":"Hamilton VIEWMATIC SKELETON",
+    "category":"JAZZMASTER",
+    "price":45.90,
+    "description":"Black is beautiful – graceful second hand. Sophistication has the upper hand with a flower cut into the mother of pearl dial to reveal the elaborately decorated H-20-S movement. The ultimate statement of brilliance is a diamond-set case comprising 68 gorgeous stones.",
+    "image":"/data/images/8.png",
+    "largeImage":"/data/images/10-25058A.jpg",
+    "details":[
+      {
+        "timelineTitle":"test Name 02",
+        "timelineMessage":"test Description 02"
+      },
+      {
+        "timelineTitle":"test Name 02",
+        "timelineMessage":"test Description 02"
+      }
+    ]
+  },
+  {
     "name":"Ladies+Yerba+Knit+Quarter+Zip",
     "title":"Ladies Yerba Knit Quarter Zip",
     "category":"unit",

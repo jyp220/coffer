@@ -19,7 +19,20 @@
         margin-top:9%;
         overflow:hidden;
       }
-
+      iron-image{
+        width:40%;
+        max-height:200px;
+      }
+      iron-image *{margin:auto;}
+      iron-image::shadow img{
+        max-width:200px;
+        max-height:200px;
+      }
+      ul,ol{list-style:none;margin:0;padding:0;}
+      .tile__list{
+        width:49%;
+        float:left;
+      }
     </style>
 
 		<app-route
@@ -37,15 +50,17 @@
 
 			<template is="dom-repeat" items=[[_getListItems(category.items)]] as="items">
 				<template is="dom-repeat" items=[[_toArray(items.cofferGroup)]] as="group">
-					<div class="tile__list">
+					
+          <div class="tile__list">
+           <div class="tile__name">Coffer Name : [[group.value.groupTitle]]</div>
+            <div class="tile__name">Total Unit : [[group.value.totalCount]]</div>
 						<template is="dom-repeat" items=[[_toImageArray(group.value.unit)]] as="list">
 							<a href$="[[_getItemHref(list.value)]]">
 								<iron-image src="[[list.value.image]]"></iron-image>
 							</a>
 						</template>
 					</div>
-					<div class="tile__name">Coffer Title : [[group.value.groupTitle]]</div>
-					<div class="tile__name">Total Unit : [[group.value.totalCount]]</div>
+					
 				</template>
 			</template>
 
@@ -56,7 +71,7 @@
         <br>
         <br>
 
-        <div class="tile__name">Coffer Title : [[entry.groupTitle]]</div>
+        <div class="tile__name">Coffer Name : [[entry.groupTitle]]</div>
         <div class="tile__name">Total Unit : [[entry.totalCount]]</div>
       </template>
 
