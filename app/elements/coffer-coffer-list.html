@@ -20,7 +20,7 @@
         overflow:hidden;
       }
       iron-image{
-        width:40%;
+        width:48%;
         max-height:200px;
       }
       iron-image *{margin:auto;}
@@ -30,8 +30,15 @@
       }
       ul,ol{list-style:none;margin:0;padding:0;}
       .tile__list{
-        width:49%;
+        width:47%;
+        margin:20px 1% 0 1%;
         float:left;
+      }
+      .title-name{
+        @apply(--things-coffer-title)
+      }
+      .title-name span{
+        @apply(--things-coffer-desc)
       }
     </style>
 
@@ -52,8 +59,10 @@
 				<template is="dom-repeat" items=[[_toArray(items.cofferGroup)]] as="group">
 					
           <div class="tile__list">
-           <div class="tile__name">Coffer Name : [[group.value.groupTitle]]</div>
-            <div class="tile__name">Total Unit : [[group.value.totalCount]]</div>
+            <div class="tile__name title-name">
+              [[group.value.groupTitle]]
+              <span>[[group.value.totalCount]]</span>
+            </div>
 						<template is="dom-repeat" items=[[_toImageArray(group.value.unit)]] as="list">
 							<a href$="[[_getItemHref(list.value)]]">
 								<iron-image src="[[list.value.image]]"></iron-image>
