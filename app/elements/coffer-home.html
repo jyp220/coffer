@@ -89,11 +89,11 @@
       <img src="/images/ladies_outerwear.jpg">
       <img src="/images/mens_tshirts.jpg">
     </sc-swiper> -->
-    <div class="coffer-summary">
+    <!-- <div class="coffer-summary">
       <a href="#">KHAKI FIELD<span>12</span></a>
       <a href="#">JAZZMASTER<span>9</span></a>
       <a href="#">AMERICAN CLAS..<span>158</span></a>
-    </div>
+    </div> -->
 
 <!--     <template is="dom-repeat" items="[[categories]]" strip-whitespace>
       <a href$="[[_goLinkTab(item.name)]]">
@@ -109,7 +109,7 @@
       </a>
     </template> -->
 
-    <ul hidden$="[[failure]]">
+    <!-- <ul hidden$="[[failure]]">
       <template is="dom-repeat" items="[[_getListItems(category.items)]]" initial-count="4">
         <li>
           <a href$="[[_getItemHref(item)]]"><coffer-unit-list-item item="[[item]]"></coffer-unit-list-item></a>
@@ -120,9 +120,19 @@
         <li>
           <a href$="[[_getItemHref(entry)]]"><coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item></a>
         </li>
-        <!-- <p>[[entry]]</p> -->
       </template>
-    </ul>
+    </ul> -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>QR Code</h2>
+            <div id="reader" style="width:300px;height:250px">
+            </div>
+            <h6>Result</h6>
+           <span id="read" class="center"></span>
+           <br>
+       </div>
+   </div>
 
   </template>
 
@@ -147,7 +157,19 @@
 
       _visibleChanged: function(visible) {
         if (visible) {
+          $(document).ready(function () {
+            $('#reader').html5_qrcode(function (data) {
+              alert(data);
+            },
+            function (error) {
+              console.log(error);
+            }, function (videoError) {
+              console.log(videoError);
+            });
+          });
           this.fire('change-section', { title: 'Home' });
+        } else {
+          $('#reader').html5_qrcode_stop();
         }
       },
 

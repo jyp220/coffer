@@ -54,6 +54,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Because this project uses vulcanize this should be your only html import
        in this file. All other imports should go in elements.html -->
   <link rel="import" href="/elements/elements.html">
+  <script type="text/javascript" src="/lib/jquery.js"></script>
+  <script type="text/javascript" src="/lib/html5-qrcode.min.js"></script>
+  <script type="text/javascript" src="/lib/jsqrcode-combined.min.js"></script>
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
   <style>
@@ -79,6 +82,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       overflow: visible;
     }
   </style>
+  <!-- <script type="text/javascript">
+    $(document).ready(function () {
+      $('#reader').html5_qrcode(function (data) {
+        alert(data);
+        $('#reader').html5_qrcode_stop()
+      },
+      function (error) {
+        console.log(error);
+      }, function (videoError) {
+        console.log(videoError);
+      });
+    });
+
+</script> -->
 </head>
 
 <body unresolved>
