@@ -127,6 +127,7 @@
         border:solid 3px #acacac;
       }
       .timeline-item .content{
+
         font-size:15px;
         color:var(--app-primary-text-color);
         line-height:1.3
@@ -138,6 +139,22 @@
       .discard .content strong{color:var(--app-primary-color);}
       .create .timedot span{border-color:#87c833;}
       .create .content strong{color:#87c833;}
+      .timeline-item .content div{
+        float:right;
+        margin:3px 7px 0 0;
+      }
+      .timeline-item .edit{
+        background:url(/images/icon-more.png) 50% -200px no-repeat;
+        width:25px;height:16px;
+        display:block;
+        float:left;
+      }
+      .timeline-item .delete{
+        background:url(/images/icon-more.png) 50% -250px no-repeat;
+        width:25px;height:16px;
+        display:block;
+        float:left;
+      }
     </style>
 
     <!--
@@ -214,9 +231,6 @@
                 <a href="#" class="delete"></a>
               </div>
             </div>
-            <!-- <a href$="[[_getItemHref(testArr, item)]]">
-            Timeline Title: <span>{{testArr.value.timelineTitle}}</span></a>
-            <br> Timeline Message: <span>{{testArr.value.timelineMessage}}</span> -->
           </li>
         </template>
         </ul>
