@@ -5,10 +5,14 @@
 <link rel="import" href="coffer-unit-list-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+<link rel="import" href="../bower_components/things-ajax/things-ajax.html">
+<link rel="import" href="../bower_components/file-upload/file-upload.html">
+<link rel="import" href="../bower_components/things-upload/things-file-upload.html">
+<link rel="import" href="../bower_components/sc-upload/sc-upload.html">
 
 <dom-module id="coffer-unit-list">
 
-  <template>
+  <template id="ap">
 
     <style>
       :host{
@@ -36,47 +40,36 @@
       }
     </style>
 
-    <!--
-      app-route provides the name of the category.
-    -->
     <app-route
         route="[[route]]"
         pattern="/:category"
         data="{{routeData}}"></app-route>
 
-    <!--
-      coffer-category-data provides the category data for a given category name.
-    -->
-    <coffer-category-data
-        id="categoryData"
-        category-name="[[routeData.category]]"
-        category="{{category}}"
-        failure="{{failure}}"></coffer-category-data>
+    <things-ajax
+      auto=""
+      id="get-resource"
+      method="GET"
+      resource-action="index"
+      resource-url="units"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{resource}}">
+    </things-ajax>
 
     <header>
-      <!-- <h1>[[category.title]]</h1> -->
-      <span>[[_getPluralizedQuantity(category.items.length)]]</span>
+      <span>[[_getPluralizedQuantity(resource.items.length)]]</span>
     </header>
 
     <ul hidden$="[[failure]]">
-      <template is="dom-repeat" items="[[_getListItems(category.items)]]" initial-count="4">
-        <li>
-          <a href$="[[_getItemHref(item)]]"><coffer-unit-list-item item="[[item]]"></coffer-unit-list-item></a>
-        </li>
-      </template>
-
-      <template is="dom-repeat" items="[[unit]]" as="entry">
-        <li>
-          <a href$="[[_getItemHref(entry)]]"><coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item></a>
-        </li>
-        <!-- <p>[[entry]]</p> -->
+      <template is="dom-repeat" items="{{resource.items}}" as="unitItem" initial-count="4">
+        <a href$="[[_getItemHref(unitItem)]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
       </template>
 
       <paper-fab noink id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
-        <coffer-unit-new id="new-unit-data" groups="[[_cofferList()]]"></coffer-unit-new>
+        <coffer-unit-new id="new-unit-data" data="true"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -95,16 +88,22 @@
 
         routeData: Object,
 
-        visible: Boolean,
-
-        offline: {
+        visible: {
           type: Boolean,
-          observer: '_offlineChanged'
+          observer: '_visibleChanged'
         },
 
         failure: Boolean,
 
-        unit: Array
+        page: {
+          type: Number,
+          value: 1
+        },
+
+        limit: {
+          type: Number,
+          value: 30
+        }
 
       },
 
@@ -113,19 +112,16 @@
         'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed'
       },
 
-      observers: [
-        '_categoryChanged(category, visible)'
-      ],
-
-      _getListItems: function(items) {
-        // Return placeholder items when the items haven't loaded yet.
-        return items || [{},{},{},{},{},{},{},{},{},{}];
+      _visibleChanged: function(visible) {
+        if (visible) {
+          this.page = 1;
+          this.unitListReload();
+          this.fire('change-section', { title: 'unit' });
+        } 
       },
 
       _getItemHref: function(item) {
-        // By returning null when `itemId` is undefined, the href attribute won't be set and
-        // the link will be disabled.
-        return item.name ? ['/unit-detail-list', this.category.name, item.name].join('/') : null;
+        return item.id ? ['/unit-detail-list', item.id].join('/') : null;
       },
 
       _getPluralizedQuantity: function(quantity) {
@@ -136,42 +132,38 @@
         return  '(' + quantity + ' ' + pluralizedQ + ')';
       },
 
-      _categoryChanged: function(category, visible) {
-        if (visible) {
-          this.debounce('change-section', function() {
-            // Notify the category and the page's title
-            this.fire('change-section', {
-              category: category.name,
-              title: category.title
-            });
-          });
-        }
-      },
-
-      _tryReconnect: function() {
-        this.$.categoryData.refresh();
-      },
-
-      _offlineChanged: function(offline) {
-        if (!offline) {
-          this._tryReconnect();
-        }
-      },
-
       onTapAddUnit: function(e) {
         this.$["new-unit"].open();
       },
 
       createResource: function(data) {
-        this.fire('add-unit-item', {
-          name : data.name,
-          title: data.name,
-          category: this.category.name,
-          description : data.description,
-          group : data.group,
-          image:"/data/images/10-24102B.jpg",
-          largeImage:"/data/images/10-24102A.jpg"
-        });
+        var ajax = this.$['get-resource'];
+        var form = document.querySelector("#unitNewForm");
+        var oData = new FormData(form);
+
+        var result = {
+          'name' : oData.get('name'),
+          'cofferId' : data.cofferId,
+          'content' : oData.get('content'),
+        };
+
+        oData.append('item', JSON.stringify(result));
+        var myRequest = new XMLHttpRequest();
+        myRequest.onreadystatechange = function(){
+          if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+            ajax.generateRequest();
+          } 
+        };
+
+        var setting = document.querySelector('#setting');
+        myRequest.withCredentials = true;
+        myRequest.open('post', setting.get('globals.baseUrl') + '/' + this.route.prefix,true);
+        myRequest.send(oData);
+      },
+
+      unitListReload: function() {
+        var ajax = this.$['get-resource'];
+        ajax.generateRequest();
       },
 
       onNewUnitDialogClosed: function(e) {
@@ -189,12 +181,6 @@
             };
           });
         }
-      },
-
-      _cofferList: function() {
-        var list = [{'groupTitle':'KHAKI_FIELD'},{'groupTitle':'KHAKI_AVIATION'},{'groupTitle':'JAZZMASTER'},{'groupTitle':'KHAKI_NAVY'}];
-
-        return list;
       }
 
     });

@@ -5,6 +5,7 @@
 <link rel="import" href="coffer-unit-list-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+<link rel="import" href="../bower_components/things-ajax/things-ajax.html">
 
 <dom-module id="coffer-coffer-list">
 	<template>
@@ -50,41 +51,36 @@
         pattern="/:category"
         data="{{routeData}}"></app-route>
 
-    <coffer-category-data
-        id="categoryData"
-        category-name="[[routeData.category]]"
-        category="{{category}}"
-        failure="{{failure}}"></coffer-category-data>
+    <things-ajax
+      auto=""
+      id="coffer-search"
+      method="GET"
+      resource-action="index"
+      resource-url="coffers"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{cofferResource}}">
+    </things-ajax>
+
+    <things-ajax
+      id="create-coffer-ajax"
+      resource-action="create"
+      resource-url="[[route.prefix]]">
+    </things-ajax>
 
     <ul hidden$="[[failure]]">
 
-			<template is="dom-repeat" items=[[_getListItems(category.items)]] as="items">
-				<template is="dom-repeat" items=[[_toArray(items.cofferGroup)]] as="group">
-					
+      <template is="dom-repeat" items=[[cofferResource.items]] as="coffer">
+        <a href$="[[_getItemHref(coffer)]]">
           <div class="tile__list">
             <div class="tile__name title-name">
-              [[group.value.groupTitle]]
-              <span>unit : [[group.value.totalCount]]</span>
+              [[coffer.name]]
+              <span>unit : [[coffer.count]]</span>
             </div>
-						<template is="dom-repeat" items=[[_toImageArray(group.value.unit)]] as="list">
-							<a href$="[[_getItemHref(list.value)]]">
-								<iron-image src="[[list.value.image]]"></iron-image>
-							</a>
-						</template>
-					</div>
-					
-				</template>
-			</template>
-
-      <template is="dom-repeat" items="[[coffer]]" as="entry">
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-
-        <div class="tile__name">Coffer Name : [[entry.groupTitle]]</div>
-        <div class="tile__name">Total Unit : [[entry.totalCount]]</div>
+            <iron-image src="[[_imageSrc(coffer.thumbnail_id)]]"></iron-image>
+            <iron-image src="[[_imageSrc(coffer.thumbnail_id_sec)]]"></iron-image>
+          </div>
+        </a>
       </template>
 
       <paper-fab noink id="add-coffer" icon="add" title="add coffer"></paper-fab>
@@ -110,37 +106,43 @@
 
         routeData: Object,
 
-        visible: Boolean,
-
-        offline: {
+        visible: {
           type: Boolean,
-          observer: '_offlineChanged'
+          observer: '_visibleChanged'
         },
 
         failure: Boolean,
 
-        coffer: Array
+        page: {
+          type: Number,
+          value: 1
+        },
+
+        limit: {
+          type: Number,
+          value: 30
+        }
 
       },
 
       listeners: {
         'add-coffer.tap': 'onTapAddCoffer',
-        'new-coffer.iron-overlay-closed': 'onNewCofferDialogClosed'
+        'new-coffer.iron-overlay-closed': 'onNewCofferDialogClosed',
+        'create-coffer-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'create-coffer-ajax.things-ajax-error' : '_handleSaveFailure'
       },
 
-      observers: [
-        '_categoryChanged(category, visible)'
-      ],
-
-      _getListItems: function(items) {
-        // Return placeholder items when the items haven't loaded yet.
-        return items || [{},{},{},{},{},{},{},{},{},{}];
+      _visibleChanged: function(visible) {
+        if (visible) {
+          this.cofferListReload();
+          this.fire('change-section', { title: 'coffer' });
+        } 
       },
 
       _getItemHref: function(item) {
         // By returning null when `itemId` is undefined, the href attribute won't be set and
         // the link will be disabled.
-        return item.name ? ['/coffer-detail-list', this.category.name, item.category, item.cofferGroup].join('/') : null;
+        return item.id ? ['/coffer-detail', item.id].join('/') : null;
       },
 
       _getPluralizedQuantity: function(quantity) {
@@ -149,28 +151,6 @@
         }
         var pluralizedQ = quantity === 1 ? 'item' : 'items';
         return  '(' + quantity + ' ' + pluralizedQ + ')';
-      },
-
-      _categoryChanged: function(category, visible) {
-        if (visible) {
-          this.debounce('change-section', function() {
-            // Notify the category and the page's title
-            this.fire('change-section', {
-              category: category.name,
-              title: category.title
-            });
-          });
-        }
-      },
-
-      _tryReconnect: function() {
-        this.$.categoryData.refresh();
-      },
-
-      _offlineChanged: function(offline) {
-        if (!offline) {
-          this._tryReconnect();
-        }
       },
 
       onTapAddCoffer: function(e) {
@@ -185,39 +165,44 @@
       },
 
       createResource: function(data) {
-        this.fire('add-coffer-item', {
-          groupTitle : data.name,
-          totalCount: data.description,
-          description: data.content,
-          createdAt : data.coffer
-        });
+        var row = {
+          'name' : data.name,
+          'coffer_color' : data.color
+        };
+
+        var ajax = this.$['create-coffer-ajax'];
+        ajax.body = row;
+        ajax.generateRequest();
       },
 
-      _toArray: function(obj) {
-        if(obj != null) {
-          return Object.keys(obj).map(function(key) {
-            return {
-              value: obj[key]
-            };
-          });
-        }
+      cofferListReload: function() {
+        var ajax = this.$['coffer-search'];
+        ajax.generateRequest();
       },
 
-      _toImageArray: function(obj) {
-        var arr = [];
-        if(obj != null) {
-          if(obj.length > 2) {
-            for(var i = 0 ; i < 2 ; i++) {
-              arr.push({value: obj[i]});
+      /**
+       * 저장 성공시 액션
+       *
+       * @param {Object} event
+       */
+      _handleSaveSuccess: function(event) {
+        this.cofferListReload();
+      },
 
-            }
-          } else {
-            for(var i = 0 ; i < obj.length ; i++) {
-              arr.push({value: obj[i]});
-            }
-          }
+      /**
+       * 저장 실패시 액션
+       *
+       * @param {Object} event
+       */
+      _handleSaveFailure: function(event) {
+        alert('fail');
+      },
+
+      _imageSrc: function(thumbnail) {
+        if(thumbnail != null) {
+          var setting = document.querySelector('#setting');
+          return setting.get('globals.baseUrl') + "/download/" + thumbnail
         }
-        return arr;
       }
 
     });

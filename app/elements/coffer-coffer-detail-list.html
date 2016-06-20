@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="coffer-category-data.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="coffer-unit-list-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -24,54 +23,55 @@
 
     </style>
 
-    <!--
-      app-route provides the name of the category.
-    -->
     <app-route
         route="[[route]]"
-        pattern="/:category/:category/:cofferGroup"
+        pattern="/:category"
         data="{{routeData}}"></app-route>
 
-    <!--
-      shop-category-data provides the item data for a given category and item name.
-    -->
-    <coffer-category-data
-        id="categoryData"
-        category-name="[[routeData.category]]"
-        category="{{category}}"
-        item-name="[[routeData.category]]"
-        item="{{item}}"
-        group-name="[[routeData.cofferGroup]]"
-        coffer-group="{{coffer-group}}"
-        failure="{{failure}}"></coffer-category-data>
+    <things-ajax
+      id="coffer-search"
+      method="GET"
+      resource-action="index"
+      resource-url="coffers"
+      query-fields="[[cofferQueryFields]]"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{cofferResource}}">
+    </things-ajax>
+
+    <things-ajax
+      id="unit-search"
+      method="GET"
+      resource-action="index"
+      resource-url="units"
+      query-fields="[[unitQueryFields]]"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{unitResource}}">
+    </things-ajax>
+
 
     <header>
-      <h1>Coffer Title : [[coffer-group.groupTitle]]</h1>
-      <h1>Unit Count : [[coffer-group.totalCount]]</h1>
-      <h1>Coffer Description : [[coffer-group.description]]</h1>
-      <h1>Create Date : [[coffer-group.createdAt]]</h1>
+      <template is="dom-repeat" items="[[cofferResource.items]]">
+        <h1>Coffer Color : [[item.coffer_color]]</h1>
+        <h1>Coffer Title : [[item.name]]</h1>
+        <h1>Unit Count : [[item.count]]</h1>
+        <h1>Create Date : [[item.created_at]]</h1>
+      </template>
     </header>
 
     <ul>
-      <template is="dom-repeat" items="[[_getListItems(coffer-group.items)]]">
+      <template is="dom-repeat" items="[[unitResource.items]]">
         <li>
           <coffer-unit-list-item item="[[item]]"></coffer-unit-list-item>
         </li>
-      </template>
-
-      <template is="dom-repeat" items="[[unit]]" as="entry">
-        <template is="dom-if" if=[[_showGroup(routeData.cofferGroup,entry)]]>
-          <li>
-            <coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item>
-          </li>
-        </template>
       </template>
 
       <paper-fab noink id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
-        <coffer-unit-new id="new-unit-data" groups="[[_cofferList()]]"></coffer-unit-new>
+        <coffer-unit-new id="new-unit-data_coffer"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -84,22 +84,29 @@
 
       properties: {
 
-        category: Object,
-
-        route: Object,
+        route: {
+          type: Object,
+          observer: 'routeChange'
+        },
 
         routeData: Object,
 
-        visible: Boolean,
-
-        offline: {
+        visible: {
           type: Boolean,
-          observer: '_offlineChanged'
+          observer: '_visibleChanged'
         },
 
         failure: Boolean,
 
-        unit: Array
+        page: {
+          type: Number,
+          value: 1
+        },
+
+        limit: {
+          type: Number,
+          value: 30
+        }
 
       },
 
@@ -108,49 +115,37 @@
         'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed'
       },
 
-      observers: [
-        '_categoryChanged(category, visible)'
-      ],
+      routeChange: function(route) {
+        if(route.prefix == '/coffer-detail') {
+          var cofferId = route.path.substr(1);
 
-      _getListItems: function(items) {
-        // Return placeholder items when the items haven't loaded yet.
-        return items || [{},{},{},{},{},{},{},{},{},{}];
-      },
+          if(cofferId != null && cofferId != "") {
+            this.unitQueryFields = [ {
+              name: 'coffer_id',
+              operator: 'eq',
+              value: cofferId
+            } ];
 
-      _getItemHref: function(item) {
-        // By returning null when `itemId` is undefined, the href attribute won't be set and
-        // the link will be disabled.
-        return item.name ? ['/detail', this.category.name, item.name].join('/') : null;
-      },
+            this.unitListReload();
 
-      _getPluralizedQuantity: function(quantity) {
-        if (!quantity) {
-          return '';
+            this.cofferQueryFields = [ {
+              name: 'id',
+              operator: 'eq',
+              value: cofferId
+            } ];
+
+            this.cofferListReload();
+          }
         }
-        var pluralizedQ = quantity === 1 ? 'item' : 'items';
-        return  '(' + quantity + ' ' + pluralizedQ + ')';
       },
 
-      _categoryChanged: function(category, visible) {
+      _visibleChanged: function(visible) {
         if (visible) {
-          this.debounce('change-section', function() {
-            // Notify the category and the page's title
-            this.fire('change-section', {
-              category: category.name,
-              title: category.title
-            });
-          });
-        }
-      },
-
-      _tryReconnect: function() {
-        this.$.categoryData.refresh();
-      },
-
-      _offlineChanged: function(offline) {
-        if (!offline) {
-          this._tryReconnect();
-        }
+          this.page = 1;
+          this.unitListReload();
+          this.cofferListReload();
+          this.fire('change-section', { title: this.routeData.category });
+        } 
       },
 
       onTapAddUnit: function(e) {
@@ -158,36 +153,45 @@
       },
 
       createResource: function(data) {
-        this.fire('add-unit-item', {
-          name : data.name,
-          title: data.name,
-          category: this.category.name,
-          description : data.description,
-          group : data.group,
-          image:"/data/images/10-24102A.jpg",
-          largeImage:"/data/images/10-24102B.jpg"
-        });
+        var ajax = this.$['unit-search'];
+        var form = document.querySelector("#unitNewForm");
+        var oData = new FormData(form);
+
+        var result = {
+          'name' : oData.get('name'),
+          'cofferId' : data.cofferId,
+          'content' : oData.get('content'),
+        };
+
+        oData.append('item', JSON.stringify(result));
+        var myRequest = new XMLHttpRequest();
+        myRequest.onreadystatechange = function(){
+          if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+            ajax.generateRequest();
+          } 
+        };
+
+        var setting = document.querySelector('#setting');
+        myRequest.withCredentials = true;
+        myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
+        myRequest.send(oData);
       },
 
       onNewUnitDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-unit-data'].object);
+        this.createResource(this.$['new-unit-data_coffer'].object);
       },
 
-      _showGroup: function(group, entry) {
-        if(group === entry.group) {
-          return true;
-        } else {
-          return false;
-        }
+      unitListReload: function() {
+        var ajax = this.$['unit-search'];
+        ajax.generateRequest();
       },
 
-      _cofferList: function() {
-        var list = [{'groupTitle':'KHAKI_FIELD'},{'groupTitle':'KHAKI_AVIATION'},{'groupTitle':'JAZZMASTER'},{'groupTitle':'KHAKI_NAVY'}];
-
-        return list;
+      cofferListReload: function() {
+        var ajax = this.$['coffer-search'];
+        ajax.generateRequest();
       }
 
     });

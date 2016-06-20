@@ -78,61 +78,53 @@
       
     </style>
 
-    <coffer-category-data
-      id="categoryData"
-      category-name="unit"
-      category="{{category}}"
-      failure="{{failure}}"></coffer-category-data>
+    <app-route
+        route="[[route]]"
+        pattern="/:category"
+        data="{{routeData}}"></app-route>
 
-    <!-- <sc-swiper>
-      <img src="/images/mens_outerwear.jpg">
-      <img src="/images/ladies_outerwear.jpg">
-      <img src="/images/mens_tshirts.jpg">
-    </sc-swiper> -->
-    <!-- <div class="coffer-summary">
-      <a href="#">KHAKI FIELD<span>12</span></a>
-      <a href="#">JAZZMASTER<span>9</span></a>
-      <a href="#">AMERICAN CLAS..<span>158</span></a>
-    </div> -->
+    <things-ajax
+      auto=""
+      id="get-resource"
+      method="GET"
+      resource-action="index"
+      resource-url="units"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{unitResource}}">
+    </things-ajax>
 
-<!--     <template is="dom-repeat" items="[[categories]]" strip-whitespace>
-      <a href$="[[_goLinkTab(item.name)]]">
-        <paper-card class="rate">
-          <iron-image class="rate-image" sizing="contain" src="[[item.image]]"></iron-image>
-          <div class="rate-content">
-            <div class="card-content">
-              <div class="rate-header">[[item.name]]</div>
-              <div class="rate-name">[[item.title]]</div>
-            </div>
-          </div>
-        </paper-card>
-      </a>
-    </template> -->
+    <things-ajax
+      auto=""
+      id="coffer-search"
+      method="GET"
+      resource-action="index"
+      resource-url="coffers"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{cofferResource}}">
+    </things-ajax>
 
-    <!-- <ul hidden$="[[failure]]">
-      <template is="dom-repeat" items="[[_getListItems(category.items)]]" initial-count="4">
-        <li>
-          <a href$="[[_getItemHref(item)]]"><coffer-unit-list-item item="[[item]]"></coffer-unit-list-item></a>
-        </li>
+
+    <sc-swiper>
+      <template is="dom-repeat" items="[[_showCofferSummary(cofferResource.items)]]" as="coffer">
+        <div class="coffer-summary">
+        <!-- <template is="dom-if" if="[[_cofferSummaryOne(cofferResource.items)]]"> -->
+          <a href$="[[_getItemCofferHref(coffer.coffer_id_one)]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a>
+        <!-- </template> -->
+        <!-- <template is="dom-if" if="[[_cofferSummaryTwo(cofferResource.items)]]"> -->
+          <a href$="[[_getItemCofferHref(coffer.coffer_id_two)]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
+        <!-- </template> -->
+        <!-- <template is="dom-if" if="[[_cofferSummaryThree(cofferResource.items)]]"> -->
+          <a href$="[[_getItemCofferHref(coffer.coffer_id_three)]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a>
+        <!-- </template> -->
+        </div>
       </template>
+    </sc-swiper>
 
-      <template is="dom-repeat" items="[[unit]]" as="entry">
-        <li>
-          <a href$="[[_getItemHref(entry)]]"><coffer-unit-list-item item="[[entry]]"></coffer-unit-list-item></a>
-        </li>
-      </template>
-    </ul> -->
-
-    <div class="row">
-        <div class="col-md-12">
-            <h2>QR Code</h2>
-            <div id="reader" style="width:300px;height:250px">
-            </div>
-            <h6>Result</h6>
-           <span id="read" class="center"></span>
-           <br>
-       </div>
-   </div>
+    <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
+      <a href$="[[_getItemHref(unitItem)]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+    </template>
 
   </template>
 
@@ -151,51 +143,157 @@
         visible: {
           type: Boolean,
           observer: '_visibleChanged'
+        },
+
+        page: {
+          type: Number,
+          value: 1
+        },
+
+        limit: {
+          type: Number,
+          value: 20
         }
 
       },
 
       _visibleChanged: function(visible) {
         if (visible) {
-          $(document).ready(function () {
-            $('#reader').html5_qrcode(function (data) {
-              alert(data);
-            },
-            function (error) {
-              console.log(error);
-            }, function (videoError) {
-              console.log(videoError);
-            });
-          });
+          // var ajax = this.$['coffer-search'];
+          // ajax.generateRequest();
+          
+
+            // $('#reader').html5_qrcode(function (data) {
+            //   console.log(data);
+            //   location.replace("unit-detail-list/unit/Hamilton%20AUTO%2040MM");
+            // },
+            // function (error) {
+            //   // this.location.href("http://localhost:5000/unit-list/unit"); 
+            // }, function (videoError) {
+            //   // console.log(videoError);
+            // });
+          this.unitListReload();
           this.fire('change-section', { title: 'Home' });
         } else {
-          $('#reader').html5_qrcode_stop();
+          // $('#reader').html5_qrcode_stop();
         }
-      },
-
-      _goLinkTab: function(category) {
-        var link = '/home';
-        if(category == 'home') {
-          link = '/home';
-        } else if (category == 'unit') {
-          link = '/unit-list/' + category;
-        } else if (category == 'coffer') {
-          link = '/coffer-list/' + category;
-        } else if (category == 'ladies_tshirts') {
-          link = '/home';
-        }
-        return link;
-      },
-
-      _getListItems: function(items) {
-        // Return placeholder items when the items haven't loaded yet.
-        return items || [{},{},{},{},{},{},{},{},{},{}];
       },
 
       _getItemHref: function(item) {
         // By returning null when `itemId` is undefined, the href attribute won't be set and
         // the link will be disabled.
-        return item.name ? ['/unit-detail-list', this.category.name, item.name].join('/') : null;
+        return item.id ? ['/unit-detail-list', item.id].join('/') : null;
+      },
+
+      _getItemCofferHref: function(id) {
+        // By returning null when `itemId` is undefined, the href attribute won't be set and
+        // the link will be disabled.
+        return id ? ['/coffer-detail', id].join('/') : null;
+      },
+
+      unitListReload: function() {
+        var ajax = this.$['get-resource'];
+        ajax.generateRequest();
+      },
+
+      _imageSrc: function(thumbnail) {
+        if(thumbnail != null) {
+          var setting = document.querySelector('#setting');
+          return setting.get('globals.baseUrl') + "/download/" + thumbnail
+        }
+      },
+
+      _showCofferSummary: function(items) {
+        var arr = [];
+        var obj = {};
+        var cnt = items.length / 3;
+        cnt = parseInt(cnt);
+        var remainder = items.length % 3;
+        remainder = parseInt(remainder);
+
+        if(cnt == 0) {
+          if(remainder == 1) {
+            obj.coffer_id_one = items[i].id;
+            obj.coffer_name_one = items[i].name;
+            obj.coffer_count_one = items[i].count;
+
+            arr.push(obj);
+          } else if(remainder == 2) {
+            obj.coffer_id_one = items[i].id;
+            obj.coffer_name_one = items[i].name;
+            obj.coffer_count_one = items[i].count;
+            obj.coffer_id_two = items[i+1].id;
+            obj.coffer_name_two = items[i+1].name;
+            obj.coffer_count_two = items[i+1].count;
+
+            arr.push(obj);
+          }
+        } else {
+
+          
+
+
+          for(var i = 0 ; i < cnt ; i++) {
+            obj = {};
+            var j = 3*i;
+
+            obj.coffer_id_one = items[j].id;
+            obj.coffer_name_one = items[j].name;
+            obj.coffer_count_one = items[j].count;
+            obj.coffer_id_two = items[j+1].id;
+            obj.coffer_name_two = items[j+1].name;
+            obj.coffer_count_two = items[j+1].count;
+            obj.coffer_id_three = items[j+2].id;
+            obj.coffer_name_three = items[j+2].name;
+            obj.coffer_count_three = items[j+2].count;
+
+            arr.push(obj);
+          }
+          obj = {};
+          if(remainder == 1) {
+            obj.coffer_id_one = items[cnt*3].id;
+            obj.coffer_name_one = items[cnt*3].name;
+            obj.coffer_count_one = items[cnt*3].count;
+
+            arr.push(obj);
+          } else if(remainder == 2) {
+            obj.coffer_id_one = items[cnt*3].id;
+            obj.coffer_name_one = items[cnt*3].name;
+            obj.coffer_count_one = items[cnt*3].count;
+            obj.coffer_id_two = items[cnt*3+1].id;
+            obj.coffer_name_two = items[cnt*3+1].name;
+            obj.coffer_count_two = items[cnt*3+1].count;
+
+            arr.push(obj);
+          }
+        }
+
+        return arr;
+      },
+
+      _cofferSummaryOne: function(items) {
+        if(items.length % 3 == 1) {
+          return true;
+        } else {
+          return true;
+        }
+
+      },
+
+      _cofferSummaryTwo: function(items) {
+        if(items.length % 3 == 2) {
+          return true;
+        } else {
+          return true;
+        }
+      },
+
+      _cofferSummaryThree: function(items) {
+        if(items.length % 3 == 0) {
+          return true;
+        } else {
+          return true;
+        }
       }
 
     });

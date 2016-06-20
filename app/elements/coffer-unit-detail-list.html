@@ -1,7 +1,3 @@
-<link rel="import" href="coffer-category-data.html">
-<link rel="import" href="coffer-unit-localstorage-data.html">
-<link rel="import" href="coffer-timeline-localstorage-data.html">
-
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 
@@ -157,34 +153,47 @@
       }
     </style>
 
-    <!--
-      app-route provides the name of the category and the item.
-    -->
     <app-route
         route="[[route]]"
-        pattern="/:category/:item"
+        pattern="/:category"
         data="{{routeData}}"></app-route>
 
-    <!--
-      shop-category-data provides the item data for a given category and item name.
-    -->
-    <coffer-category-data
-        id="categoryData"
-        category-name="[[routeData.category]]"
-        item-name="[[routeData.item]]"
-        item="{{item}}"
-        failure="{{failure}}"></coffer-category-data>
+    <things-ajax
+      id="unit-search"
+      method="GET"
+      resource-url="units/[[routeData.category]]"
+      last-response="{{unitResource}}">
+    </things-ajax>
 
+    <things-ajax
+      id="timeline-search"
+      method="GET"
+      resource-action="index"
+      resource-url="time_lines"
+      query-fields="[[timelineQueryFields]]"
+      page="[[page]]"
+      limit="[[limit]]"
+      last-response="{{timelineResource}}">
+    </things-ajax>
 
-    <coffer-unit-localstorage-data id="unit" item-name="[[routeData.item]]" unit-item="{{test}}"></coffer-unit-localstorage-data>
-    <coffer-timeline-localstorage-data id="timeline" unit-name="[[routeData.item]]" timeline-arr="{{timelineArr}}"></coffer-timeline-localstorage-data>
+    <things-ajax
+      id="create-timeline-ajax"
+      resource-action="create"
+      resource-url="time_lines">
+    </things-ajax>
+
+    <things-ajax
+      id="delete-timeline-ajax"
+      resource-action="delete"
+      resource-url="time_lines/[[timelineId]]">
+    </things-ajax>
 
     <div id="content">
       <div class="detail">
-        <template is="dom-if" if="{{_showUnit(item)}}">
-          <paper-card heading="Top western road trips" image="[[item.image]]" class="white" elevation="0">
+        <template is="dom-if" if="{{_showUnit(unitResource)}}">
+          <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
             <div class="rate-info">
-             <iron-icon icon="icons:assignment"></iron-icon>[[item.category]]
+             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer_id]]
              <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
             </div>
             <div class="card-actions">
@@ -193,23 +202,8 @@
               <iron-collapse id="moreInfo" style="width:100%;">
                 <div class="description">
                   <h2>Description</h2>
-                  <p>[[item.description]]</p>
+                  <p>[[unitResource.content]]</p>
                   <!-- <p id="desc"></p> -->
-                </div>
-              </iron-collapse>
-            </div>
-          </paper-card>
-        </template>
-
-        <template is="dom-if" if="{{_showUnit(test)}}">
-          <paper-card heading="Top western road trips" image="[[test.image]]" class="white">
-            <div class="card-actions">
-              <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggleLocal" style="float:right;">
-              </paper-icon-button>
-              <iron-collapse id="moreInfoLocal" style="width:100%;">
-                <div class="description">
-                  <h2>Description</h2>
-                  <p>[[test.description]]</p>
                 </div>
               </iron-collapse>
             </div>
@@ -217,32 +211,25 @@
         </template>
         
         <ul>
-        <template is="dom-repeat" items="{{_toArray(item.details)}}" as="testArr">
-          <li class="timeline-item"><!--type : create-생성, discard-폐기, 없음-기본 -->
+        <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
+          <li class="timeline-item"> <!--type : create-생성, discard-폐기, 없음-기본-->
             <div class="timedot">
               <span></span>
-              2016.06.30<br>18:30:00
+              {{timeline.updated_at}}
             </div>
             <div class="content">
-              <strong>{{testArr.value.timelineTitle}}</strong>
-              {{testArr.value.timelineMessage}}
+              <strong>{{timeline.name}}</strong>
+              {{timeline.content}}
               <div>
-                <a href="#" class="edit"></a>
-                <a href="#" class="delete"></a>
+                <paper-button raised class="edit" on-click ="_edit"></paper-button>
+                <paper-button raised name="[[timeline.id]]" class="delete" on-click ="_delete"></paper-button>
               </div>
             </div>
           </li>
         </template>
         </ul>
-
-        <template is="dom-repeat" items="[[_toArray(timelineArr)]]" as="entry">
-          <a href$="[[_getItemHref(entry, item)]]">
-            Timeline Title: <span>{{entry.value.timelineTitle}}</span></a>
-            <br> Timeline Message: <span>{{entry.value.timelineMessage}}</span>
-            <br>
-            <hr>
-        </template>
       </div>
+
       <paper-fab noink id="add-timeline" icon="add" title="add timeline"></paper-fab>
       <paper-fullscreen-dialog id="new-timeline">
         <h2>New Timeline</h2>
@@ -261,81 +248,69 @@
 
       properties: {
 
-        item: Object,
-
-        route: Object,
+        route: {
+          type: Object,
+          observer: 'routeChange'
+        },
 
         routeData: Object,
 
-        visible: Boolean,
-
-        offline: {
+        visible: {
           type: Boolean,
-          observer: '_offlineChanged'
+          observer: '_visibleChanged'
         },
 
         failure: Boolean,
 
-        unit: Array,
+        page: {
+          type: Number,
+          value: 1
+        },
 
-        timeline: Array,
-
-        timelineArr: Array,
-
-        test: Object
+        limit: {
+          type: Number,
+          value: 30
+        }
 
       },
 
       listeners: {
         'add-timeline.tap': 'onTapAddTimeline',
-        'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed'
+        'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed',
+        'create-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'create-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
+        'delete-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure'
       },
 
-      observers: [
-        '_itemChanged(item, visible)'
-      ],
+      routeChange: function(route) {
+        if(route.prefix == '/unit-detail-list') {
+          var unitId = route.path.substr(1);
 
-      attributeChanged: function() {
-        this.$.unit.reload();
-      },
+          if(unitId != null && unitId != "") {
+            this.timelineQueryFields = [ {
+              name: 'unit_id',
+              operator: 'eq',
+              value: unitId
+            } ];
 
-      _itemChanged: function(item, visible) {
-        if (visible) {
-          this.debounce('item-change', function(e) {
-            // var text = item ? item.description : '';
-            // this.$.desc.innerHTML = this._unescapeText(text);
+            var ajax = this.$['timeline-search'];
+            ajax.generateRequest();
 
-            this.fire('change-section', {
-              category: item.category,
-              title: item.title
-            });
-          });
+            this.$['unit-search'].generateRequest();
+          }
         }
+      },
+
+      _visibleChanged: function(visible) {
+        if (visible) {
+          this.page = 1;
+          this.fire('change-section', { title: this.routeData.category });
+        } 
       },
 
       _showUnit: function(item) {
         return item != null;
-      },
-
-      _tryReconnect: function() {
-        this.$.categoryData.refresh();
-      },
-
-      _offlineChanged: function(offline) {
-        if (!offline) {
-          this._tryReconnect();
-        }
-      },
-
-      _toArray: function(obj) {
-        if(obj != null) {
-          return Object.keys(obj).map(function(key) {
-            return {
-              value: obj[key]
-            };
-          });
-        }
-        
       },
 
       _toggle: function(e) {
@@ -346,26 +321,20 @@
         moreInfo.toggle();
       },
 
-      _toggleLocal: function(e) {
-        var moreInfoLocal = e.currentTarget.parentElement.querySelector('iron-collapse');
-        var iconButton = Polymer.dom(event).localTarget;
-        iconButton.icon = moreInfoLocal.opened ? 'hardware:keyboard-arrow-up'
-                                          : 'hardware:keyboard-arrow-down';
-        moreInfoLocal.toggle();
-      },
-
       onTapAddTimeline: function(e) {
         this.$["new-timeline"].open();
       },
 
       createResource: function(data) {
-        var result = {
-          'unitName' : this.routeData.item,
-          'timelineTitle' : data.title,
-          'timelineMessage' : data.message
+        var row = {
+          'name' : data.name,
+          'unit_id' : this.routeData.category,
+          'content' : data.content
         };
-        this.$.timeline.addItem(result);
-        this.timelineArr = this.$.timeline.refresh(this.routeData.item);
+
+        var ajax = this.$['create-timeline-ajax'];
+        ajax.body = row;
+        ajax.generateRequest();
       },
 
       onNewTimelineDialogClosed: function(e) {
@@ -377,7 +346,50 @@
 
       _getItemHref: function(testArr, item) {
         return item.name ? ['/unit-detail', item.category, item.name, testArr.value.testName].join('/') : null;
+      },
+
+      _imageSrc: function(thumbnail) {
+        if(thumbnail != null) {
+          var setting = document.querySelector('#setting');
+          return setting.get('globals.baseUrl') + "/download/" + thumbnail
+        }
+      },
+
+      /**
+       * 저장 성공시 액션
+       *
+       * @param {Object} event
+       */
+      _handleSaveSuccess: function(event) {
+        this.timelineListReload();
+      },
+
+      /**
+       * 저장 실패시 액션
+       *
+       * @param {Object} event
+       */
+      _handleSaveFailure: function(event) {
+        alert('fail');
+      },
+
+      timelineListReload: function() {
+        var ajax = this.$['timeline-search'];
+        ajax.generateRequest();
+      },
+
+      _edit: function(timeline) {
+        console.log(timeline.target.data);
+      },
+
+      _delete: function(timeline) {
+        var ajax = this.$['delete-timeline-ajax'];
+        this.timelineId = timeline.target.name;
+        ajax.generateRequest();
+
+        // this.timelineListReload();
       }
+
     });
 
   </script>

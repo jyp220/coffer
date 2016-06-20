@@ -61,15 +61,15 @@
     </style>
 
     <paper-card class="rate">
-      <iron-image class="rate-image" sizing="contain" src="[[item.image]]" alt="[[item.title]]"></iron-image>
+      <iron-image class="rate-image" sizing="contain" src="[[_imageSrc(item.thumbnail_id)]]"></iron-image>
       <div class="rate-content">
         <div class="card-content">
-          <div class="rate-header">[[item.title]]</div>
+          <div class="rate-header">[[item.name]]</div>
           <div class="rate-info">
-            <iron-icon icon="icons:assignment"></iron-icon>[[item.category]]
+            <iron-icon icon="icons:assignment"></iron-icon>[[item.coffer_id]]
             <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
           </div>
-          <div class="rate-desc">[[item.description]]</div>
+          <div class="rate-desc">[[item.content]]</div>
         </div>
       </div>
     </paper-card>
@@ -84,12 +84,17 @@
 
       properties: {
 
+        baseUrl: String,
+
         item: Object
 
       },
 
-      _formatPrice: function(price) {
-        return price ? '$' + price.toFixed(2) : '';
+      _imageSrc: function(thumbnail) {
+        if(thumbnail != null) {
+          var setting = document.querySelector('#setting');
+          return setting.get('globals.baseUrl') + "/download/" + thumbnail
+        }
       }
 
     });

@@ -192,12 +192,18 @@
           display: block;
         }
 
-        :host([page=unit-detail-list]) .menu-btn,:host([page=unit-detail]) .menu-btn,:host([page=coffer-list]) .menu-btn {
+        :host([page=unit-detail-list]) .menu-btn,:host([page=unit-detail]) .menu-btn,:host([page=coffers]) .menu-btn {
           display: none;
         }
       }
 
     </style>
+
+    <things-ajax
+      id="create-coffer-ajax"
+      resource-action="create"
+      resource-url="coffers">
+    </things-ajax>
 
     <app-location route="{{route}}"></app-location>
     <app-route
@@ -208,19 +214,38 @@
 
     <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
     <coffer-category-data categories="{{categories}}"></coffer-category-data>
-    <coffer-unit-localstorage-data id="unit" unit="{{unit}}"></coffer-unit-localstorage-data>
-    <coffer-coffer-localstorage-data id="coffer" coffer="{{coffer}}"></coffer-coffer-localstorage-data>
-    <coffer-timeline-localstorage-data id="timeline" timeline="{{timeline}}"></coffer-timeline-localstorage-data>
+    <things-setting id="setting" hidden></things-setting>  
+    <script type="text/javascript">
+      var app = document.querySelector('#content');
+      var setting = document.querySelector('#setting');
+
+      window.addEventListener('WebComponentsReady', function() {
+          if (setting){
+            setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+          }
+      });
+    </script>
+
+    <iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+      <things-login 
+        name="login"
+        data-route="login"
+        route ="{{route}}"
+        title="Things"
+        login-path="login"
+        content-type="application/x-www-form-urlencoded"
+        success-route="/"
+        username-input-label="ID"
+        password-input-label="Password"
+        submit-label = "sign_up"
+        Reset-label = "Reset">
+        <img avatar src="https://maps.gstatic.com/tactile/pane/default_geocode-1x.png"/>
+      </things-login>
+    </iron-pages>
 
     <app-header role="navigation" id="header" effects="waterfall" condenses reveals>
       <app-toolbar>
         <div class="left-bar-item">
-          <!-- <paper-icon-button
-              class="menu-btn"
-              icon="menu"
-              on-tap="_toggleDrawer"
-              aria-label="Categories">
-          </paper-icon-button> -->
           <template is="dom-if" if="{{_showBtn(page)}}">
             <paper-icon-button icon="arrow-back" aria-label="Go back" on-tap="_goBack"></paper-icon-button>
           </template>
@@ -228,11 +253,10 @@
         <div class="logo" title><a href="/" aria-label="coffer App Home">Things Coffer</a></div>
       </app-toolbar>
 
-      <!-- Lazy-create the tabs for larger screen sizes. -->
-      <div id="tabContainer">
-        <!-- <template is="dom-if" if="[[_shouldRenderTabs]]"> -->
+      <template is="dom-if" if="{{_showLogin(page)}}">
+        <div id="tabContainer">
           <coffer-tabs
-            selected="[[categoryName]]"
+            selected="[[routeData.page]]"
             attr-for-selected="name">
             <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
               <coffer-tab name="[[category.name]]">
@@ -252,49 +276,31 @@
               <paper-item id="delete" on-tap="_moreMenuSelected" class="icon-more delete">Delete</paper-item>
             </paper-menu>
           </paper-menu-button>
-        <!-- </template> -->
-      </div>
+        </div>
+      </template>
     </app-header>
 
-    <template is="dom-if" if="[[_shouldRenderDrawer]]">
-      <app-drawer opened="{{drawerOpened}}" swipe-open tabindex="0">
-        <iron-selector role="navigation" class="drawer-list" selected="[[categoryName]]" attr-for-selected="name">
-          <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
-            <a name="[[category.name]]" href="[[_goLinkTab(category.name)]]">[[category.title]]</a>
-          </template>
-        </iron-selector>
-      </app-drawer>
-    </template>
-
     <iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-      <!-- home view -->
       <coffer-home name="home" categories="[[categories]]"></coffer-home>
-      <!-- list view of items in a category -->
-      <coffer-unit-list name="unit-list" route="[[subroute]]" offline="[[offline]]" unit="[[unit]]"></coffer-unit-list>
-      <!-- detail view of one item -->
-      <coffer-unit-detail-list name="unit-detail-list" route="[[subroute]]" offline="[[offline]]" unit="[[unit]]" timeline="[[timeline]]"></coffer-unit-detail-list>
+      <coffer-unit-list name="units" route="[[subroute]]" offline="[[offline]]"></coffer-unit-list>
+      <coffer-unit-detail-list name="unit-detail-list" route="[[subroute]]" offline="[[offline]]"></coffer-unit-detail-list>
       <coffer-unit-detail name="unit-detail" route="[[subroute]]" offline="[[offline]]"></coffer-unit-detail>
-      <coffer-coffer-list name="coffer-list" route="[[subroute]]" offline="[[offline]]" coffer="[[coffer]]"></coffer-coffer-list>
-      <coffer-coffer-detail-list name="coffer-detail-list" route="[[subroute]]" offline="[[offline]]" unit="[[unit]]"></coffer-coffer-detail-list>
+      <coffer-coffer-list name="coffers" route="[[subroute]]" offline="[[offline]]"></coffer-coffer-list>
+      <coffer-coffer-detail-list name="coffer-detail" route="[[subroute]]" offline="[[offline]]"></coffer-coffer-detail-list>
     </iron-pages>
 
     <paper-fullscreen-dialog id="new-unit">
       <h2>New Unit</h2>
       <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
-      <coffer-unit-new id="new-unit-data" groups="[[_cofferList()]]"></coffer-unit-new>
+      <coffer-unit-new id="new-unit-data_app"></coffer-unit-new>
     </paper-fullscreen-dialog>
 
     <paper-fullscreen-dialog id="new-coffer">
       <h2>New Coffer</h2>
       <paper-button id="create-coffer" affirmative dialog-confirm>create</paper-button>
-      <coffer-coffer-new id="new-coffer-data"></coffer-coffer-new>
+      <coffer-coffer-new id="new-coffer-data_app"></coffer-coffer-new>
     </paper-fullscreen-dialog>
 
-    <footer>
-      <a href="https://www.polymer-project.org/1.0/toolbox/">footer</a>
-    </footer>
-
-    <!-- a11y announcer -->
     <div class="announcer" aria-live="assertive">[[_a11yLabel]]</div>
 
   </template>
@@ -305,6 +311,11 @@
       is: 'coffer-app',
 
       properties: {
+
+        loginYN: {
+          type: Boolean,
+          value: false
+        },
 
         page: {
           type: String,
@@ -330,9 +341,6 @@
       ],
 
       listeners: {
-        'add-unit-item': '_onAddUnitItem',
-        'add-coffer-item': '_onAddCofferItem',
-        'add-timeline-item': '_onAddTimelineItem',
         'change-section': '_onChangeSection',
         'announce': '_onAnnounce',
         'dom-change': '_domChange',
@@ -342,12 +350,10 @@
 
       created: function() {
         window.performance && performance.mark && performance.mark('coffer-app.created');
-        // Custom elements polyfill safe way to indicate an element has been upgraded.
         this.removeAttribute('unresolved');
       },
 
       ready: function() {
-        // listen for online/offline
         Polymer.RenderStatus.afterNextRender(this, function() {
           this.listen(window, 'online', '_notifyNetworkStatus');
           this.listen(window, 'offline', '_notifyNetworkStatus');
@@ -355,26 +361,22 @@
       },
 
       _routePageChanged: function(page) {
-        this.page = page || 'home';
-        // Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
-        // with `behavior: 'silent'` to disable header scroll effects during the scroll.
-        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
-        // Close the drawer - in case the *route* change came from a link in the drawer.
-        this.drawerOpened = false;
+        if(page == '') page = 'home';
+        this.page = page;
+        // Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+        this.page = page;
       },
 
       _pageChanged: function(page, oldPage) {
         if (page != null) {
-          // home route is eagerly loaded
           if (page == 'home') {
             this._pageLoaded(Boolean(oldPage));
-          // other routes are lazy loaded
           } else {
-            this.importHref(
-              this.resolveUrl('coffer-' + page),
-              function() {
-                this._pageLoaded(Boolean(oldPage));
-              }, null, true);
+            // this.importHref(
+            //   this.resolveUrl('coffer-' + page),
+            //   function() {
+            //     this._pageLoaded(Boolean(oldPage));
+            //   }, null, true);
           }
         }
       },
@@ -382,8 +384,6 @@
       _pageLoaded: function(shouldResetLayout) {
         this._ensureLazyLoaded();
         if (shouldResetLayout) {
-          // The size of the header depends on the page (e.g. on some pages the tabs
-          // do not appear), so reset the header's layout only when switching pages.
           this.async(function() {
             this.$.header.resetLayout();
           }, 1);
@@ -391,17 +391,8 @@
       },
 
       _ensureLazyLoaded: function() {
-        // load lazy resources after render and set `loadComplete` when done.
         if (!this.loadComplete) {
           Polymer.RenderStatus.afterNextRender(this, function() {
-            // this.importHref(this.resolveUrl('lazy-resources.html'), function() {
-            //   // Register service worker if supported.
-            //   // if ('serviceWorker' in navigator) {
-            //   //   navigator.serviceWorker.register('/service-worker.js');
-            //   // }
-            //   this._notifyNetworkStatus();
-            //   this.loadComplete = true;
-            // });
             this._notifyNetworkStatus();
             this.loadComplete = true;
           });
@@ -411,8 +402,6 @@
       _notifyNetworkStatus: function() {
         var oldOffline = this.offline;
         this.offline =  !navigator.onLine;
-        // Show the snackbar if the user is offline when starting a new session
-        // or if the network status changed.
         if (this.offline || (!this.offline && oldOffline === true)) {
           if (!this._networkSnackbar) {
             this._networkSnackbar = document.createElement('coffer-snackbar');
@@ -424,28 +413,19 @@
         }
       },
 
-      _toggleDrawer: function() {
-        this.drawerOpened = !this.drawerOpened;
-      },
-
-      // Elements in the app can notify section changes.
-      // Response by a11y announcing the section and syncronizing the category.
       _onChangeSection: function(event) {
         var detail = event.detail;
         this.categoryName = detail.category || '';
-        // Announce the page's title
         if (detail.title) {
           document.title = detail.title + ' - COFFER';
           this._announce(detail.title + ', loaded');
         }
       },
 
-      // Elements in the app can notify a change to be a11y announced.
       _onAnnounce: function(e) {
         this._announce(e.detail);
       },
       
-      // A11y announce the given message.
       _announce: function(message) {
         this._a11yLabel = '';
         this.debounce('_a11yAnnouncer', function() {
@@ -453,7 +433,6 @@
         }, 100);
       },
 
-      // This is for performance logging only.
       _domChange: function(e) {
         if (window.performance && performance.mark && !this.__loggedDomChange) {
           var target = Polymer.dom(e).rootTarget;
@@ -465,7 +444,7 @@
       },
 
       _computeShouldShowTabs: function(page, smallScreen) {
-        return (page === 'home' || page === 'unit-list' || page === 'unit-detail-list' || page === 'unit-detail' || page === 'coffer-list' || page === 'coffer-detail-list') && !smallScreen;
+        return (page === 'home' || page === 'units' || page === 'unit-detail-list' || page === 'unit-detail' || page === 'coffers' || page === 'coffer-detail-list') && !smallScreen;
       },
 
       _computeShouldRenderTabs: function(_shouldShowTabs, loadComplete) {
@@ -481,7 +460,7 @@
       },
 
       _showBtn: function(page) {
-        if(page === 'home' || page === 'unit-list' || page === 'coffer-list')
+        if(page === 'home' || page === 'units' || page === 'coffers')
           return false;
         else
           return true;
@@ -496,28 +475,11 @@
         if(category == 'home') {
           link = '/home';
         } else if (category == 'unit') {
-          link = '/unit-list/' + category;
+          link = '/units';
         } else if (category == 'coffer') {
-          link = '/coffer-list/' + category;
-        } else if (category == 'ladies_tshirts') {
-          link = '/home';
-        }
+          link = '/coffers';
+        } 
         return link;
-      },
-
-      _onAddUnitItem: function(event) {
-        this.$.unit.addItem(event.detail);
-        this._announce('Create Unit');
-      },
-
-      _onAddCofferItem: function(event) {
-        this.$.coffer.addItem(event.detail);
-        this._announce('Create Coffer');
-      },
-
-      _onAddTimelineItem: function(event) {
-        this.$.timeline.addItem(event.detail);
-        this._announce('Create Timeline');
       },
 
       _moreMenuSelected: function(e) {
@@ -526,7 +488,7 @@
         }else if(e.target.id === 'creteCoffer') {
           this.$["new-coffer"].open();
         }else if(e.target.id === 'qrScan') {
-          
+          // startScan();
         }else if(e.target.id === 'search') {
           
         }else if(e.target.id === 'edit') {
@@ -536,39 +498,46 @@
         }
       },
 
-      _cofferList: function() {
-        var list = [{'groupTitle':'KHAKI_FIELD'},{'groupTitle':'KHAKI_AVIATION'},{'groupTitle':'JAZZMASTER'},{'groupTitle':'KHAKI_NAVY'}];
-
-        return list;
-      },
-
       onNewUnitDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-unit-data'].object, 'unit');
+        this.createResource(this.$['new-unit-data_app'].object, 'unit');
       },
 
       createResource: function(data, category) {
         if(category === 'unit') {
+          // var ajax = this.$['get-resource'];
+          var form = document.querySelector("#unitNewForm");
+          var oData = new FormData(form);
+
           var result = {
-            'name' : data.name,
-            'title': data.name,
-            'category': 'unit',
-            'description' : data.description,
-            'group' : data.group,
-            'image':"/data/images/10-24102B.jpg",
-            'largeImage':"/data/images/10-24102A.jpg"
+            'name' : oData.get('name'),
+            'cofferId' : data.cofferId,
+            'content' : oData.get('content'),
           };
-          this.$.unit.addItem(result);
+
+          oData.append('item', JSON.stringify(result));
+          var myRequest = new XMLHttpRequest();
+          myRequest.onreadystatechange = function(){
+            if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+              // ajax.generateRequest();
+            } 
+          };
+
+          var setting = document.querySelector('#setting');
+          myRequest.withCredentials = true;
+          myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
+          myRequest.send(oData);
         } else if(category === 'coffer') {
-          var result = {
-            'groupTitle' : data.name,
-            'totalCount': data.description,
-            'description': data.content,
-            'createdAt' : data.coffer
+          var row = {
+            'name' : data.name,
+            'coffer_color' : data.color
           };
-          this.$.coffer.addItem(result);
+
+          var ajax = this.$['create-coffer-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
         }
       },
 
@@ -576,7 +545,15 @@
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-coffer-data'].object, 'coffer');
+        this.createResource(this.$['new-coffer-data_app'].object, 'coffer');
+      },
+
+      _showLogin: function(page) {
+        if(page === 'login') {
+          return false;
+        } else {
+          return true;
+        }
       }
 
     });

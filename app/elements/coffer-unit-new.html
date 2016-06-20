@@ -5,6 +5,9 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/sc-upload/sc-upload.html">
+<link rel="import" href="../bower_components/sc-thumbnail/sc-thumbnail.html">
 
 <dom-module id="coffer-unit-new">
   <template>
@@ -12,23 +15,32 @@
     <style>
     </style>
 
-    <paper-input label="name" type="string" value="{{name}}"></paper-input>
+    <things-ajax
+      auto
+      id="get-resource"
+      method="GET"
+      resource-url="coffers"
+      last-response="{{cofferResource}}">
+    </things-ajax>
 
-    <paper-textarea label="description" type="string" value="{{description}}"></paper-textarea>
 
-    <paper-dropdown-menu label="group"
+    <form is="iron-form" id="unitNewForm" method="post" enctype="multipart/form-data">
+      <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
+      <paper-textarea name="content" label="description" type="string" value="{{description}}"></paper-textarea>
+      <paper-dropdown-menu label="group" name="group" 
                          value="{{group}}"
                          vertical-align="top"
                          horizontal-align="left">
 
-      <paper-menu class="dropdown-content" selected="{{selectedGroup(group)}}">
-        <template is="dom-repeat" items="{{groups}}">
-          <paper-item>{{item.groupTitle}}</paper-item>
-        </template>
-      </paper-menu>
-    </paper-dropdown-menu>
+        <paper-menu class="dropdown-content" selected="{{selectedGroup(group)}}">
+          <template is="dom-repeat" items="{{cofferResource.items}}">
+            <paper-item>{{item.name}}</paper-item>
+          </template>
+        </paper-menu>
+      </paper-dropdown-menu>
 
-    <paper-textarea label="memo" value="{{memo}}"></paper-textarea>
+      <paper-input name="file" label="file" type="file" value="{{file}}"></paper-input>
+    </form>
   </template>
 
   <script>
@@ -39,34 +51,50 @@
         is: 'coffer-unit-new',
 
         properties: {
-          groups: {
-            notify: true
+          cofferResource: Object,
+
+          cofferId: String,
+
+          data: {
+            type: Boolean,
+            observer: '_visibleChanged'
           },
+
           object: {
             type: Object,
             value: {},
             notify: true,
-            computed: '_computeUnitObject(name,description,group,memo)'
+            computed: '_computeUnitObject(name,description,group,file,cofferId)'
           }
         },
 
-        _computeUnitObject(name,description,group,memo) {
-          
+        _visibleChanged: function(data) {
+          console.log(data);
+        },
+
+        _computeUnitObject(name,description,group,file,cofferId) {
+          var form = this.$.unitNewForm;
+          var oData = new FormData(form);
+
           return {
             name: name,
             description: description,
             group: group,
-            memo: memo
+            file: file,
+            cofferId: cofferId,
+            oData: oData
           }
         },
 
         selectedGroup: function(group) {
-          if(!this.groups)
+          if(!this.cofferResource)
             return
 
-          for(var i = 0;i < this.groups.length;i++) {
-            if(this.groups[i].groupTitle == group)
-              return i
+          for(var i = 0;i < this.cofferResource.items.length;i++) {
+            if(this.cofferResource.items[i].name == group) {
+              this.cofferId = this.cofferResource.items[i].id;
+              return this.cofferResource.items[i].id;
+            }
           }
         }
 

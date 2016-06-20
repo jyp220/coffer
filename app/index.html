@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="theme-color" content="#2E3AA1">
 
   <!-- Web Application Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/manifest.json">
 
   <!-- Tile color for Win8 -->
   <meta name="msapplication-TileColor" content="#3372DF">
@@ -55,7 +55,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        in this file. All other imports should go in elements.html -->
   <link rel="import" href="/elements/elements.html">
   <script type="text/javascript" src="/lib/jquery.js"></script>
-  <script type="text/javascript" src="/lib/html5-qrcode.min.js"></script>
+  <script type="text/javascript" src="/lib/html5-qrcode.js"></script>
   <script type="text/javascript" src="/lib/jsqrcode-combined.min.js"></script>
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
@@ -103,14 +103,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <span id="browser-sync-binding"></span>
   <!-- endbuild -->
 
-  <!-- <template is="dom-bind" id="app"> -->
+  <template is="dom-bind" id="app">
     <coffer-app unresolved></coffer-app>
-  <!-- </template> -->
+  </template>
 
-  <!-- build:js scripts/app.js -->
-  <!-- <script src="/scripts/app.js"></script> -->
-  
-  <!-- endbuild-->
+
+  <script src="/bower_components/page/page.js"></script>
+
+  <!-- <script src="scripts/app.js"></script>
+  <script src="cordova.js"></script> -->
 </body>
 
 </html>

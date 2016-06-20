@@ -9,10 +9,10 @@
     <style>
     </style>
 
-    <paper-input label="title" type="string" value="{{title}}">
+    <paper-input label="name" type="string" value="{{name}}">
     </paper-input>
 
-    <paper-textarea label="message" type="string" value="{{message}}">
+    <paper-textarea label="content" type="string" value="{{content}}">
     </paper-textarea>
   </template>
 
@@ -28,14 +28,14 @@
             type: Object,
             value: {},
             notify: true,
-            computed: '_computeTimelineObject(title,message)'
+            computed: '_computeTimelineObject(name,content)'
           }
         },
 
-        _computeTimelineObject(title, message) {
+        _computeTimelineObject(name, content) {
           return {
-            title: title,
-            message: message
+            name: name,
+            content: content
           }
         }
       });
