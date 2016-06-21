@@ -281,6 +281,8 @@
     </app-header>
 
     <iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+    [[page]]
+      [[subroute.path]]
       <coffer-home name="home" categories="[[categories]]"></coffer-home>
       <coffer-unit-list name="units" route="[[subroute]]" offline="[[offline]]"></coffer-unit-list>
       <coffer-unit-detail-list name="unit-detail-list" route="[[subroute]]" offline="[[offline]]"></coffer-unit-detail-list>
@@ -474,9 +476,9 @@
         var link = '/home';
         if(category == 'home') {
           link = '/home';
-        } else if (category == 'unit') {
+        } else if (category == 'units') {
           link = '/units';
-        } else if (category == 'coffer') {
+        } else if (category == 'coffers') {
           link = '/coffers';
         } 
         return link;
