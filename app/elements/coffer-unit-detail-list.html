@@ -193,7 +193,7 @@
         <template is="dom-if" if="{{_showUnit(unitResource)}}">
           <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
             <div class="rate-info">
-             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer_id]]
+             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
              <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
             </div>
             <div class="card-actions">

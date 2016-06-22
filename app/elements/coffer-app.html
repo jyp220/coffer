@@ -214,17 +214,7 @@
 
     <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
     <coffer-category-data categories="{{categories}}"></coffer-category-data>
-    <things-setting id="setting" hidden></things-setting>  
-    <script type="text/javascript">
-      var app = document.querySelector('#content');
-      var setting = document.querySelector('#setting');
-
-      window.addEventListener('WebComponentsReady', function() {
-          if (setting){
-            setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
-          }
-      });
-    </script>
+    
 
     <iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
       <things-login 
@@ -281,8 +271,6 @@
     </app-header>
 
     <iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-    [[page]]
-      [[subroute.path]]
       <coffer-home name="home" categories="[[categories]]"></coffer-home>
       <coffer-unit-list name="units" route="[[subroute]]" offline="[[offline]]"></coffer-unit-list>
       <coffer-unit-detail-list name="unit-detail-list" route="[[subroute]]" offline="[[offline]]"></coffer-unit-detail-list>
@@ -490,13 +478,13 @@
         }else if(e.target.id === 'creteCoffer') {
           this.$["new-coffer"].open();
         }else if(e.target.id === 'qrScan') {
-          // startScan();
+          startScan();
         }else if(e.target.id === 'search') {
-          
+          startScan();
         }else if(e.target.id === 'edit') {
-          
+          startScan();
         }else if(e.target.id === 'delete') {
-          
+          startScan();
         }
       },
 
@@ -561,5 +549,7 @@
     });
 
   </script>
+  <!-- <script src="../scripts/app.js"></script>
+  <script src="../scripts/cordova.js"></script> -->
 
 </dom-module>

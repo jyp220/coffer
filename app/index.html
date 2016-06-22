@@ -96,6 +96,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
 </script> -->
+<base href="/"></base>
 </head>
 
 <body unresolved>
@@ -104,6 +105,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- endbuild -->
 
   <template is="dom-bind" id="app">
+    <things-setting id="setting" hidden></things-setting>  
+    <script type="text/javascript">
+      var app = document.querySelector('#content');
+      var setting = document.querySelector('#setting');
+
+      window.addEventListener('WebComponentsReady', function() {
+          if (setting){
+            setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+          }
+      });
+    </script>
     <coffer-app unresolved></coffer-app>
   </template>
 
@@ -111,7 +123,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="/bower_components/page/page.js"></script>
 
   <!-- <script src="scripts/app.js"></script>
-  <script src="cordova.js"></script> -->
+  <script src="scripts/cordova.js"></script> -->
 </body>
 
 </html>
