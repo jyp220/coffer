@@ -45,7 +45,8 @@
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.1",
     "sc-swiper": "*",
     "things-elements": "ThingsElements/things-elements",
-    "app-router": "^2.6.1"
+    "app-router": "^2.6.1",
+    "linkedin-signin": "^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "4.0.0"

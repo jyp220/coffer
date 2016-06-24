@@ -9,7 +9,7 @@
 
 <dom-module id="coffer-coffer-list">
 	<template>
-		<style>
+    <style>
       paper-fab{
         @apply(--things-coffer-fab)
       }
@@ -46,32 +46,18 @@
       }
     </style>
 
-		<!-- <app-route
-        route="[[route]]"
-        pattern="/:category"
-        data="{{routeData}}"></app-route> -->
+    
 
-    <things-ajax
-      auto=""
-      id="coffer-search"
-      method="GET"
-      resource-action="index"
-      resource-url="coffers"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{cofferResource}}">
+    <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
-    <things-ajax
-      id="create-coffer-ajax"
-      resource-action="create"
-      resource-url="[[route.prefix]]">
+    <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="[[route.prefix]]">
     </things-ajax>
 
     <ul hidden$="[[failure]]">
 
-      <template is="dom-repeat" items=[[cofferResource.items]] as="coffer">
-        <a href$="[[_getItemHref(coffer)]]">
+      <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
+        <a href="#" on-click="_clickCoffer" name="[[coffer.id]]">
           <div class="tile__list">
             <div class="tile__name title-name">
               [[coffer.name]]
@@ -83,16 +69,16 @@
         </a>
       </template>
 
-      <paper-fab noink id="add-coffer" icon="add" title="add coffer"></paper-fab>
+      <paper-fab noink="" id="add-coffer" icon="add" title="add coffer"></paper-fab>
       <paper-fullscreen-dialog id="new-coffer">
         <h2>New Coffer</h2>
-        <paper-button id="create-coffer" affirmative dialog-confirm>create</paper-button>
+        <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-coffer-new id="new-coffer-data"></coffer-coffer-new>
       </paper-fullscreen-dialog>
     </ul>
-	</template>
+  </template>
 
-	<script>
+  <script>
 
     Polymer({
 
@@ -133,6 +119,7 @@
       },
 
       _visibleChanged: function(visible) {
+        // alert('coffers : ' + visible);
         if (visible) {
           this.cofferListReload();
           this.fire('change-section', { title: 'coffer' });
@@ -203,6 +190,12 @@
           var setting = document.querySelector('#setting');
           return setting.get('globals.baseUrl') + "/download/" + thumbnail
         }
+      },
+
+      _clickCoffer: function(e) {
+        // alert(e.currentTarget.name);
+        document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.currentTarget.name;
+        document.querySelector("coffer-app").page = 'coffer-coffer-detail-list';
       }
 
     });

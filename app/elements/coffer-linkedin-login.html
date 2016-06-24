@@ -1,0 +1,80 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="coffer-linkedin-login">
+  <template>
+
+    <style>
+      .input {
+        margin-bottom: 20px;
+      }
+      .init-hint {
+        color: red;
+        margin-top: 20px;
+      }
+    </style>
+
+    <template is="dom-if" if="[[initialized]]">
+      <h4>Standard LinkedIn button</h4>
+      <div class="vertical-section">
+        <linkedin-signin
+          id="signin"
+          client-id="[[key]]"
+          fields="[[fields]]"
+          authorize="[[authorize]]"
+          lang="[[lang]]"
+          signed-in="{{signedIn}}"
+          button-ready="{{buttonReady}}"
+          person="{{person}}"
+          error="{{error}}"
+          o-auth-data="{{oAuthData}}">
+        </linkedin-signin>
+        <template is="dom-if" if="[[signedIn]]">
+          <img src$="[[person.pictureUrl]]">
+          <paper-button raised on-click="clickLogout">LogOut</paper-button>
+        </template>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-linkedin-login',
+
+        properties: {
+
+          key: {
+            type: String,
+            value: '75tql789or1lu1'
+          },
+
+          initialized: {
+            type: Boolean,
+            value: true
+          },
+
+          fields: {
+            type: String,
+            value: 'id,num-connections,picture-url'
+          },
+
+          lang: {
+            type: String,
+            value: 'en_US'
+          }
+        },
+
+        init: function() {
+          this.initialized = true;
+        },
+
+        clickLogout: function(e) {
+          document.querySelector("#signin").signOut();
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

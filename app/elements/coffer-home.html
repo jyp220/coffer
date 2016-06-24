@@ -15,7 +15,7 @@
         text-align:center;
       }
       .coffer-summary a{
-        background:url(/images/icon-coffer.png) 50% 10px no-repeat #f6f6f6;
+        background:url("/images/icon-coffer.png") 50% 10px no-repeat #f6f6f6;
         display:inline-block;
         width:29%;
         margin:0 1%;padding:43px 0 5px 0;
@@ -78,52 +78,36 @@
       
     </style>
 
-    <!-- <app-route
-        route="[[route]]"
-        pattern="/:category"
-        data="{{routeData}}"></app-route> -->
+    
 
-    <things-ajax
-      auto=""
-      id="get-resource"
-      method="GET"
-      resource-action="index"
-      resource-url="units"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{unitResource}}">
+    <things-ajax auto="" id="get-resource" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{unitResource}}">
     </things-ajax>
 
-    <things-ajax
-      auto=""
-      id="coffer-search"
-      method="GET"
-      resource-action="index"
-      resource-url="coffers"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{cofferResource}}">
+    <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
 
-    <sc-swiper>
+    <sc-swiper pagination on-click="_clickSwiper">
       <template is="dom-repeat" items="[[_showCofferSummary(cofferResource.items)]]" as="coffer">
         <div class="coffer-summary">
-        <!-- <template is="dom-if" if="[[_cofferSummaryOne(cofferResource.items)]]"> -->
-          <a href$="[[_getItemCofferHref(coffer.coffer_id_one)]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a>
-        <!-- </template> -->
-        <!-- <template is="dom-if" if="[[_cofferSummaryTwo(cofferResource.items)]]"> -->
-          <a href$="[[_getItemCofferHref(coffer.coffer_id_two)]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
-        <!-- </template> -->
-        <!-- <template is="dom-if" if="[[_cofferSummaryThree(cofferResource.items)]]"> -->
-          <a href$="[[_getItemCofferHref(coffer.coffer_id_three)]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a>
-        <!-- </template> -->
+        
+          <!-- <a href$="[[_getItemCofferHref(coffer.coffer_id_one)]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a> -->
+          <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_one]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a>
+          <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_two]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
+          <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_three]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a>
+        
+        
+          <!-- <a href$="[[_getItemCofferHref(coffer.coffer_id_two)]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
+        
+        
+          <a href$="[[_getItemCofferHref(coffer.coffer_id_three)]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a> -->
+        
         </div>
       </template>
     </sc-swiper>
 
     <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
-      <a href$="[[_getItemHref(unitItem)]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
     </template>
 
   </template>
@@ -294,6 +278,18 @@
         } else {
           return true;
         }
+      },
+
+      _clickSwiper: function(e) {
+        alert(e.currentTarget.name);
+        // document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.target.name;
+        // document.querySelector("coffer-app").page = 'coffer-coffer-detail-list';
+      },
+
+      _clickUnit: function(e) {
+        // alert(e.currentTarget.name);
+        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
+        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
       }
 
     });

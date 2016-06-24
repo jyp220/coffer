@@ -95,7 +95,7 @@
         padding:5px 0 0 0;
       }
       .timeline-item{
-        background:url(/images/bg-timeline.png) 17px 0 repeat-y #f6f6f6;
+        background:url("../images/bg-timeline.png") 17px 0 repeat-y #f6f6f6;
         border-bottom:1px solid #ddd;
         overflow:hidden;
         clear:both;
@@ -140,60 +140,39 @@
         margin:3px 7px 0 0;
       }
       .timeline-item .edit{
-        background:url(/images/icon-more.png) 50% -200px no-repeat;
+        background:url("../images/icon-more.png") 50% -200px no-repeat;
         width:25px;height:16px;
         display:block;
         float:left;
       }
       .timeline-item .delete{
-        background:url(/images/icon-more.png) 50% -250px no-repeat;
+        background:url("../images/icon-more.png") 50% -250px no-repeat;
         width:25px;height:16px;
         display:block;
         float:left;
       }
     </style>
 
-    <app-route
-        route="[[route]]"
-        pattern="/:category"
-        data="{{routeData}}"></app-route>
+    <!-- <app-route route="[[route]]" pattern="/:category" data="{{routeData}}"></app-route> -->
 
-    <things-ajax
-      id="unit-search"
-      method="GET"
-      resource-url="units/[[routeData.category]]"
-      last-response="{{unitResource}}">
+    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
     </things-ajax>
 
-    <things-ajax
-      id="timeline-search"
-      method="GET"
-      resource-action="index"
-      resource-url="time_lines"
-      query-fields="[[timelineQueryFields]]"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{timelineResource}}">
+    <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}">
     </things-ajax>
 
-    <things-ajax
-      id="create-timeline-ajax"
-      resource-action="create"
-      resource-url="time_lines">
+    <things-ajax id="create-timeline-ajax" resource-action="create" resource-url="time_lines">
     </things-ajax>
 
-    <things-ajax
-      id="delete-timeline-ajax"
-      resource-action="delete"
-      resource-url="time_lines/[[timelineId]]">
+    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[timelineId]]">
     </things-ajax>
 
     <div id="content">
       <div class="detail">
-        <template is="dom-if" if="{{_showUnit(unitResource)}}">
+        <!-- <template is="dom-if" if="{{_showUnit(unitResource)}}"> -->
           <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
             <div class="rate-info">
-             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
+             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer_id]]
              <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
             </div>
             <div class="card-actions">
@@ -203,16 +182,16 @@
                 <div class="description">
                   <h2>Description</h2>
                   <p>[[unitResource.content]]</p>
-                  <!-- <p id="desc"></p> -->
+                  
                 </div>
               </iron-collapse>
             </div>
           </paper-card>
-        </template>
+        <!-- </template> -->
         
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
-          <li class="timeline-item"> <!--type : create-생성, discard-폐기, 없음-기본-->
+          <li class="timeline-item"> 
             <div class="timedot">
               <span></span>
               {{timeline.updated_at}}
@@ -221,8 +200,8 @@
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
               <div>
-                <paper-button raised class="edit" on-click ="_edit"></paper-button>
-                <paper-button raised name="[[timeline.id]]" class="delete" on-click ="_delete"></paper-button>
+                <paper-button raised="" class="edit" on-click="_edit"></paper-button>
+                <paper-button raised="" name="[[timeline.id]]" class="delete" on-click="_delete"></paper-button>
               </div>
             </div>
           </li>
@@ -230,10 +209,10 @@
         </ul>
       </div>
 
-      <paper-fab noink id="add-timeline" icon="add" title="add timeline"></paper-fab>
+      <paper-fab noink="" id="add-timeline" icon="add" title="add timeline"></paper-fab>
       <paper-fullscreen-dialog id="new-timeline">
         <h2>New Timeline</h2>
-        <paper-button id="create-timeline" affirmative dialog-confirm>create</paper-button>
+        <paper-button id="create-timeline" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-unit-timeline-new id="new-timeline-data"></coffer-unit-timeline-new>
       </paper-fullscreen-dialog>
     </div>
@@ -284,8 +263,10 @@
       },
 
       routeChange: function(route) {
-        if(route.prefix == '/unit-detail-list') {
-          var unitId = route.path.substr(1);
+        // alert('routeChange.path : ' + route.path);
+        // alert('routeChange.prefix : ' + route.prefix);
+        if(route.prefix == 'coffer-unit-detail-list') {
+          var unitId = route.path;
 
           if(unitId != null && unitId != "") {
             this.timelineQueryFields = [ {
@@ -303,14 +284,43 @@
       },
 
       _visibleChanged: function(visible) {
+        var test = this.route.path.split('/');
+        this.route.path = test[2];
+        this.route.prefix = test[1];
+
+
+        // alert('_visibleChanged : ' + visible);
+        // alert('_visibleChanged routeChange.path : ' + this.route.path);
+        // alert('_visibleChanged routeChange.prefix : ' + this.route.prefix);
+
         if (visible) {
           this.page = 1;
-          this.fire('change-section', { title: this.routeData.category });
+          // this.fire('change-section', { title: this.routeData.category });
+
+          if(this.route.prefix == 'coffer-unit-detail-list') {
+            var unitId = this.route.path;
+            this.unitItemId = unitId;
+
+            if(unitId != null && unitId != "") {
+              this.timelineQueryFields = [ {
+                name: 'unit_id',
+                operator: 'eq',
+                value: this.unitItemId
+              } ];
+
+              var ajax = this.$['timeline-search'];
+              ajax.generateRequest();
+
+              this.$['unit-search'].generateRequest();
+            }
+          }
         } 
       },
 
       _showUnit: function(item) {
-        return item != null;
+        // alert('_showUnit :' + item);
+        // return item != null;
+        return true;
       },
 
       _toggle: function(e) {

@@ -23,37 +23,18 @@
 
     </style>
 
-    <app-route
-        route="[[route]]"
-        pattern="/:category"
-        data="{{routeData}}"></app-route>
+    <!-- <app-route route="[[route]]" pattern="/:category" data="{{routeData}}"></app-route> -->
 
-    <things-ajax
-      id="coffer-search"
-      method="GET"
-      resource-action="index"
-      resource-url="coffers"
-      query-fields="[[cofferQueryFields]]"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{cofferResource}}">
+    <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers" query-fields="[[cofferQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
-    <things-ajax
-      id="unit-search"
-      method="GET"
-      resource-action="index"
-      resource-url="units"
-      query-fields="[[unitQueryFields]]"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{unitResource}}">
+    <things-ajax id="unit-search" method="GET" resource-action="index" resource-url="units" query-fields="[[unitQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{unitResource}}">
     </things-ajax>
 
 
     <header>
       <template is="dom-repeat" items="[[cofferResource.items]]">
-        <h1>Coffer Color : [[item.coffer_color]]</h1>
+        <!-- <h1>Coffer Color : [[item.coffer_color]]</h1> -->
         <h1>Coffer Title : [[item.name]]</h1>
         <h1>Unit Count : [[item.count]]</h1>
         <h1>Create Date : [[item.created_at]]</h1>
@@ -67,10 +48,10 @@
         </li>
       </template>
 
-      <paper-fab noink id="add-unit" icon="add" title="add unit"></paper-fab>
+      <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
-        <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
+        <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-unit-new id="new-unit-data_coffer"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
@@ -116,7 +97,9 @@
       },
 
       routeChange: function(route) {
-        if(route.prefix == '/coffer-detail') {
+        // alert('route.path : ' + route.path);
+        // alert('route.prefix : ' + route.prefix);
+        if(route.prefix == '/coffer-unit-detail') {
           var cofferId = route.path.substr(1);
 
           if(cofferId != null && cofferId != "") {
@@ -140,11 +123,38 @@
       },
 
       _visibleChanged: function(visible) {
+        var test = this.route.path.split('/');
+        this.route.path = test[2];
+        this.route.prefix = test[1];
+
         if (visible) {
           this.page = 1;
-          this.unitListReload();
-          this.cofferListReload();
-          this.fire('change-section', { title: this.routeData.category });
+          // this.unitListReload();
+          // this.cofferListReload();
+          // this.fire('change-section', { title: this.routeData.category });
+          
+          if(this.route.prefix == 'coffer-coffer-detail-list') {
+            var cofferId = this.route.path;
+
+            if(cofferId != null && cofferId != "") {
+              this.unitQueryFields = [ {
+                name: 'coffer_id',
+                operator: 'eq',
+                value: cofferId
+              } ];
+
+              this.unitListReload();
+
+              this.cofferQueryFields = [ {
+                name: 'id',
+                operator: 'eq',
+                value: cofferId
+              } ];
+
+              this.cofferListReload();
+            }
+          } 
+          
         } 
       },
 

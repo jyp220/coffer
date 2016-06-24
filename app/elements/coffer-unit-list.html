@@ -40,20 +40,9 @@
       }
     </style>
 
-    <!-- <app-route
-        route="[[route]]"
-        pattern="/:category"
-        data="{{routeData}}"></app-route> -->
+    
 
-    <things-ajax
-      auto=""
-      id="get-resource"
-      method="GET"
-      resource-action="index"
-      resource-url="units"
-      page="[[page]]"
-      limit="[[limit]]"
-      last-response="{{resource}}">
+    <things-ajax auto="" id="get-resource" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{resource}}">
     </things-ajax>
 
     <header>
@@ -61,14 +50,16 @@
     </header>
 
     <ul hidden$="[[failure]]">
-      <template is="dom-repeat" items="{{resource.items}}" as="unitItem" initial-count="4">
-        <a href$="[[_getItemHref(unitItem)]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      <template is="dom-repeat" items="{{resource.items}}" as="unitItem">
+        <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
       </template>
 
-      <paper-fab noink id="add-unit" icon="add" title="add unit"></paper-fab>
+
+
+      <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
-        <paper-button id="create-unit" affirmative dialog-confirm>create</paper-button>
+        <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-unit-new id="new-unit-data" data="true"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
@@ -181,6 +172,12 @@
             };
           });
         }
+      },
+
+      _clickUnit: function(e) {
+        // alert(e.currentTarget.name);
+        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
+        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
       }
 
     });
