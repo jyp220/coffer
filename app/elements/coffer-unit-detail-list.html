@@ -161,10 +161,16 @@
     <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}">
     </things-ajax>
 
+    <things-ajax id="timeline-item-search" method="GET" resource-action="index" resource-url="time_lines/[[timelineItemId]]" last-response="{{timelineItemResource}}">
+    </things-ajax>
+
     <things-ajax id="create-timeline-ajax" resource-action="create" resource-url="time_lines">
     </things-ajax>
 
-    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[timelineId]]">
+    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
+    </things-ajax>
+
+    <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
     </things-ajax>
 
     <div id="content">
@@ -200,7 +206,7 @@
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
               <div>
-                <paper-button raised="" class="edit" on-click="_edit"></paper-button>
+                <paper-button raised="" name="[[timeline.id]]" class="edit" on-click="_edit"></paper-button>
                 <paper-button raised="" name="[[timeline.id]]" class="delete" on-click="_delete"></paper-button>
               </div>
             </div>
@@ -214,6 +220,12 @@
         <h2>New Timeline</h2>
         <paper-button id="create-timeline" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-unit-timeline-new id="new-timeline-data"></coffer-unit-timeline-new>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="update-timeline">
+        <h2>Update Timeline</h2>
+        <paper-button id="btn-update-timeline" affirmative="" dialog-confirm="">update</paper-button>
+        <coffer-unit-timeline-update id="update-timeline-data" name="[[timelineName]]", content="[[timelineContent]]"></coffer-unit-timeline-update>
       </paper-fullscreen-dialog>
     </div>
 
@@ -256,10 +268,15 @@
       listeners: {
         'add-timeline.tap': 'onTapAddTimeline',
         'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed',
+        'update-timeline.iron-overlay-closed': 'onUpdateTimelineDialogClosed',
         'create-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
         'create-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'delete-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure'
+        'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
+        'timeline-item-search.things-ajax-response' : '_handleSearchSuccess',
+        'timeline-item-search.things-ajax-error' : '_handleSearchFailure',
+        'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
       },
 
       routeChange: function(route) {
@@ -313,6 +330,7 @@
 
               this.$['unit-search'].generateRequest();
             }
+            this.visible = false;
           }
         } 
       },
@@ -335,23 +353,43 @@
         this.$["new-timeline"].toggle();
       },
 
-      createResource: function(data) {
-        var row = {
-          'name' : data.name,
-          'unit_id' : this.route.path,
-          'content' : data.content
-        };
+      createResource: function(data, type) {
+        if(type == 'create') {
+          var row = {
+            'name' : data.name,
+            'unit_id' : this.route.path,
+            'content' : data.content
+          };
 
-        var ajax = this.$['create-timeline-ajax'];
-        ajax.body = row;
-        ajax.generateRequest();
+          var ajax = this.$['create-timeline-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        } else if(type == 'update') {
+          var row = {
+            'id' : this.timelineItemId,
+            'name' : data.name,
+            'unit_id' : this.route.path,
+            'content' : data.content
+          };
+
+          var ajax = this.$['update-timeline-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        }
       },
 
       onNewTimelineDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-timeline-data'].object);
+        this.createResource(this.$['new-timeline-data'].object, 'create');
+      },
+
+      onUpdateTimelineDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+
+        this.createResource(this.$['update-timeline-data'].object, 'update');
       },
 
       _getItemHref: function(testArr, item) {
@@ -389,15 +427,27 @@
       },
 
       _edit: function(timeline) {
-        console.log(timeline.target.data);
+        var ajax = this.$['timeline-item-search'];
+        this.timelineItemId = timeline.target.name;
+        ajax.generateRequest();
       },
 
       _delete: function(timeline) {
         var ajax = this.$['delete-timeline-ajax'];
-        this.timelineId = timeline.target.name;
+        this.deleteTimelineId = timeline.target.name;
         ajax.generateRequest();
 
         // this.timelineListReload();
+      },
+
+      _handleSearchSuccess: function(event) {
+        this.timelineName = event.detail.name;
+        this.timelineContent = event.detail.content;
+        this.$['update-timeline'].toggle();
+      },
+
+      _handleSearchFailure: function(event) {
+        alert('fail');
       }
 
     });

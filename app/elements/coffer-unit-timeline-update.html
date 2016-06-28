@@ -1,0 +1,48 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="coffer-unit-timeline-update">
+  <template>
+
+    <style>
+    </style>
+
+    <paper-input label="name" type="string" value="{{name}}">
+    </paper-input>
+
+    <paper-textarea label="content" type="string" value="{{content}}">
+    </paper-textarea>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-unit-timeline-update',
+
+        properties: {
+          name: String,
+
+          content: String,
+
+          object: {
+            type: Object,
+            value: {},
+            notify: true,
+            computed: '_computeTimelineObject(name,content)'
+          }
+        },
+
+        _computeTimelineObject: function(name, content) {
+          return {
+            name: name,
+            content: content
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

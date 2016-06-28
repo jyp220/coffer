@@ -1,0 +1,100 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="coffer-search-unit">
+  <template>
+
+    <style>
+    </style>
+
+    <things-ajax id="unit-search" method="GET" resource-action="index" resource-url="units" query-fields="[[unitQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{unitResource}}">
+    </things-ajax>
+
+    <div id="popup-test">
+      <paper-search-input id="colors"></paper-search-input>
+      <paper-button raised on-click="clickSearch">Search</paper-button>
+
+      <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
+        <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      </template>
+    </div>
+<!--     <iron-scroll-threshold scroll-target="popup-test" on-lower-threshold="loadMoreData" id="threshold">
+    </iron-scroll-threshold> -->
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-search-unit',
+
+        properties: {
+          name: String,
+
+          content: String,
+
+          object: {
+            type: Object,
+            value: {},
+            notify: true,
+            computed: '_computeTimelineObject(name,content)'
+          },
+
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          page: {
+            type: Number,
+            value: 0
+          },
+
+          limit: {
+            type: Number,
+            value: 0
+          },
+
+          addUnit: Object
+        },
+
+        listeners: {
+          'colors.paper-search-input-execute': 'onSearchDialog'
+        },
+
+        _computeTimelineObject: function(name, content) {
+          return {
+            name: name,
+            content: content
+          }
+        },
+
+        _visibleChanged: function(visible) {
+          if (visible) {
+            this.page = 1;
+          }
+        },
+
+        onSearchDialog: function(e) {
+          this.unitQueryFields = [ {
+            name: 'name',
+            operator: 'like',
+            value: e.detail.value
+          } ];
+
+          var ajax = this.$['unit-search'];
+          ajax.generateRequest();
+        },
+
+        clickSearch: function(e) {
+          this.$['colors'].executeSearch();
+        },
+
+        _clickUnit: function(e) {
+          this.fire('search-unit-section', {routePath: '/coffer-unit-detail-list/' + e.currentTarget.name, page: 'coffer-unit-detail-list'});
+          
+        }
+      });
+    })();
+  </script>
+</dom-module>

@@ -46,7 +46,8 @@
     "sc-swiper": "*",
     "things-elements": "ThingsElements/things-elements",
     "app-router": "^2.6.1",
-    "linkedin-signin": "^1.0.0"
+    "linkedin-signin": "^1.0.0",
+    "paper-search-input": "^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "4.0.0"
