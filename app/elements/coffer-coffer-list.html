@@ -51,7 +51,7 @@
     <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
-    <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="[[route.prefix]]">
+    <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="coffers">
     </things-ajax>
 
     <ul hidden$="[[failure]]">
@@ -106,7 +106,7 @@
 
         limit: {
           type: Number,
-          value: 30
+          value: 10
         }
 
       },

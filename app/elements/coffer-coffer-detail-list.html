@@ -52,7 +52,7 @@
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
-        <coffer-unit-new id="new-unit-data_coffer"></coffer-unit-new>
+        <coffer-unit-new id="new-unit-data" data="true"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -164,13 +164,13 @@
 
       createResource: function(data) {
         var ajax = this.$['unit-search'];
-        var form = document.querySelector("#unitNewForm");
-        var oData = new FormData(form);
+        // var form = document.querySelector("#unitNewForm");
+        var oData = new FormData(data.form);
 
         var result = {
-          'name' : oData.get('name'),
+          'name' : data.form.elements['name'].value,
           'cofferId' : data.cofferId,
-          'content' : oData.get('content'),
+          'content' : data.form.elements['content'].value,
         };
 
         oData.append('item', JSON.stringify(result));
@@ -191,7 +191,7 @@
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-unit-data_coffer'].object);
+        this.createResource(this.$['new-unit-data'].object);
       },
 
       unitListReload: function() {

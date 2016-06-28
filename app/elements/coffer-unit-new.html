@@ -72,9 +72,8 @@
           console.log(data);
         },
 
-        _computeUnitObject(name,description,group,file,cofferId) {
+        _computeUnitObject: function(name,description,group,file,cofferId) {
           var form = this.$.unitNewForm;
-          var oData = new FormData(form);
 
           return {
             name: name,
@@ -82,7 +81,7 @@
             group: group,
             file: file,
             cofferId: cofferId,
-            oData: oData
+            form: form
           }
         },
 

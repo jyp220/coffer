@@ -86,22 +86,15 @@
     <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
+    <things-ajax id="get-unit" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{addUnit}}">
+    </things-ajax>
 
     <sc-swiper pagination on-click="_clickSwiper">
       <template is="dom-repeat" items="[[_showCofferSummary(cofferResource.items)]]" as="coffer">
         <div class="coffer-summary">
-        
-          <!-- <a href$="[[_getItemCofferHref(coffer.coffer_id_one)]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a> -->
           <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_one]]">[[coffer.coffer_name_one]]<span>[[coffer.coffer_count_one]]</span></a>
           <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_two]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
-          <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_three]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a>
-        
-        
-          <!-- <a href$="[[_getItemCofferHref(coffer.coffer_id_two)]]">[[coffer.coffer_name_two]]<span>[[coffer.coffer_count_two]]</span></a>
-        
-        
-          <a href$="[[_getItemCofferHref(coffer.coffer_id_three)]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a> -->
-        
+          <a href="#" on-click="_clickSwiper" name="[[coffer.coffer_id_three]]">[[coffer.coffer_name_three]]<span>[[coffer.coffer_count_three]]</span></a>        
         </div>
       </template>
     </sc-swiper>
@@ -110,6 +103,8 @@
       <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
     </template>
 
+    <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
+    </iron-scroll-threshold>
   </template>
 
   <script>
@@ -136,9 +131,18 @@
 
         limit: {
           type: Number,
-          value: 20
-        }
+          value: 10
+        },
 
+        addUnit: Object,
+
+        unitResource: Object
+
+      },
+
+      listeners: {
+        'get-unit.things-ajax-response' : '_handleSaveSuccess',
+        'get-unit.things-ajax-error' : '_handleSaveFailure'
       },
 
       _visibleChanged: function(visible) {
@@ -156,6 +160,7 @@
             // }, function (videoError) {
             //   // console.log(videoError);
             // });
+          this.page = 1;
           this.unitListReload();
           this.fire('change-section', { title: 'Home' });
         } else {
@@ -214,9 +219,6 @@
           }
         } else {
 
-          
-
-
           for(var i = 0 ; i < cnt ; i++) {
             obj = {};
             var j = 3*i;
@@ -255,31 +257,6 @@
         return arr;
       },
 
-      _cofferSummaryOne: function(items) {
-        if(items.length % 3 == 1) {
-          return true;
-        } else {
-          return true;
-        }
-
-      },
-
-      _cofferSummaryTwo: function(items) {
-        if(items.length % 3 == 2) {
-          return true;
-        } else {
-          return true;
-        }
-      },
-
-      _cofferSummaryThree: function(items) {
-        if(items.length % 3 == 0) {
-          return true;
-        } else {
-          return true;
-        }
-      },
-
       _clickSwiper: function(e) {
         alert(e.currentTarget.name);
         // document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.target.name;
@@ -290,7 +267,30 @@
         // alert(e.currentTarget.name);
         document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
         document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
-      }
+      },
+
+      loadMoreData: function() {
+        this.async(function () {
+          this.$.threshold.clearTriggers();
+          if(this.visible && this.unitResource != null) {
+            this.page++;
+            var ajax = this.$['get-unit'];
+            ajax.generateRequest();
+          }
+        });
+      },
+
+      _handleSaveSuccess: function(event) {
+        if(this.addUnit.items != null) {
+          for(var i = 0 ; i < this.addUnit.items.length ; i++) {
+            this.push('unitResource.items',this.addUnit.items[i]);
+          }
+        }
+      },
+
+      _handleSaveFailure: function(event) {
+        alert('fail');
+      },
 
     });
 

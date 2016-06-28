@@ -332,13 +332,13 @@
       },
 
       onTapAddTimeline: function(e) {
-        this.$["new-timeline"].open();
+        this.$["new-timeline"].toggle();
       },
 
       createResource: function(data) {
         var row = {
           'name' : data.name,
-          'unit_id' : this.routeData.category,
+          'unit_id' : this.route.path,
           'content' : data.content
         };
 

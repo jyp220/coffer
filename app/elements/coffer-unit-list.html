@@ -44,17 +44,23 @@
 
     <things-ajax auto="" id="get-resource" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{resource}}">
     </things-ajax>
+    <things-ajax id="get-unit" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{addUnit}}">
+    </things-ajax>
 
     <header>
-      <span>[[_getPluralizedQuantity(resource.items.length)]]</span>
+      <span>[[_getPluralizedQuantity(resource.total)]]</span>
     </header>
 
     <ul hidden$="[[failure]]">
-      <template is="dom-repeat" items="{{resource.items}}" as="unitItem">
-        <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
-      </template>
 
 
+      <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
+        <iron-list id="unit-list" scroll-target="threshold" items="{{resource.items}}" as="unitItem">
+          <template>
+            <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+          </template>
+        </iron-list>
+      </iron-scroll-threshold>
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
@@ -93,14 +99,18 @@
 
         limit: {
           type: Number,
-          value: 30
-        }
+          value: 20
+        },
+
+        addUnit: Object
 
       },
 
       listeners: {
         'add-unit.tap': 'onTapAddUnit',
-        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed'
+        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
+        'get-unit.things-ajax-response' : '_handleSaveSuccess',
+        'get-unit.things-ajax-error' : '_handleSaveFailure'
       },
 
       _visibleChanged: function(visible) {
@@ -133,22 +143,23 @@
         var oData = new FormData(form);
 
         var result = {
-          'name' : oData.get('name'),
+          'name' : form.elements['name'].value,
           'cofferId' : data.cofferId,
-          'content' : oData.get('content'),
+          'content' : form.elements['content'].value,
         };
 
         oData.append('item', JSON.stringify(result));
         var myRequest = new XMLHttpRequest();
         myRequest.onreadystatechange = function(){
           if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+            this.page = 1;
             ajax.generateRequest();
           } 
         };
 
         var setting = document.querySelector('#setting');
         myRequest.withCredentials = true;
-        myRequest.open('post', setting.get('globals.baseUrl') + '/' + this.route.prefix,true);
+        myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
         myRequest.send(oData);
       },
 
@@ -164,21 +175,33 @@
         this.createResource(this.$['new-unit-data'].object);
       },
 
-      _toArray: function(obj) {
-        if(obj != null) {
-          return Object.keys(obj).map(function(key) {
-            return {
-              value: obj[key]
-            };
-          });
+      _clickUnit: function(e) {
+        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
+        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
+      },
+
+      loadMoreData: function() {
+        this.async(function () {
+          this.$.threshold.clearTriggers();
+          if(this.visible) {
+            this.page++;
+            var ajax = this.$['get-unit'];
+            ajax.generateRequest();
+          }
+        });
+      },
+
+      _handleSaveSuccess: function(event) {
+        if(this.addUnit.items != null) {
+          for(var i = 0 ; i < this.addUnit.items.length ; i++) {
+            this.push('resource.items',this.addUnit.items[i]);
+          }
         }
       },
 
-      _clickUnit: function(e) {
-        // alert(e.currentTarget.name);
-        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
-        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
-      }
+      _handleSaveFailure: function(event) {
+        alert('fail');
+      },
 
     });
 
