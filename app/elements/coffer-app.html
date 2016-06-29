@@ -247,7 +247,7 @@
 
       <template is="dom-if" if="{{_showLogin(page)}}">
         <div id="tabContainer">
-          <coffer-tabs selected="[[routeData.page]]" attr-for-selected="name">
+          <coffer-tabs selected="[[page]]" attr-for-selected="name">
             <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
               <coffer-tab name="[[category.name]]">
                 <a href="#" on-click="_goLinkTab" name="[[category.name]]">[[category.title]]</a>
@@ -262,8 +262,8 @@
               <paper-item id="creteCoffer" on-tap="_moreMenuSelected" class="icon-more createcoffer">Create Coffer</paper-item>
               <paper-item id="qrScan" on-tap="_moreMenuSelected" class="icon-more qrscan">QR Scan</paper-item>
               <paper-item id="search" on-tap="_moreMenuSelected" class="icon-more search">Search</paper-item>
-              <paper-item id="edit" on-tap="_moreMenuSelected" class="icon-more edit">Edit</paper-item>
-              <paper-item id="delete" on-tap="_moreMenuSelected" class="icon-more delete">Delete</paper-item>
+              <!-- <paper-item id="edit" on-tap="_moreMenuSelected" class="icon-more edit">Edit</paper-item>
+              <paper-item id="delete" on-tap="_moreMenuSelected" class="icon-more delete">Delete</paper-item> -->
             </paper-menu>
           </paper-menu-button>
         </div>
@@ -520,11 +520,12 @@
         }else if(e.target.id === 'search') {
           // startScan();
           this.$["search-unit"].open();
-        }else if(e.target.id === 'edit') {
-          startScan();
-        }else if(e.target.id === 'delete') {
-          startScan();
         }
+        // else if(e.target.id === 'edit') {
+        //   startScan();
+        // }else if(e.target.id === 'delete') {
+        //   startScan();
+        // }
       },
 
       onNewUnitDialogClosed: function(e) {
@@ -561,7 +562,13 @@
           var myRequest = new XMLHttpRequest();
           myRequest.onreadystatechange = function(){
             if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-              // ajax.generateRequest();
+              var routePath = document.querySelector("coffer-app").route.path;
+              var tempPage = document.querySelector("coffer-app").page;
+              
+              document.querySelector("coffer-app").page = '/';
+
+              document.querySelector("coffer-app").route.path = routePath;
+              document.querySelector("coffer-app").page = tempPage;
             } 
           };
 
@@ -595,8 +602,13 @@
       },
 
       _handleCofferSaveSuccess: function(event) {
-        // var ajax = document.querySelector('#coffer-search');
-        // ajax.generateRequest();
+        var routePath = this.route.path;
+        var tempPage = this.page;
+        
+        this.page = '/';
+
+        this.route.path = routePath;
+        this.page = tempPage;
       },
 
       _handleCofferSaveFailure: function(event) {
