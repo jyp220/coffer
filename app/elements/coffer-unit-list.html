@@ -38,6 +38,11 @@
       li:nth-child(even){
         background-color:rgba(0,0,0,.05);
       }
+      paper-spinner{
+        position:absolute;
+        top:30%;
+        left:50%;
+      }
     </style>
 
     
@@ -61,6 +66,8 @@
           </template>
         </iron-list>
       </iron-scroll-threshold>
+
+      <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
@@ -184,6 +191,9 @@
         this.async(function () {
           this.$.threshold.clearTriggers();
           if(this.visible) {
+            if(this.resource.items.length >= this.resource.total) return;
+            
+            this.active = true;
             this.page++;
             var ajax = this.$['get-unit'];
             ajax.generateRequest();
@@ -196,6 +206,7 @@
           for(var i = 0 ; i < this.addUnit.items.length ; i++) {
             this.push('resource.items',this.addUnit.items[i]);
           }
+          this.active = false;
         }
       },
 

@@ -338,7 +338,7 @@
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(route.path)'
       ],
 
       listeners: {
@@ -370,10 +370,9 @@
       },
 
       _routePageChanged: function(page) {
-        // alert('_routePageChanged : ' + page);
         if(page == 'Users' || page == 'android_asset') page = '';
             
-        if(page == '') page = 'coffer-home';
+        if(page == '' || page == '/') page = 'coffer-home';
         this.page = page;
       },
 
@@ -435,6 +434,9 @@
 
       _onUnitSection: function(event) {
         var detail = event.detail;
+
+        if(this.page == detail.page) this.page = '/';
+
         this.route.path = detail.routePath;
         this.page = detail.page;
 
