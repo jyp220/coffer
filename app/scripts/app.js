@@ -18,7 +18,8 @@ function startScan() {
               document.querySelector("coffer-app").route.path = result.text;
               document.querySelector("coffer-app").page = prefix[1];
             } else {
-              alert("퉤 우리꺼 아님!!!");
+              document.querySelector("coffer-app #new-unit").open();
+              // alert("퉤 우리꺼 아님!!!");
               // alert('aaa');
               // document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + result.text;
               // document.querySelector("coffer-app").page = 'coffer-unit-detail-list'

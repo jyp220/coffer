@@ -178,8 +178,8 @@
         <!-- <template is="dom-if" if="{{_showUnit(unitResource)}}"> -->
           <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
             <div class="rate-info">
-             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer_id]]
-             <iron-icon icon="icons:alarm-on"></iron-icon><span>12</span>
+             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
+             <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
             </div>
             <div class="card-actions">
               <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
@@ -197,7 +197,8 @@
         
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
-          <li class="timeline-item"> 
+          <li class$="{{timelineItem(timeline)}}"> 
+          <!-- <li class="timeline-item create">  -->
             <div class="timedot">
               <span></span>
               {{timeline.updated_at}}
@@ -251,8 +252,6 @@
           observer: '_visibleChanged'
         },
 
-        failure: Boolean,
-
         page: {
           type: Number,
           value: 1
@@ -261,6 +260,11 @@
         limit: {
           type: Number,
           value: 30
+        },
+
+        timelineCnt: {
+          type: Number,
+          value: 1
         }
 
       },
@@ -301,16 +305,13 @@
       },
 
       _visibleChanged: function(visible) {
-        var test = this.route.path.split('/');
-        this.route.path = test[2];
-        this.route.prefix = test[1];
-
-
-        // alert('_visibleChanged : ' + visible);
-        // alert('_visibleChanged routeChange.path : ' + this.route.path);
-        // alert('_visibleChanged routeChange.prefix : ' + this.route.prefix);
-
         if (visible) {
+          var tempPath = this.route.path;
+          var test = tempPath.split('/');
+          this.route.path = test[2];
+          this.route.prefix = test[1];
+
+          this.timelineCnt = 1;
           this.page = 1;
           // this.fire('change-section', { title: this.routeData.category });
 
@@ -447,6 +448,18 @@
 
       _handleSearchFailure: function(event) {
         alert('fail');
+      },
+
+      timelineItem: function(timeline) {
+        var result = 'timeline-item';
+        if(timeline.terminate_at != null) {
+          result = 'timeline-item discard';
+        } else if(this.timelineCnt == this.timelineResource.items.length) {
+          result = 'timeline-item create';
+        }
+
+        this.timelineCnt++;
+        return result;
       }
 
     });

@@ -47,7 +47,9 @@
     "things-elements": "ThingsElements/things-elements",
     "app-router": "^2.6.1",
     "linkedin-signin": "^1.0.0",
-    "paper-search-input": "^1.0.0"
+    "paper-search-input": "^1.0.0",
+    "paper-color-picker": "^0.9.2",
+    "polymer-color-picker": "^1.0.1"
   },
   "devDependencies": {
     "web-component-tester": "4.0.0"

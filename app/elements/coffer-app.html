@@ -213,7 +213,7 @@
 
     <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
     <coffer-category-data categories="{{categories}}"></coffer-category-data>
-    <things-setting id="setting" hidden=""></things-setting>  
+    <things-setting id="setting"></things-setting>  
     <script type="text/javascript">
       var app = document.querySelector('#content');
       var setting = document.querySelector('#setting');
@@ -279,16 +279,16 @@
       <coffer-coffer-detail-list id="coffer-coffer-detail-list" name="coffer-coffer-detail-list" route="[[route]]" offline="[[offline]]"></coffer-coffer-detail-list>
     </iron-pages>
 
-    <paper-fullscreen-dialog id="new-unit">
+    <paper-fullscreen-dialog id="new-unit-home">
       <h2>New Unit</h2>
       <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
-      <coffer-unit-new id="new-unit-data_app"></coffer-unit-new>
+      <coffer-unit-new id="new-unit-data-app"></coffer-unit-new>
     </paper-fullscreen-dialog>
 
     <paper-fullscreen-dialog id="new-coffer">
       <h2>New Coffer</h2>
       <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
-      <coffer-coffer-new id="new-coffer-data_app"></coffer-coffer-new>
+      <coffer-coffer-new id="new-coffer-data-app"></coffer-coffer-new>
     </paper-fullscreen-dialog>
 
     <paper-fullscreen-dialog id="search-unit">
@@ -338,14 +338,14 @@
       },
 
       observers: [
-        '_routePageChanged(route.path)'
+        '_routePageChanged(routeData.page)'
       ],
 
       listeners: {
         'change-section': '_onChangeSection',
         'announce': '_onAnnounce',
         'dom-change': '_domChange',
-        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
+        'new-unit-home.iron-overlay-closed': 'onNewUnitDialogClosed',
         'new-coffer.iron-overlay-closed': 'onNewCofferDialogClosed',
         'search-unit.iron-overlay-closed': 'onSearchDialogClosed',
         'create-coffer-ajax.things-ajax-response' : '_handleCofferSaveSuccess',
@@ -363,10 +363,10 @@
       },
 
       ready: function() {
-        Polymer.RenderStatus.afterNextRender(this, function() {
-          this.listen(window, 'online', '_notifyNetworkStatus');
-          this.listen(window, 'offline', '_notifyNetworkStatus');
-        });
+        // Polymer.RenderStatus.afterNextRender(this, function() {
+        //   this.listen(window, 'online', '_notifyNetworkStatus');
+        //   this.listen(window, 'offline', '_notifyNetworkStatus');
+        // });
       },
 
       _routePageChanged: function(page) {
@@ -403,25 +403,25 @@
       _ensureLazyLoaded: function() {
         if (!this.loadComplete) {
           Polymer.RenderStatus.afterNextRender(this, function() {
-            this._notifyNetworkStatus();
+            // this._notifyNetworkStatus();
             this.loadComplete = true;
           });
         }
       },
 
-      _notifyNetworkStatus: function() {
-        var oldOffline = this.offline;
-        this.offline =  !navigator.onLine;
-        if (this.offline || (!this.offline && oldOffline === true)) {
-          if (!this._networkSnackbar) {
-            this._networkSnackbar = document.createElement('coffer-snackbar');
-            Polymer.dom(this.root).appendChild(this._networkSnackbar);
-          }
-          Polymer.dom(this._networkSnackbar).innerHTML = this.offline ?
-              'You are offline' : 'You are online';
-          this._networkSnackbar.open();
-        }
-      },
+      // _notifyNetworkStatus: function() {
+      //   var oldOffline = this.offline;
+      //   this.offline =  !navigator.onLine;
+      //   if (this.offline || (!this.offline && oldOffline === true)) {
+      //     if (!this._networkSnackbar) {
+      //       this._networkSnackbar = document.createElement('coffer-snackbar');
+      //       Polymer.dom(this.root).appendChild(this._networkSnackbar);
+      //     }
+      //     Polymer.dom(this._networkSnackbar).innerHTML = this.offline ?
+      //         'You are offline' : 'You are online';
+      //     this._networkSnackbar.open();
+      //   }
+      // },
 
       _onChangeSection: function(event) {
         var detail = event.detail;
@@ -512,13 +512,13 @@
 
       _moreMenuSelected: function(e) {
         if(e.target.id === 'createUnit') {
-          this.$["new-unit"].open();
+          this.$["new-unit-home"].open();
         }else if(e.target.id === 'creteCoffer') {
           this.$["new-coffer"].open();
         }else if(e.target.id === 'qrScan') {
-          startScan();
-        }else if(e.target.id === 'search') {
           // startScan();
+          document.querySelector("coffer-app #new-unit-home").open();
+        }else if(e.target.id === 'search') {
           this.$["search-unit"].open();
         }
         // else if(e.target.id === 'edit') {
@@ -532,14 +532,14 @@
         if(!e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-unit-data_app'].object, 'unit');
+        this.createResource(this.$['new-unit-data-app'].object, 'unit');
       },
 
       onNewCofferDialogClosed: function(e) {
-        if(!e.detail.confirmed)
+        if(e.target.id != 'new-coffer' || !e.detail.confirmed)
           return
 
-        this.createResource(this.$['new-coffer-data_app'].object, 'coffer');
+        this.createResource(this.$['new-coffer-data-app'].object, 'coffer');
       },
 
       onSearchDialogClosed: function(e) {

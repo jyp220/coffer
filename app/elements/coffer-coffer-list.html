@@ -13,11 +13,11 @@
       paper-fab{
         @apply(--things-coffer-fab)
       }
-      paper-fullscreen-dialog{
+/*      paper-fullscreen-dialog{
         height:80% !important;
         margin-top:9%;
         overflow:hidden;
-      }
+      }*/
       iron-image{
         width:48%;
         max-height:200px;
@@ -54,7 +54,7 @@
     <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="coffers">
     </things-ajax>
 
-    <ul hidden$="[[failure]]">
+    <ul>
 
       <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
         <a href="#" on-click="_clickCoffer" name="[[coffer.id]]">
@@ -97,8 +97,6 @@
           observer: '_visibleChanged'
         },
 
-        failure: Boolean,
-
         page: {
           type: Number,
           value: 1
@@ -119,17 +117,10 @@
       },
 
       _visibleChanged: function(visible) {
-        // alert('coffers : ' + visible);
         if (visible) {
           this.cofferListReload();
           this.fire('change-section', { title: 'coffer' });
         } 
-      },
-
-      _getItemHref: function(item) {
-        // By returning null when `itemId` is undefined, the href attribute won't be set and
-        // the link will be disabled.
-        return item.id ? ['/coffer-detail', item.id].join('/') : null;
       },
 
       _getPluralizedQuantity: function(quantity) {
@@ -145,7 +136,7 @@
       },
 
       onNewCofferDialogClosed: function(e) {
-        if(!e.detail.confirmed)
+        if(e.target.id != 'new-coffer' || !e.detail.confirmed)
           return
 
         this.createResource(this.$['new-coffer-data'].object);
@@ -193,7 +184,6 @@
       },
 
       _clickCoffer: function(e) {
-        // alert(e.currentTarget.name);
         document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.currentTarget.name;
         document.querySelector("coffer-app").page = 'coffer-coffer-detail-list';
       }
