@@ -1,14 +1,11 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="coffer-category-data.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="coffer-unit-list-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 <link rel="import" href="../bower_components/things-ajax/things-ajax.html">
-<link rel="import" href="../bower_components/file-upload/file-upload.html">
-<link rel="import" href="../bower_components/things-upload/things-file-upload.html">
-<link rel="import" href="../bower_components/sc-upload/sc-upload.html">
+<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
 
 <dom-module id="coffer-unit-list">
 
@@ -57,12 +54,11 @@
     </header>
 
     <ul>
+      <template is="dom-repeat" items="{{resource.items}}" as="unitItem">
+        <a href="{{baseUrl}}unit-detail-list/[[unitItem.id]]" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      </template>
+
       <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
-        <iron-list id="unit-list" scroll-target="threshold" items="{{resource.items}}" as="unitItem">
-          <template>
-            <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
-          </template>
-        </iron-list>
       </iron-scroll-threshold>
 
       <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
@@ -172,11 +168,6 @@
           return
 
         this.createResource(this.$['new-unit-data'].object);
-      },
-
-      _clickUnit: function(e) {
-        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
-        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
       },
 
       loadMoreData: function() {

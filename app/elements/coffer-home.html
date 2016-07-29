@@ -15,7 +15,7 @@
         text-align:center;
       }
       .coffer-summary a{
-        background:url("/images/icon-coffer.png") 50% 10px no-repeat #f6f6f6;
+        background:url("../images/icon-coffer.png") 50% 10px no-repeat #f6f6f6;
         display:inline-block;
         width:29%;
         margin:0 1%;padding:43px 0 5px 0;
@@ -106,7 +106,7 @@
     <sc-swiper id="sc-swiper-coffer" pagination slides-per-view="3">
       <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
         <div class="coffer-summary">
-          <a href="#" name="[[coffer.id]]">[[coffer.name]]<span>[[coffer.count]]</span></a>      
+          <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]]<span>[[coffer.count]]</span></a>      
         </div>
       </template>
     </sc-swiper>
@@ -114,7 +114,7 @@
     <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
     <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
-      <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      <a href="{{baseUrl}}unit-detail-list/[[unitItem.id]]" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
     </template>
 
     <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
@@ -157,39 +157,17 @@
 
       listeners: {
         'get-unit.things-ajax-response' : '_handleSaveSuccess',
-        'get-unit.things-ajax-error' : '_handleSaveFailure',
-        'sc-swiper-coffer.tap' : '_clickSwiper'
+        'get-unit.things-ajax-error' : '_handleSaveFailure'
       },
 
       _visibleChanged: function(visible) {
         if (visible) {
-          // var ajax = this.$['coffer-search'];
-          // ajax.generateRequest();
-          
-
-            // $('#reader').html5_qrcode(function (data) {
-            //   console.log(data);
-            //   location.replace("unit-detail-list/unit/Hamilton%20AUTO%2040MM");
-            // },
-            // function (error) {
-            //   // this.location.href("http://localhost:5000/unit-list/unit"); 
-            // }, function (videoError) {
-            //   // console.log(videoError);
-            // });
           this.page = 1;
           this.unitListReload();
           this.fire('change-section', { title: 'Home' });
         } else {
           // $('#reader').html5_qrcode_stop();
         }
-      },
-
-      _getItemHref: function(item) {
-        return item.id ? ['/unit-detail-list', item.id].join('/') : null;
-      },
-
-      _getItemCofferHref: function(id) {
-        return id ? ['/coffer-detail', id].join('/') : null;
       },
 
       unitListReload: function() {
@@ -267,19 +245,6 @@
         }
 
         return arr;
-      },
-
-      _clickSwiper: function(e) {
-        // alert(e.target.name);
-
-        document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.target.name;
-        document.querySelector("coffer-app").page = 'coffer-coffer-detail-list';
-      },
-
-      _clickUnit: function(e) {
-        // alert(e.currentTarget.name);
-        document.querySelector("coffer-app").route.path = '/coffer-unit-detail-list/' + e.currentTarget.name;
-        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
       },
 
       loadMoreData: function() {

@@ -1,5 +1,4 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
@@ -13,6 +12,7 @@
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/fullscreen-api/fullscreen-api.html">
 
 <dom-module id="coffer-unit-detail-list">
 
@@ -153,9 +153,10 @@
       }
     </style>
 
-    <!-- <app-route route="[[route]]" pattern="/:category" data="{{routeData}}"></app-route> -->
-
     <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
+    </things-ajax>
+
+    <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers/coffer_list" last-response="{{cofferResource}}">
     </things-ajax>
 
     <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}">
@@ -173,27 +174,32 @@
     <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
     </things-ajax>
 
+    <fullscreen-api id="fsapi"></fullscreen-api>
+
     <div id="content">
       <div class="detail">
-        <!-- <template is="dom-if" if="{{_showUnit(unitResource)}}"> -->
-          <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
-            <div class="rate-info">
-             <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
-             <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
-            </div>
-            <div class="card-actions">
-              <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
-              </paper-icon-button>
-              <iron-collapse id="moreInfo" style="width:100%;">
-                <div class="description">
-                  <h2>Description</h2>
-                  <p>[[unitResource.content]]</p>
-                  
-                </div>
-              </iron-collapse>
-            </div>
-          </paper-card>
-        <!-- </template> -->
+        <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
+          <div class="rate-info">
+           <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
+           <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
+          </div>
+          <div class="card-actions">
+            <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
+            </paper-icon-button>
+            <iron-collapse id="moreInfo" style="width:100%;">
+              <div class="description">
+                <h2>Description</h2>
+                <p>[[unitResource.content]]</p>
+                
+              </div>
+            </iron-collapse>
+          </div>
+        </paper-card>
+
+        <p>[[unitResource.creator.name]]`s Coffer List</p>
+        <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
+          <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]] / </a>
+        </template>
         
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
@@ -228,6 +234,11 @@
         <paper-button id="btn-update-timeline" affirmative="" dialog-confirm="">update</paper-button>
         <coffer-unit-timeline-update id="update-timeline-data" name="[[timelineName]]", content="[[timelineContent]]"></coffer-unit-timeline-update>
       </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="unit-image-viewer">
+        <paper-button id="btn-unit-image-viewer" affirmative="" dialog-confirm=""></paper-button>
+        <coffer-image-viewer unit-thumbnail="[[unitThumbnail]]"></coffer-image-viewer>
+      </paper-fullscreen-dialog>
     </div>
 
   </template>
@@ -240,16 +251,16 @@
 
       properties: {
 
-        route: {
-          type: Object,
-          observer: 'routeChange'
+        visible: Boolean,
+
+        defaultPage: {
+          type: Number,
+          value: 0
         },
 
-        routeData: Object,
-
-        visible: {
-          type: Boolean,
-          observer: '_visibleChanged'
+        defaultLimit: {
+          type: Number,
+          value: 0
         },
 
         page: {
@@ -269,6 +280,10 @@
 
       },
 
+      observers: [
+        '_routeChanged(params.id, visible)'
+      ],
+
       listeners: {
         'add-timeline.tap': 'onTapAddTimeline',
         'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed',
@@ -280,64 +295,34 @@
         'timeline-item-search.things-ajax-response' : '_handleSearchSuccess',
         'timeline-item-search.things-ajax-error' : '_handleSearchFailure',
         'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
+        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure'
       },
 
-      routeChange: function(route) {
-        // alert('routeChange.path : ' + route.path);
-        // alert('routeChange.prefix : ' + route.prefix);
-        if(route.prefix == 'coffer-unit-detail-list') {
-          var unitId = route.path;
+      _routeChanged: function(id, visible) {
+        if (visible) {
+          this.timelineCnt = 1;
+          this.page = 1;
+
+          var unitId = id;
+          this.unitItemId = unitId;
 
           if(unitId != null && unitId != "") {
             this.timelineQueryFields = [ {
               name: 'unit_id',
               operator: 'eq',
-              value: unitId
+              value: this.unitItemId
             } ];
 
             var ajax = this.$['timeline-search'];
             ajax.generateRequest();
 
             this.$['unit-search'].generateRequest();
-          }
-        }
-      },
-
-      _visibleChanged: function(visible) {
-        if (visible) {
-          var tempPath = this.route.path;
-          var test = tempPath.split('/');
-          this.route.path = test[2];
-          this.route.prefix = test[1];
-
-          this.timelineCnt = 1;
-          this.page = 1;
-          // this.fire('change-section', { title: this.routeData.category });
-
-          if(this.route.prefix == 'coffer-unit-detail-list') {
-            var unitId = this.route.path;
-            this.unitItemId = unitId;
-
-            if(unitId != null && unitId != "") {
-              this.timelineQueryFields = [ {
-                name: 'unit_id',
-                operator: 'eq',
-                value: this.unitItemId
-              } ];
-
-              var ajax = this.$['timeline-search'];
-              ajax.generateRequest();
-
-              this.$['unit-search'].generateRequest();
-            }
+            this.$['coffer-search'].generateRequest();
           }
         } 
       },
 
       _showUnit: function(item) {
-        // alert('_showUnit :' + item);
-        // return item != null;
         return true;
       },
 
@@ -357,7 +342,7 @@
         if(type == 'create') {
           var row = {
             'name' : data.name,
-            'unit_id' : this.route.path,
+            'unit_id' : app.params.id,
             'content' : data.content
           };
 
@@ -368,7 +353,7 @@
           var row = {
             'id' : this.timelineItemId,
             'name' : data.name,
-            'unit_id' : this.route.path,
+            'unit_id' : app.params.id,
             'content' : data.content
           };
 
@@ -390,10 +375,6 @@
           return
 
         this.createResource(this.$['update-timeline-data'].object, 'update');
-      },
-
-      _getItemHref: function(testArr, item) {
-        return item.name ? ['/unit-detail', item.category, item.name, testArr.value.testName].join('/') : null;
       },
 
       _imageSrc: function(thumbnail) {
@@ -460,7 +441,24 @@
 
         this.timelineCnt++;
         return result;
-      }
+      },
+
+      clickOnImage: function(e) {
+        this.unitThumbnail = setting.get('globals.baseUrl') + "/download/" + this.unitResource.thumbnail_id;
+        this.$['unit-image-viewer'].open();
+        
+        // this.toggleFullscreen(event.target);
+      },
+
+      toggleFullscreen: function(element) {
+        var fsapi = document.querySelector('#fsapi');
+        fsapi.target = element;
+        fsapi.toggleFullscreen();
+      },
+
+      _qrData: function(unitItemId) {
+        return "http://192.168.35.96:5000/#!/unit-detail-list/" + unitItemId;
+      },
 
     });
 

@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="coffer-qrcode-viewer">
+  <template>
+
+    <style>
+    </style>
+    [[route]][[params.id]]
+    <qr-code data="[[route]]/[[params.id]]"></qr-code>
+    <h3>카카오톡 앱이 설치되어 있는 모바일 기기라면 아래의 링크가 동작합니다.</h3>
+    <a id="kakao-link-btn" href="javascript:;" on-click="qrTest">
+      <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
+    </a>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-qrcode-viewer',
+
+        properties: {
+          route: String,
+          params: Object
+        },
+
+        ready: function() {
+          Kakao.init('a9d75d64bddba18c128e0da81a709e27');
+        },
+
+        qrTest: function() {
+          Kakao.Link.createTalkLinkButton({
+            container: '#kakao-link-btn',
+            label: 'qr test~~~',
+            image: {
+              src: 'http://dn.api1.kage.kakao.co.kr/14/dn/btqaWmFftyx/tBbQPH764Maw2R6IBhXd6K/o.jpg',
+              width: '300',
+              height: '200'
+            },
+            webButton: {
+              text: 'qr test~~~',
+              url: 'http://192.168.35.96:5000/#!/' + this.route + "/" + this.params.id // 앱 설정의 웹 플랫폼에 등록한 도메인의 URL이어야 합니다.
+            }
+          });
+        }
+      });
+    })();
+  </script>
+</dom-module>

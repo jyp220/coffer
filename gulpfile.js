@@ -96,8 +96,6 @@ gulp.task('images', function() {
 gulp.task('copy', function() {
   var app = gulp.src([
     'app/*',
-    'app/images',
-    'app/scripts',
     '!app/test',
     '!app/elements',
     '!app/bower_components',

@@ -1,0 +1,39 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/sc-swiper/sc-swiper.html">
+
+<dom-module id="coffer-image-viewer">
+  <template>
+
+    <style>
+    </style>
+    {{unitThumbnail}}
+    [[test]]
+    <sc-swiper>
+      <iron-image src="{{unitThumbnail}}"></iron-image>
+      <iron-image src="http://192.168.35.96:8001/rest/download/341"></iron-image>
+      <iron-image src="http://192.168.35.96:8001/rest/download/[[test]]"></iron-image>
+      <iron-image src="http://lorempixel.com/640/480/cats"></iron-image>
+      <iron-image src="http://lorempixel.com/640/480/cats"></iron-image>
+    </sc-swiper>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'coffer-image-viewer',
+
+        properties: {
+          unitThumbnail: String,
+
+          test: {
+            type: String,
+            value: "341"
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

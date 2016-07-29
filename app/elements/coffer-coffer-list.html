@@ -1,5 +1,4 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="coffer-category-data.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="coffer-unit-list-item.html">
@@ -13,11 +12,11 @@
       paper-fab{
         @apply(--things-coffer-fab)
       }
-/*      paper-fullscreen-dialog{
+      paper-fullscreen-dialog{
         height:80% !important;
         margin-top:9%;
         overflow:hidden;
-      }*/
+      }
       iron-image{
         width:48%;
         max-height:200px;
@@ -57,7 +56,7 @@
     <ul>
 
       <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
-        <a href="#" on-click="_clickCoffer" name="[[coffer.id]]">
+        <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">
           <div class="tile__list">
             <div class="tile__name title-name">
               [[coffer.name]]
@@ -181,11 +180,6 @@
           var setting = document.querySelector('#setting');
           return setting.get('globals.baseUrl') + "/download/" + thumbnail
         }
-      },
-
-      _clickCoffer: function(e) {
-        document.querySelector("coffer-app").route.path = '/coffer-coffer-detail-list/' + e.currentTarget.name;
-        document.querySelector("coffer-app").page = 'coffer-coffer-detail-list';
       }
 
     });

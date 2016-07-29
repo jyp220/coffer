@@ -1,5 +1,4 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="coffer-unit-list-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -23,8 +22,6 @@
 
     </style>
 
-    <!-- <app-route route="[[route]]" pattern="/:category" data="{{routeData}}"></app-route> -->
-
     <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers" query-fields="[[cofferQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
@@ -45,21 +42,14 @@
     </header>
 
     <ul>
+      <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
+        <a href="{{baseUrl}}unit-detail-list/[[unitItem.id]]" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
+      </template>
+
       <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
-        <iron-list id="unit-list" scroll-target="threshold" items="{{unitResource.items}}" as="unitItem">
-          <template>
-            <a href="#" on-click="_clickUnit" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
-          </template>
-        </iron-list>
       </iron-scroll-threshold>
 
       <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
-
-<!--       <template is="dom-repeat" items="[[unitResource.items]]">
-        <li>
-          <coffer-unit-list-item item="[[item]]"></coffer-unit-list-item>
-        </li>
-      </template> -->
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
@@ -78,14 +68,7 @@
 
       properties: {
 
-        route: Object,
-
-        routeData: Object,
-
-        visible: {
-          type: Boolean,
-          observer: '_visibleChanged'
-        },
+        visible: Boolean,
 
         page: {
           type: Number,
@@ -101,6 +84,10 @@
 
       },
 
+      observers: [
+        '_routeChanged(params.id, visible)'
+      ],
+
       listeners: {
         'add-unit.tap': 'onTapAddUnit',
         'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
@@ -108,67 +95,29 @@
         'add-unit-search.things-ajax-error' : '_handleSaveFailure'
       },
 
-      // routeChange: function(route) {
-      //   // alert('route.path : ' + route.path);
-      //   // alert('route.prefix : ' + route.prefix);
-      //   if(route.prefix == '/coffer-unit-detail') {
-      //     var cofferId = route.path.substr(1);
-
-      //     if(cofferId != null && cofferId != "") {
-      //       this.unitQueryFields = [ {
-      //         name: 'coffer_id',
-      //         operator: 'eq',
-      //         value: cofferId
-      //       } ];
-
-      //       this.unitListReload();
-
-      //       this.cofferQueryFields = [ {
-      //         name: 'id',
-      //         operator: 'eq',
-      //         value: cofferId
-      //       } ];
-
-      //       this.cofferListReload();
-      //     }
-      //   }
-      // },
-
-      _visibleChanged: function(visible) {
+      _routeChanged: function(id, visible) {
         if (visible) {
-          var tempPath = this.route.path;
-          var test = tempPath.split('/');
-          this.route.path = test[2];
-          this.route.prefix = test[1];
-
           this.page = 1;
-          // this.unitListReload();
-          // this.cofferListReload();
-          // this.fire('change-section', { title: 'Coffer Detail' });
-          
-          if(this.route.prefix == 'coffer-coffer-detail-list') {
-            var cofferId = this.route.path;
+          var cofferId = id;
 
-            if(cofferId != null && cofferId != "") {
-              this.unitQueryFields = [ {
-                name: 'coffer_id',
-                operator: 'eq',
-                value: cofferId
-              } ];
+          if(cofferId != null && cofferId != "") {
+            this.unitQueryFields = [ {
+              name: 'coffer_id',
+              operator: 'eq',
+              value: cofferId
+            } ];
 
-              this.unitListReload();
+            this.unitListReload();
 
-              this.cofferQueryFields = [ {
-                name: 'id',
-                operator: 'eq',
-                value: cofferId
-              } ];
+            this.cofferQueryFields = [ {
+              name: 'id',
+              operator: 'eq',
+              value: cofferId
+            } ];
 
-              this.cofferListReload();
-            }
+            this.cofferListReload();
           } 
-          
-        } 
+        }
       },
 
       onTapAddUnit: function(e) {
@@ -245,12 +194,6 @@
         alert('fail');
         this.page--;
         this.active = false;
-      },
-
-      _clickUnit: function(e) {
-        var temp = '/coffer-unit-detail-list/' + e.currentTarget.name;
-        document.querySelector("coffer-app").route.path = temp;
-        document.querySelector("coffer-app").page = 'coffer-unit-detail-list';
       }
 
     });

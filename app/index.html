@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta charset="utf-8">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="generator" content="Polymer Starter Kit">
+  <meta name="generator" content="Coffer">
   <title>Coffer</title>
 
   <!-- Place favicon.ico in the `app/` directory -->
@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="theme-color" content="#2E3AA1">
 
   <!-- Web Application Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
 
   <!-- Tile color for Win8 -->
   <meta name="msapplication-TileColor" content="#3372DF">
@@ -32,87 +32,355 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="application-name" content="PSK">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
 
   <!-- Add to homescreen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Polymer Starter Kit">
-  <link rel="apple-touch-icon" href="/images/touch/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Coffer">
+  <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
 
   <!-- Tile icon for Win8 (144x144) -->
-  <meta name="msapplication-TileImage" content="/images/touch/ms-touch-icon-144x144-precomposed.png">
+  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
 
   <!-- build:css styles/main.css -->
+  <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild-->
 
   <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
-  <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="bower_components/qrjs/qr.js"></script>
+  <script src="bower_components/qr-code/src/qr-code.js"></script>
+
+
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
   <!-- endbuild -->
 
   <!-- Because this project uses vulcanize this should be your only html import
        in this file. All other imports should go in elements.html -->
-  <link rel="import" href="/elements/elements.html">
-  <script type="text/javascript" src="/lib/jquery.js"></script>
-  <script type="text/javascript" src="/lib/html5-qrcode.js"></script>
-  <script type="text/javascript" src="/lib/jsqrcode-combined.min.js"></script>
+  <link rel="import" href="elements/elements.html">
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
+  <!-- <style is="custom-style" include="shared-styles"></style> -->
   <style>
-    body {
-      margin: 0;
-      font-family: 'Roboto', 'Noto', sans-serif;
-      font-size: 13px;
-      line-height: 1.5;
-      min-height: 100vh;
+    :host {
+      display: block;
+      position: relative;
+      padding-top: 80px;
+      padding-bottom: 64px;
     }
 
-    /* styling for render while resources are loading */
-    coffer-app[unresolved] {
-      display: block;
-      min-height: 101vh;
-      line-height: 68px;
+    app-header {
+      @apply(--layout-fixed-top);
+      z-index: 1;
+      background-color:#d05251;
+      --app-header-shadow: {
+        box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.2);
+        height: 10px;
+        bottom: -10px;
+      };
+    }
+    app-toolbar{
+      height:40px;
+    }
+    #tabContainer {
+      position: relative;
+      height:40px;
+    }
+    .alarm-btn{
+      position:absolute;
+      right:175px;
+      margin-top:-40px;
+      opacity:.5
+    }
+    .alarm-btn2:hover{opacity:1}
+    paper-icon-button {
+      color:#fff;
+    }
+    .more-btn{
+      position:absolute;
+      right:5px;
+      margin-top:-40px;
+      opacity:.5
+    }
+    .more-btn:hover{opacity:1}
+    paper-icon-button {
+      color:#fff;
+    }
+    .logo {
       text-align: center;
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      color: #202020;
+    }
+    .logo a {
+      font-size: 18px;
+      font-weight: 700;
+      color:#fff;
+      text-decoration: none;
+      /* required for IE 11, so this <a> can receive pointer events */
+      display: inline-block;
+      pointer-events: auto;
+    }
+    coffer-tab a {
+      display: inline-block;
+      outline: none;
+      padding:5px 15px 3px 15px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--app-accent50p-color);
+    }
+    coffer-tab{
+      /*border:1px solid var(--app-accent50p-color);*/
+      border-radius:15px;
+    }
+    coffer-tabs{
+      background-color:var(--primary-background-color);
+    }
+    coffer-tabs::shadow #overlay{
+      display:none !important;
+    }
+    coffer-tab.iron-selected{
+      border:1px solid #fff;
+      border-radius:15px;
+    }
+    coffer-tab.iron-selected a{
+      color:#fff;
+      font-weight:bold;
+    }
+    iron-pages {
+      max-width: 1440px;
+      margin: 0 auto;margin-top:15px;
+    }
+    paper-menu-button{
+      width:130px;
+      padding:0;
+    }
+    paper-menu-button paper-icon-button{
+      float:right;
+    }
+    paper-item{
+      padding:0 5px 0 10px;
+      min-width:120px;
+      font-size:15px;
+      color:var(--app-primary-text-color);
+    }
+    .icon-more{
+      background: url("images/icon-more.png") 7px 5px no-repeat;
+      text-indent:18px;
+    }
+    .icon-more.createunit{
+      background-position:7px 18px;
+    }
+    .icon-more.createcoffer{
+      background-position:7px -32px;
+    }
+    .icon-more.qrscan{
+      background-position:7px -82px;
+    }
+    .icon-more.search{
+      background-position:7px -132px;
+    }
+    .icon-more.edit{
+      background-position:7px -182px;
+    }
+    .icon-more.delete{
+      background-position:7px -232px;
+    }
+    paper-menu{
+      padding:0;
+    }
+    paper-item[focused]{
+      background-color:#fff;
+    }
+
+    .left-bar-item {
+      width: 40px;
+    }
+
+    .menu-btn {
+      display: none;
+    }
+
+    .announcer {
+      position: fixed;
+      height: 0;
+      overflow: hidden;
+    }
+
+    :host() .back-btn {
+      display: none;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .drawer-list {
+      margin: 0 20px;
+    }
+
+    .drawer-list a {
+      display: block;
       padding: 0 16px;
-      overflow: visible;
+      line-height: 40px;
+      text-decoration: none;
+      color: var(--app-secondary-color);
+    }
+
+    .drawer-list a.iron-selected {
+      color: black;
+      font-weight: bold;
+    }
+
+    app-drawer {
+      z-index: 3;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      margin: 20px;
+      line-height: 24px;
+    }
+
+    footer > a {
+      color: var(--app-secondary-color);
+      text-decoration: none;
+    }
+
+    footer > a:hover {
+      text-decoration: underline;
+    }
+
+    /* small screen */
+    @media (max-width: 767px) {
+      :host {
+        padding-top: 64px;
+      }
+
+      .menu-btn {
+        display: block;
+      }
+
+      :host([page=unit-detail-list]) .menu-btn,:host([page=unit-detail]) .menu-btn,:host([page=coffers]) .menu-btn {
+        display: none;
+      }
+    }
+
+    #colors {
+      --search-background-color: #518ac0;
+      --search-text-color: #518ac0;
+      --search-label-color: white;
+      --search-width: 500px;
     }
   </style>
-  <!-- <script type="text/javascript">
-    $(document).ready(function () {
-      $('#reader').html5_qrcode(function (data) {
-        alert(data);
-        $('#reader').html5_qrcode_stop()
-      },
-      function (error) {
-        console.log(error);
-      }, function (videoError) {
-        console.log(videoError);
-      });
-    });
-
-</script> -->
-<base href="#"></base>
 </head>
 
 <body unresolved>
-  <!-- build:remove -->
   <span id="browser-sync-binding"></span>
-  <!-- endbuild -->
 
   <template is="dom-bind" id="app">
-    <coffer-app unresolved></coffer-app>
+
+    <things-ajax id="create-coffer-ajax-home" resource-action="create" resource-url="coffers"></things-ajax>
+    <coffer-category-data categories="{{categories}}"></coffer-category-data>
+    <things-setting id="setting" hidden></things-setting> 
+    <script type="text/javascript">
+      // var app = document.querySelector('#content');
+      var setting = document.querySelector('#setting');
+      window.addEventListener('WebComponentsReady', function() {
+          if (setting){
+            setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+          }
+      });
+    </script>
+
+    <app-header role="navigation" id="header" effects="waterfall" condenses="" reveals="">
+      <app-toolbar>
+        <div class="left-bar-item">
+          <template is="dom-if" if="{{_showBtn(route)}}">
+            <paper-icon-button icon="arrow-back" aria-label="Go back" on-tap="_goBack"></paper-icon-button>
+          </template>
+        </div>
+        <div class="logo" title=""><a href="{{baseUrl}}">Things Coffer</a></div>
+      </app-toolbar>
+
+      <template is="dom-if" if="{{_showLogin(route)}}">
+        <div id="tabContainer">
+          <coffer-tabs selected="[[route]]" attr-for-selected="data-route">
+            <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
+              <coffer-tab data-route="[[category.name]]">
+                <a href="{{baseUrl}}[[category.name]]" name="[[category.name]]">[[category.title]]</a>
+              </coffer-tab>
+            </template>
+          </coffer-tabs>
+
+          <paper-menu-button class="alarm-btn">
+            <paper-icon-button id="alarm-btn" icon="menu" class="dropdown-trigger"></paper-icon-button>
+            <paper-menu class="dropdown-content">
+              <paper-item id="createUnit">Test</paper-item>
+            </paper-menu>
+          </paper-menu-button>
+          <paper-badge for="alarm-btn" label="4" class="blue"></paper-badge>
+
+          <paper-menu-button class="more-btn">
+            <paper-icon-button icon="icons:more-horiz" class="dropdown-trigger"></paper-icon-button>
+            <paper-menu class="dropdown-content">
+              <paper-item id="createUnit" on-tap="_moreMenuSelected" class="icon-more createunit">Create Unit</paper-item>
+              <paper-item id="creteCoffer" on-tap="_moreMenuSelected" class="icon-more createcoffer">Create Coffer</paper-item>
+              <paper-item id="qrScan" on-tap="_moreMenuSelected" class="icon-more qrscan">QR Scan</paper-item>
+              <paper-item id="search" on-tap="_moreMenuSelected" class="icon-more search">Search</paper-item>
+              <template is="dom-if" if="{{_showQrCreate(route)}}">
+                <paper-item id="qrCreate" on-tap="_moreMenuSelected" class="icon-more search">QR Create</paper-item>
+              </template>
+            </paper-menu>
+          </paper-menu-button>
+        </div>
+      </template>
+    </app-header>
+
+    <div class="content">
+      <iron-pages role="main" attr-for-selected="data-route" selected="{{route}}" selected-attribute="visible">
+        <coffer-home data-route="home" categories="[[categories]]"></coffer-home>
+        <coffer-unit-list data-route="unit-list"></coffer-unit-list>
+        <coffer-unit-detail-list data-route="unit-detail-list" route="[[route]]" params="[[params]]"></coffer-unit-detail-list>
+        <coffer-coffer-list data-route="coffer-list"></coffer-coffer-list>
+        <coffer-coffer-detail-list data-route="coffer-detail-list" route="[[route]]" params="[[params]]"></coffer-coffer-detail-list>
+        <coffer-linkedin-login data-route="login"></coffer-linkedin-login>
+      </iron-pages>
+
+      <paper-fullscreen-dialog id="new-unit-home">
+        <h2>New Unit</h2>
+        <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
+        <coffer-unit-new id="new-unit-data-home"></coffer-unit-new>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="new-coffer-home">
+        <h2>New Coffer</h2>
+        <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
+        <coffer-coffer-new id="new-coffer-data-home"></coffer-coffer-new>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="search-unit">
+        <h2>Search Unit</h2>
+        <paper-button id="btn-search-unit" affirmative=""></paper-button>
+        <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="qrcode-viewer">
+        <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
+        <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
+      </paper-fullscreen-dialog>
+    </div>
+
+    <paper-toast id="toast">
+      <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+    </paper-toast>
+
   </template>
 
-
-  <script src="/bower_components/page/page.js"></script>
-
-  <!-- <script src="scripts/app.js"></script> -->
-  <!-- <script src="scripts/cordova.js"></script> -->
+  <script src="scripts/app.js"></script>
 </body>
 
 </html>
