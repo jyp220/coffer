@@ -153,13 +153,13 @@
       }
     </style>
 
-    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
-    </things-ajax>
 
     <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers/coffer_list" last-response="{{cofferResource}}">
     </things-ajax>
 
     <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}">
+    </things-ajax>
+    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
     </things-ajax>
 
     <things-ajax id="timeline-item-search" method="GET" resource-action="index" resource-url="time_lines/[[timelineItemId]]" last-response="{{timelineItemResource}}">
