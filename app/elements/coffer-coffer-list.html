@@ -50,11 +50,7 @@
     <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
-    <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="coffers">
-    </things-ajax>
-
     <ul>
-
       <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
         <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">
           <div class="tile__list">
@@ -72,7 +68,7 @@
       <paper-fullscreen-dialog id="new-coffer">
         <h2>New Coffer</h2>
         <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
-        <coffer-coffer-new id="new-coffer-data"></coffer-coffer-new>
+        <coffer-coffer-new id="new-coffer-data" data="create-coffer-list"></coffer-coffer-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -111,8 +107,7 @@
       listeners: {
         'add-coffer.tap': 'onTapAddCoffer',
         'new-coffer.iron-overlay-closed': 'onNewCofferDialogClosed',
-        'create-coffer-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'create-coffer-ajax.things-ajax-error' : '_handleSaveFailure'
+        'create-coffer-list-close' : '_onCloseCoffer'
       },
 
       _visibleChanged: function(visible) {
@@ -137,19 +132,6 @@
       onNewCofferDialogClosed: function(e) {
         if(e.target.id != 'new-coffer' || !e.detail.confirmed)
           return
-
-        this.createResource(this.$['new-coffer-data'].object);
-      },
-
-      createResource: function(data) {
-        var row = {
-          'name' : data.name,
-          'coffer_color' : data.color
-        };
-
-        var ajax = this.$['create-coffer-ajax'];
-        ajax.body = row;
-        ajax.generateRequest();
       },
 
       cofferListReload: function() {
@@ -157,29 +139,16 @@
         ajax.generateRequest();
       },
 
-      /**
-       * 저장 성공시 액션
-       *
-       * @param {Object} event
-       */
-      _handleSaveSuccess: function(event) {
-        this.cofferListReload();
-      },
-
-      /**
-       * 저장 실패시 액션
-       *
-       * @param {Object} event
-       */
-      _handleSaveFailure: function(event) {
-        alert('fail');
-      },
-
       _imageSrc: function(thumbnail) {
         if(thumbnail != null) {
           var setting = document.querySelector('#setting');
           return setting.get('globals.baseUrl') + "/download/" + thumbnail
         }
+      },
+
+      _onCloseCoffer: function(event) {
+        this.cofferListReload();
+        this.$['new-coffer'].close();
       }
 
     });

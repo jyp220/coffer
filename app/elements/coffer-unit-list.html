@@ -66,8 +66,8 @@
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
-        <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
-        <coffer-unit-new id="new-unit-data" data="true"></coffer-unit-new>
+        <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
+        <coffer-unit-new id="new-unit-data" data="coffer-unit-list"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -109,7 +109,8 @@
         'add-unit.tap': 'onTapAddUnit',
         'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
         'get-unit.things-ajax-response' : '_handleSaveSuccess',
-        'get-unit.things-ajax-error' : '_handleSaveFailure'
+        'get-unit.things-ajax-error' : '_handleSaveFailure',
+        'coffer-unit-list-close' : '_onCloseUnit'
       },
 
       _visibleChanged: function(visible) {
@@ -132,32 +133,6 @@
         this.$["new-unit"].open();
       },
 
-      createResource: function(data) {
-        var ajax = this.$['get-resource'];
-        var form = document.querySelector("#unitNewForm");
-        var oData = new FormData(form);
-
-        var result = {
-          'name' : form.elements['name'].value,
-          'cofferId' : data.cofferId,
-          'content' : form.elements['content'].value,
-        };
-
-        oData.append('item', JSON.stringify(result));
-        var myRequest = new XMLHttpRequest();
-        this.page = 1;
-        myRequest.onreadystatechange = function(){
-          if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-            ajax.generateRequest();
-          } 
-        };
-
-        var setting = document.querySelector('#setting');
-        myRequest.withCredentials = true;
-        myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
-        myRequest.send(oData);
-      },
-
       unitListReload: function() {
         var ajax = this.$['get-resource'];
         ajax.generateRequest();
@@ -166,8 +141,6 @@
       onNewUnitDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
-
-        this.createResource(this.$['new-unit-data'].object);
       },
 
       loadMoreData: function() {
@@ -198,6 +171,12 @@
         this.page--;
         this.active = false;
       },
+
+      _onCloseUnit: function(event) {
+        this.page = 1;
+        this.unitListReload();
+        this.$['new-unit'].close();
+      }
 
     });
 

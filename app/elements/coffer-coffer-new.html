@@ -29,6 +29,8 @@
       }
     </style>
 
+    <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="coffers"></things-ajax>
+
     <paper-input label="name" type="string" value="{{name}}"></paper-input>
 
     <paper-button class="red" raised id="btn_red" on-click="clickColor">1</paper-button>
@@ -38,6 +40,8 @@
     <paper-button class="pink" raised id="btn_pink" on-click="clickColor">5</paper-button>
 
     <paper-textarea label="color" type="string" value="{{color}}" readonly></paper-textarea>
+
+    <paper-button id="submitButton" raised on-click="_cofferCreate">Submit</paper-button>
   </template>
 
   <script>
@@ -55,7 +59,14 @@
             computed: '_computeCofferObject(name,color)'
           },
 
+          data: String,
+
           color: Object
+        },
+
+        listeners: {
+          'create-coffer-ajax.things-ajax-response' : '_handleSaveSuccess',
+          'create-coffer-ajax.things-ajax-error' : '_handleSaveFailure',
         },
 
         _computeCofferObject: function(name, color) {
@@ -77,7 +88,27 @@
           } else if(e.currentTarget.id == 'btn_pink') {
             this.color = 'pink';
           }
-        }
+        },
+
+        _cofferCreate: function(e) {
+          var data = this.object;
+          var row = {
+            'name' : data.name,
+            'coffer_color' : data.color
+          };
+
+          var ajax = this.$['create-coffer-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        },
+
+        _handleSaveSuccess: function(event) {
+          this.fire(this.data + '-close', { title: 'close' });
+        },
+
+        _handleSaveFailure: function(event) {
+          alert('fail');
+        },
 
       });
     })();

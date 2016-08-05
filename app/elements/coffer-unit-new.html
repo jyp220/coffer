@@ -38,6 +38,8 @@
       </paper-dropdown-menu>
 
       <paper-input name="file" label="file" type="file" value="{{file}}"></paper-input>
+
+      <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button>
     </form>
   </template>
 
@@ -53,34 +55,7 @@
 
           cofferId: String,
 
-          data: {
-            type: Boolean,
-            observer: '_visibleChanged'
-          },
-
-          object: {
-            type: Object,
-            value: {},
-            notify: true,
-            computed: '_computeUnitObject(name,description,group,file,cofferId)'
-          }
-        },
-
-        _visibleChanged: function(data) {
-          // console.log(data);
-        },
-
-        _computeUnitObject: function(name,description,group,file,cofferId) {
-          var form = this.$.unitNewForm;
-
-          return {
-            name: name,
-            description: description,
-            group: group,
-            file: file,
-            cofferId: cofferId,
-            form: form
-          }
+          data: String
         },
 
         selectedGroup: function(group) {
@@ -93,6 +68,31 @@
               return this.cofferResource.items[i].id;
             }
           }
+        },
+
+        _unitCreate: function(e) {
+          var form = this.$.unitNewForm;
+          var oData = new FormData(form);
+          var self = this;
+
+          var result = {
+            'name' : form.elements['name'].value,
+            'cofferId' : this.cofferId,
+            'content' : form.elements['content'].value,
+          };
+
+          oData.append('item', JSON.stringify(result));
+          var myRequest = new XMLHttpRequest();
+          myRequest.onreadystatechange = function(){
+            if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+              self.fire(self.data + '-close', { title: 'close' });
+            } 
+          };
+
+          var setting = document.querySelector('#setting');
+          myRequest.withCredentials = true;
+          myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
+          myRequest.send(oData);
         }
 
       })

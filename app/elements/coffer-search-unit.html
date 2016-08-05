@@ -91,7 +91,7 @@
         },
 
         onClose: function(e) {
-          app.$['search-unit'].close();
+          this.fire('close-search', { title: 'close' });
         }
       });
     })();

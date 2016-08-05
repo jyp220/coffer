@@ -39,7 +39,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
-    // imports are loaded and elements have been registered
+    var setting = document.querySelector('#setting');
+    if (setting){
+      setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+    }
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of
@@ -69,108 +72,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // Scale middleContainer appName
     Polymer.Base.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
   });
-
-  // Scroll page to top and expand header
-  // app.scrollPageToTop = function() {
-  //   app.$.headerPanelMain.scrollToTop(true);
-  // };
-
-  // app.closeDrawer = function() {
-  //   app.$.paperDrawerPanel.closeDrawer();
-  // };
-
-  window.addEventListener('iron-overlay-closed', function(e) {
-    if(e.target.id == 'new-unit-home') {
-      var data = app.$['new-unit-data-home'].object;
-      var oData = new FormData(data.form);
-      var result = {
-        'name' : data.form.elements['name'].value,
-        'cofferId' : data.cofferId,
-        'content' : data.form.elements['content'].value,
-      };
-
-      oData.append('item', JSON.stringify(result));
-      var myRequest = new XMLHttpRequest();
-      myRequest.onreadystatechange = function(){
-        if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-          if(app.route == 'unit-list') {
-            page('/');
-            page('/unit-list');
-          }
-        } 
-      };
-
-      var setting = document.querySelector('#setting');
-      myRequest.withCredentials = true;
-      myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
-      myRequest.send(oData);
-    } else if(e.target.id == 'new-coffer-home') {
-      var data = app.$['new-coffer-data-home'].object;
-      var row = {
-        'name' : data.name,
-        'coffer_color' : data.color
-      };
-
-      var ajax = app.$['create-coffer-ajax-home'];
-      ajax.body = row;
-      ajax.generateRequest();
-
-
-      ajax.addEventListener('things-ajax-response', function(e) {
-        if(app.route == 'coffer-list') {
-          page('/');
-          page('/coffer-list');
-        }
-      });
-
-      ajax.addEventListener('things-ajax-error', function(e) {
-        alert('fail');
-      });
-
-    }
-  });
-
-  app._moreMenuSelected = function(e) {
-    if(e.target.id === 'createUnit') {
-      this.$["new-unit-home"].open();
-    }else if(e.target.id === 'creteCoffer') {
-      this.$["new-coffer-home"].open();
-    }else if(e.target.id === 'qrScan') {
-      startScan();
-      // document.querySelector("coffer-app #new-unit-home").open();
-    }else if(e.target.id === 'search') {
-      this.$["search-unit"].open();
-    }else if(e.target.id === 'qrCreate') {
-      this.$["qrcode-viewer"].open();
-    }
-  };
-
-  app._showLogin = function(route) {
-    if(route === 'login') {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  app._showBtn = function(route) {
-    if(route === 'home' || route === 'unit-list' || route === 'coffer-list' || route === 'login')
-      return false;
-    else
-      return true;
-  };
-
-  app._showQrCreate = function(route) {
-    if(route === 'unit-detail-list') {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  app._goBack = function() {
-    window.history.back();
-  };
 
   function startScan() {
     var unitHome = app.$["new-unit-home"];

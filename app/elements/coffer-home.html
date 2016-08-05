@@ -102,13 +102,13 @@
       </template>
     </sc-swiper> -->
 
-    <sc-swiper id="sc-swiper-coffer" pagination slides-per-view="3">
+<!--     <sc-swiper id="sc-swiper-coffer" pagination slides-per-view="3">
       <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
         <div class="coffer-summary">
           <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]]<span>[[coffer.count]]</span></a>      
         </div>
       </template>
-    </sc-swiper>
+    </sc-swiper> -->
 
     <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
@@ -261,7 +261,7 @@
       },
 
       _handleSaveSuccess: function(event) {
-        if(this.addUnit.items != null) {
+        if(this.addUnit && this.addUnit.items != null) {
           for(var i = 0 ; i < this.addUnit.items.length ; i++) {
             this.push('unitResource.items',this.addUnit.items[i]);
           }

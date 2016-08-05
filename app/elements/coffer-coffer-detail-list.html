@@ -54,8 +54,8 @@
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
       <paper-fullscreen-dialog id="new-unit">
         <h2>New Unit</h2>
-        <paper-button id="create-unit" affirmative="" dialog-confirm="">create</paper-button>
-        <coffer-unit-new id="new-unit-data" data="true"></coffer-unit-new>
+        <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
+        <coffer-unit-new id="new-unit-data" data="coffer-detail-list"></coffer-unit-new>
       </paper-fullscreen-dialog>
     </ul>
   </template>
@@ -92,7 +92,8 @@
         'add-unit.tap': 'onTapAddUnit',
         'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
         'add-unit-search.things-ajax-response' : '_handleSaveSuccess',
-        'add-unit-search.things-ajax-error' : '_handleSaveFailure'
+        'add-unit-search.things-ajax-error' : '_handleSaveFailure',
+        'coffer-detail-list-close' : '_onCloseUnit'
       },
 
       _routeChanged: function(id, visible) {
@@ -124,36 +125,9 @@
         this.$["new-unit"].open();
       },
 
-      createResource: function(data) {
-        var ajax = this.$['unit-search'];
-        // var form = document.querySelector("#unitNewForm");
-        var oData = new FormData(data.form);
-
-        var result = {
-          'name' : data.form.elements['name'].value,
-          'cofferId' : data.cofferId,
-          'content' : data.form.elements['content'].value,
-        };
-
-        oData.append('item', JSON.stringify(result));
-        var myRequest = new XMLHttpRequest();
-        myRequest.onreadystatechange = function(){
-          if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-            ajax.generateRequest();
-          } 
-        };
-
-        var setting = document.querySelector('#setting');
-        myRequest.withCredentials = true;
-        myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
-        myRequest.send(oData);
-      },
-
       onNewUnitDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
-
-        this.createResource(this.$['new-unit-data'].object);
       },
 
       unitListReload: function() {
@@ -194,6 +168,12 @@
         alert('fail');
         this.page--;
         this.active = false;
+      },
+
+      _onCloseUnit: function(event) {
+        this.unitListReload();
+        this.cofferListReload();
+        this.$['new-unit'].close();
       }
 
     });

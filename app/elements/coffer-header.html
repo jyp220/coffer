@@ -1,0 +1,379 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="coffer-header">
+
+  <template>
+    <style>
+      app-header {
+        @apply(--layout-fixed-top);
+        z-index: 1;
+        background-color:#d05251;
+        --app-header-shadow: {
+          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.2);
+          height: 10px;
+          bottom: -10px;
+        };
+      }
+      app-toolbar{
+        height:40px;
+      }
+      #tabContainer {
+        position: relative;
+        height:40px;
+      }
+      .alarm-btn{
+        position:absolute;
+        right:175px;
+        margin-top:-40px;
+        opacity:.5
+      }
+      .alarm-btn2:hover{opacity:1}
+      paper-icon-button {
+        color:#fff;
+      }
+      .more-btn{
+        position:absolute;
+        right:5px;
+        margin-top:-40px;
+        opacity:.5
+      }
+      .more-btn:hover{opacity:1}
+      paper-icon-button {
+        color:#fff;
+      }
+      .logo {
+        text-align: center;
+      }
+      .logo a {
+        font-size: 18px;
+        font-weight: 700;
+        color:#fff;
+        text-decoration: none;
+        /* required for IE 11, so this <a> can receive pointer events */
+        display: inline-block;
+        pointer-events: auto;
+      }
+      coffer-tab a {
+        display: inline-block;
+        outline: none;
+        padding:5px 15px 3px 15px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--app-accent50p-color);
+      }
+      coffer-tab{
+        /*border:1px solid var(--app-accent50p-color);*/
+        border-radius:15px;
+      }
+      coffer-tabs{
+        background-color:var(--app-primary-color);
+      }
+      coffer-tabs::shadow #overlay{
+        display:none !important;
+      }
+      coffer-tab.iron-selected{
+        border:1px solid #fff;
+        border-radius:15px;
+      }
+      coffer-tab.iron-selected a{
+        color:#fff;
+        font-weight:bold;
+      }
+      paper-menu-button{
+        width:130px;
+        padding:0;
+      }
+      paper-menu-button paper-icon-button{
+        float:right;
+      }
+      paper-item{
+        padding:0 5px 0 10px;
+        min-width:120px;
+        font-size:15px;
+        color:var(--app-primary-text-color);
+      }
+      .icon-more{
+        background: url("../images/icon-more.png") 7px 5px no-repeat;
+        text-indent:18px;
+      }
+      .icon-more.createunit{
+        background-position:7px 18px;
+      }
+      .icon-more.createcoffer{
+        background-position:7px -32px;
+      }
+      .icon-more.qrscan{
+        background-position:7px -82px;
+      }
+      .icon-more.search{
+        background-position:7px -132px;
+      }
+      .icon-more.edit{
+        background-position:7px -182px;
+      }
+      .icon-more.delete{
+        background-position:7px -232px;
+      }
+      paper-menu{
+        padding:0;
+      }
+      paper-item[focused]{
+        background-color:#fff;
+      }
+
+      .left-bar-item {
+        width: 40px;
+      }
+
+      .menu-btn {
+        display: none;
+      }
+      /* small screen */
+      @media (max-width: 367px) {
+        :host {
+          padding-top: 64px;
+        }
+
+        .menu-btn {
+          display: block;
+        }
+
+        :host([page=unit-detail-list]) .menu-btn,:host([page=unit-detail]) .menu-btn,:host([page=coffers]) .menu-btn {
+          display: none;
+        }
+      }
+
+      #colors {
+        --search-background-color: #518ac0;
+        --search-text-color: #518ac0;
+        --search-label-color: white;
+        --search-width: 500px;
+      }
+    </style>
+
+    <iron-media-query query="max-width: 367px" query-matches="{{smallScreen}}"></iron-media-query>
+
+    <app-header role="navigation" id="header" effects="waterfall" condenses="" reveals="">
+      <app-toolbar>
+        <div class="left-bar-item">
+          <paper-icon-button
+              class="menu-btn"
+              icon="menu"
+              on-tap="_toggleDrawer"
+              aria-label="Categories">
+          </paper-icon-button>
+          <template is="dom-if" if="{{_showBtn(route)}}">
+            <paper-icon-button icon="arrow-back" aria-label="Go back" on-tap="_goBack"></paper-icon-button>
+          </template>
+        </div>
+        <div class="logo" title=""><a href="/">Things Coffer</a></div>
+      </app-toolbar>
+
+      <template is="dom-if" if="{{_showLogin(route)}}">
+        <div id="tabContainer" primary$="[[_shouldShowTabs]]" hidden$="[[!_shouldShowTabs]]">
+          <coffer-tabs selected="[[route]]" attr-for-selected="data-route">
+            <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
+              <coffer-tab data-route="[[category.name]]">
+                <a href="{{baseUrl}}[[category.name]]" name="[[category.name]]">[[category.title]]</a>
+              </coffer-tab>
+            </template>
+          </coffer-tabs>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[_shouldRenderDrawer]]">
+        <app-drawer opened="{{drawerOpened}}" swipe-open tabindex="0">
+          <iron-selector role="navigation" class="drawer-list" selected="[[route]]" attr-for-selected="data-route">
+            <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
+              <a name="[[category.name]]" href="{{baseUrl}}[[category.name]]">[[category.title]]</a>
+            </template>
+          </iron-selector>
+        </app-drawer>
+      </template>
+      <paper-menu-button class="alarm-btn">
+        <paper-icon-button id="alarm-btn" icon="menu" class="dropdown-trigger"></paper-icon-button>
+        <paper-menu class="dropdown-content">
+          <paper-item id="createUnit">Test</paper-item>
+        </paper-menu>
+      </paper-menu-button>
+      <paper-badge for="alarm-btn" label="4" class="blue"></paper-badge>
+
+      <paper-menu-button class="more-btn">
+        <paper-icon-button icon="icons:more-horiz" class="dropdown-trigger"></paper-icon-button>
+        <paper-menu class="dropdown-content">
+          <paper-item id="createUnit" on-tap="_moreMenuSelected" class="icon-more createunit">Create Unit</paper-item>
+          <paper-item id="creteCoffer" on-tap="_moreMenuSelected" class="icon-more createcoffer">Create Coffer</paper-item>
+          <paper-item id="qrScan" on-tap="_moreMenuSelected" class="icon-more qrscan">QR Scan</paper-item>
+          <paper-item id="search" on-tap="_moreMenuSelected" class="icon-more search">Search</paper-item>
+          <template is="dom-if" if="{{_showQrCreate(route)}}">
+            <paper-item id="qrCreate" on-tap="_moreMenuSelected" class="icon-more search">QR Create</paper-item>
+          </template>
+        </paper-menu>
+      </paper-menu-button>
+    </app-header>
+
+    
+
+    <paper-fullscreen-dialog id="new-unit-home">
+        <h2>New Unit</h2>
+        <!-- <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button> -->
+        <coffer-unit-new id="new-unit-data-home" data="create-unit-header"></coffer-unit-new>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="new-coffer-home">
+        <h2>New Coffer</h2>
+        <!-- <paper-button id="create-coffer" affirmative="" dialog-confirm=""></paper-button> -->
+        <coffer-coffer-new id="new-coffer-data-home" data="create-coffer-header"></coffer-coffer-new>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="search-unit">
+        <h2>Search Unit</h2>
+        <paper-button id="btn-search-unit" affirmative=""></paper-button>
+        <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
+      </paper-fullscreen-dialog>
+
+      <paper-fullscreen-dialog id="qrcode-viewer">
+        <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
+        <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
+      </paper-fullscreen-dialog>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-header',
+
+      properties: {
+        _shouldShowTabs: {
+          computed: '_computeShouldShowTabs(route, smallScreen)'
+        },
+
+        _shouldRenderTabs: {
+          computed: '_computeShouldRenderTabs(_shouldShowTabs)'
+        },
+
+        _shouldRenderDrawer: {
+          computed: '_computeShouldRenderDrawer(smallScreen)'
+        }
+      },
+
+      listeners: {
+        'new-unit-home.iron-overlay-closed': 'onNewUnitDialogClosed',
+        'new-coffer-home.iron-overlay-closed': 'onNewCofferDialogClosed',
+        'close-search': '_onCloseSearch',
+        'create-unit-header-close' : '_onCloseUnit',
+        'create-coffer-header-close' : '_onCloseCoffer'
+      },
+
+      onNewUnitDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+      },
+
+      onNewCofferDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+      },
+
+      _moreMenuSelected: function(e) {
+        if(e.target.id === 'createUnit') {
+          this.$["new-unit-home"].open();
+        }else if(e.target.id === 'creteCoffer') {
+          this.$["new-coffer-home"].open();
+        }else if(e.target.id === 'qrScan') {
+          startScan();
+        }else if(e.target.id === 'search') {
+          this.$["search-unit"].open();
+        }else if(e.target.id === 'qrCreate') {
+          this.$["qrcode-viewer"].open();
+        }
+      },
+
+      _showLogin: function(route) {
+        if(route === 'login') {
+          return false;
+        } else {
+          return true;
+        }
+      },
+
+      _showBtn: function(route) {
+        if(route === 'home' || route === 'unit-list' || route === 'coffer-list' || route === 'login')
+          return false;
+        else
+          return true;
+      },
+
+      _showQrCreate: function(route) {
+        if(route === 'unit-detail-list') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+
+      _goBack: function() {
+        window.history.back();
+      },
+
+      _onCloseSearch: function(event) {
+        this.$['search-unit'].close();
+      },
+
+      _computeShouldShowTabs: function(route, smallScreen) {
+        return (route === 'home' || route === 'unit-list' || route === 'unit-detail-list' || route === 'unit-detail' || route === 'coffer-list' || route === 'coffer-detail-list') && !smallScreen;
+      },
+
+      _computeShouldRenderTabs: function(_shouldShowTabs) {
+        return _shouldShowTabs;
+      },
+
+      _computeShouldRenderDrawer: function(smallScreen) {
+        return smallScreen;
+      },
+      
+      _toggleDrawer: function() {
+        this.drawerOpened = !this.drawerOpened;
+      },
+
+      _onCloseUnit: function(e) {
+        if(this.route === 'unit-list') {
+          page('/');
+          page('/unit-list');
+        }
+        this.$['new-unit-home'].close();
+      },
+
+      _onCloseCoffer: function(e) {
+        if(this.route === 'coffer-list') {
+          page('/');
+          page('/coffer-list');
+        }
+        this.$['new-coffer-home'].close();
+      },
+
+      startScan: function() {
+        var unitHome = this.$["new-unit-home"];
+        page("/unit-list");
+        cordova.plugins.barcodeScanner.scan(
+            function (result) {
+              alert(result);
+                var prefix = result.text.split('/');
+                if(prefix.length > 1) {
+                  this.sendAjax(prefix[1], prefix[2], result.text);
+                } else {
+                  unitHome.open();
+                }
+            }, 
+            function (error) {
+                alert("Scanning failed: " + error);
+            }
+        );
+      }
+    });
+
+  </script>
+
+</dom-module>
