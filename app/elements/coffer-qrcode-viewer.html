@@ -9,7 +9,10 @@
     <qr-code data="[[route]]/[[params.id]]"></qr-code>
     <h3>카카오톡 앱이 설치되어 있는 모바일 기기라면 아래의 링크가 동작합니다.</h3>
     <a id="kakao-link-btn" href="javascript:;" on-click="qrTest">
-      <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
+      Web : <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
+    </a>
+    <a id="kakao-link-btn" href="javascript:;" on-click="qrTest3">
+      Android : <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
     </a>
   </template>
 
@@ -44,6 +47,20 @@
               url: 'http://192.168.35.96:5000/#!/' + this.route + "/" + this.params.id // 앱 설정의 웹 플랫폼에 등록한 도메인의 URL이어야 합니다.
             }
           });
+        },
+
+        qrTest3: function() {
+          var label = 'test';
+          var image = {
+            src: 'http://dn.api1.kage.kakao.co.kr/14/dn/btqaWmFftyx/tBbQPH764Maw2R6IBhXd6K/o.jpg',
+            width: '300',
+            height: '200'
+          };
+          var webButton = {
+            text: 'qr test~~~',
+            url: 'http://192.168.35.96:5000/#!/' + this.route + "/" + this.params.id // 앱 설정의 웹 플랫폼에 등록한 도메인의 URL이어야 합니다.
+          };
+          KakaoLinkPlugin.call(label, image, webButton);
         }
       });
     })();

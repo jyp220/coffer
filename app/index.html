@@ -52,159 +52,69 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
 
   <script type="text/javascript">
-    var isIPHONE = (navigator.userAgent.match('iPhone') != null || navigator.userAgent.match('iPod') != null);
-    var isIPAD = (navigator.userAgent.match('iPad') != null);
-    var isANDROID = (navigator.userAgent.match('Android') != null);
-    var SCHEME_FOR_TEST = 'intent://open#Intent;scheme=naversearchapp;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.search;end';
+    var storage = window.localStorage;
+    storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
+
+
     function executeApp(url) {
-      if(isIPHONE || isIPAD) {
-        this.is_installed_app_ios(url);
-      } else  {
-        this.is_installed_app_and(url);
+      var userAgent = navigator.userAgent.toLowerCase();
+      if(userAgent.match('iphone') || userAgent.match('ipad') || userAgent.match('ipod')) {    //아이폰
+         is_installed_app_ios(url,"362057947");
+      }else if(userAgent.match('android')) {    //안드로이드 기기
+        is_installed_app_and(url,"market://details?id=com.kakao.talk&hl=ko");
+      } else {    //그 외
+        alert("userAgent : " + userAgent);
       }
     }
+   
+    function is_installed_app_ios(bundleId,appstoreId)
+    {
+      var appstoreUrl = "http://itunes.apple.com/kr/app/id"+appstoreId+"?mt=8";
+      var url = bundleId + "://";
+      var clickedAt = +new Date;
+      AppCheckTimer = setTimeout(function() {
+        if (+new Date - clickedAt < 2000)
+        {
+          location.href = appstoreUrl;
+        }
+      }, 1500);
+        location.href = url;
+    }
+
+    function executeApp(url) {
+      var appUriScheme = url;
+      document.location.href = appUriScheme;
+    }
+
+    function is_installed_app_and(url,marketUrl){
+      var openAt = new Date;
+        setTimeout(
+          function() {
+            if (new Date - openAt < 1000)
+              goAppStoreOrPlayStore();
+          }, 500);
+      exeApp(url);
+      // and_GoStore(marketUrl);
+      // $("#div_app").html("<iframe id='frm' src='"+url+"' width=0 height=0 frameborder=0></iframe>");
+      // setTimeout(function(){
+      //   var div = $("#div_app");
+      //   var iframe = $("#frm");
+      //   if(iframe.length > 0){
+      //     iframe.remove();
+      //   }
+      // },1000);
+    }
+
+    function and_GoStore(marketUrl) {
+      var clickedAt = new Date();                                         
+      setTimeout(function() {
+        if (new Date() - clickedAt < 2000){
+          location.href = marketUrl;
+        }
+      }, 1500);
+    }
     
     
-    function setParams(params) {
-        this.appURI = params.appURI;
-        this.fallbackURL = params.fallbackURL;
-    }
-
-    function _createHiddenIframe() {
-        var iframe = document.createElement('IFRAME');
-
-        iframe.style.display = 'none';
-        return iframe;
-    }
-
-    function _launchAppViaIframe() {
-        var iframe = this._createHiddenIframe(),
-            start = +new Date(),
-            self = this;
-
-        iframe.src = self.appURI;
-        iframe.addEventListener('load', function onload() {
-            iframe.removeEventListener('load', onload);
-            document.body.removeChild(iframe);
-        });
-        document.body.appendChild(iframe);
-
-        setTimeout(function() {
-            var now = +new Date();
-            if (now - start < 2000) {
-                top.location.href = self.fallbackURL;
-            }
-        }, 500);
-    }
-
-    function _checkSupportingFallbackURL() {
-        var iframe = this._createHiddenIframe(),
-            self = this;
-
-        iframe.addEventListener('load', function onload() {
-            if (iframe.src === SCHEME_FOR_TEST) {
-                self.isNotSupportedFallbackURL = true;
-            } else {
-                iframe.removeEventListener('load', onload);
-                document.body.removeChild(iframe);
-                self.isPrepared = true;
-            }
-        });
-        iframe.src = SCHEME_FOR_TEST;
-
-        document.body.appendChild(iframe);
-        setTimeout(function() {
-            iframe.src = '';
-        }, 100);
-    }
-
-    function _launchAppViaIntent() {
-        var popup,
-            self = this;
-
-        if (!this.isPrepared) {
-            setTimeout(this.load.bind(this), 100);
-            return;
-        }
-
-        if (!this.isNotSupportedFallbackURL) {
-            window.location.href = self.appURI;
-            return;
-        }
-
-        popup = window.open('');
-        if (popup) {
-            popup.addEventListener('unload', function onUnload() {
-                setTimeout(function () {
-                    if (popup.opener) {
-                        popup.opener.location.href = self.fallbackURL;
-                    }
-                }, 10);
-                popup.close();
-                popup.removeEventListener('unload', onUnload);
-            });
-            popup.location.href = this.appURI.replace(/package=.*?;/, '');
-        } else {
-            alert('팝업 허용해주세요');
-        }
-    }
-
-    function load() {
-        alert('load() is not implemented!');
-    }
-
-    function _checkSupportingFallbackURL() {
-        var iframe = this._createHiddenIframe(),
-            self = this;
-
-        iframe.addEventListener('load', function onload() {
-            if (iframe.src === SCHEME_FOR_TEST) {
-                self.isNotSupportedFallbackURL = true;
-            } else {
-                iframe.removeEventListener('load', onload);
-                document.body.removeChild(iframe);
-                self.isPrepared = true;
-            }
-        });
-        iframe.src = SCHEME_FOR_TEST;
-
-        document.body.appendChild(iframe);
-        setTimeout(function() {
-            iframe.src = '';
-        }, 100);
-    }
-     
-    function is_installed_app_and(url)
-    {
-      this._checkSupportingFallbackURL();
-      this.load = this._launchAppViaIntent;
-
-
-
-    //     var macketUrl = 'https://play.google.com/store/apps/details?id=com.kakao.talk&hl=ko';
-    //     install_and( macketUrl );
-    //  
-    //     $("#div_app").html( "<iframe id='frm' src='" + url + "' width=0 height=0 frameborder=0></iframe>" );
-    //     setTimeout(function () {
-    //         var div = $("#div_app");
-    //         var iframe = $("#frm");
-    //         if( iframe.length > 0)
-    //         {
-    //             iframe.remove();
-    //         }
-    //     }, 1000 );
-     
-    }
-    function install_and( macketUrl )
-    {
-        var clickedAt = +new Date();
-        setTimeout( function () {
-            if(+new Date() - clickedAt < 2000) 
-            {
-                location.href = macketUrl;
-            }
-        }, 1500);
-    }
   </script>
 <!--   <script src="bower_components/qrjs/qr.js"></script>
   <script src="bower_components/qr-code/src/qr-code.js"></script> -->
@@ -289,6 +199,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <a href="kakaolink://" onclick="executeApp(this.href);return false;">카카오톡앱 실행</a><br />
+  <br><br><br><br><br>
+  <a href="cofferlink://" onclick="executeApp(this.href);return false;">Coffer앱 실행</a><br />
+  <div id="div_app"></div>
   <!-- <a href="kakaolink://" onclick="executeApp(this.href);return false;">네이버앱 실행</a><br />
   <div id="div_app"></div> -->
 
@@ -297,7 +212,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template is="dom-bind" id="app">
     <coffer-category-data categories="{{categories}}"></coffer-category-data>
     <things-setting id="setting" hidden></things-setting>
-    <script type="text/javascript">
+<!--     <script type="text/javascript">
       // var app = document.querySelector('#content');
       var setting = document.querySelector('#setting');
       window.addEventListener('WebComponentsReady', function() {
@@ -305,7 +220,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
           }
       });
-    </script>
+    </script> -->
 
     <coffer-header categories="[[categories]]" route="[[route]]" params="[[params]]"></coffer-header>
 
