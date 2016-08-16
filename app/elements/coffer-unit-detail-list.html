@@ -243,7 +243,7 @@
 
       <paper-dialog id="update-timeline" modal>
         <h2>Update Timeline</h2>
-        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" name="[[timelineName]]", content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
+        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update", timeline-id="[[timelineId]]" name="[[timelineName]]", content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
       </paper-dialog>
 
 <!--       <paper-fullscreen-dialog id="unit-image-viewer">
@@ -428,6 +428,7 @@
         this.timelineName = event.detail.name;
         this.timelineContent = event.detail.content;
         this.timelineThumbnail = event.detail.image_id;
+        this.timelineId = event.detail.id;
         this.$["update-timeline"].open();
       },
 

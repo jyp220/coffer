@@ -42,6 +42,7 @@
 
       <paper-button id="submitButton" raised on-click="_timelineCreate">Submit</paper-button>
       <paper-button id="closeButton" raised on-click="_timelineClose">close</paper-button>
+      <paper-button id="testButton" raised on-click="_timelineTest">test</paper-button>
     </form>
   </template>
 
@@ -71,8 +72,7 @@
         ],
 
         _thumbnailChanged: function(thumbnail) {
-          if(thumbnail != "") {
-            console.log(thumbnail);
+          if(thumbnail != null && thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
 
             for(var i = 0 ; i < thumbnailIds.length ; i++) {
@@ -222,6 +222,49 @@
           myRequest.send(oData);
         },
 
+        _timelineTest: function(e) {
+          var thumbnailIds = this.timelineThumbnail.split(',');
+          var img = [];
+
+          for(var i = 0 ; i < thumbnailIds.length ; i++) {
+            if(document.getElementById('added_' + i)) {
+              img.push(thumbnailIds[i]);
+            }
+          }
+          console.log(this.timelineId);
+          console.log(img);
+
+          var divList = document.getElementById('addedFormDiv');
+          for(var i = 0 ; i < divList.childNodes.length ; i++) {
+            divList.childNodes[i].childNodes[2].disabled = false;
+          }
+
+          var form = this.$.timelineNewForm;
+          var oData = new FormData(form);
+          var self = this;
+
+          var result = {
+            'name' : form.elements['name'].value,
+            'unit_id' : app.params.id,
+            'content' : form.elements['content'].value,
+            'img' : img
+          };
+
+          oData.append('item', JSON.stringify(result));
+          var myRequest = new XMLHttpRequest();
+          myRequest.onreadystatechange = function(){
+            if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+              self._reset();
+              self.fire(self.data + '-success', { title: 'close' });
+            } 
+          };
+
+          var setting = document.querySelector('#setting');
+          myRequest.withCredentials = true;
+          myRequest.open('post', setting.get('globals.baseUrl') + '/time_lines/' + this.timelineId,true);
+          myRequest.send(oData);
+        },
+
         _reset: function() {
           this.name = "";
           this.content = "";
@@ -231,6 +274,7 @@
             divList.removeChild( divList.firstChild );       
           }
           this.timelineThumbnail = "";
+          this.timelineId = "";
           this.maxCount = 0;
           this.count = 0;
         }
