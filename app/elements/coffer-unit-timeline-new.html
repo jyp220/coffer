@@ -37,7 +37,7 @@
       <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
       <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
 
-      <div id="addedFormDiv"></div>
+      <div id="addedTimelineDiv"></div>
       <input type="button" value=" 추가 " on-click="add_item"><br>
 
       <paper-button id="submitButton" raised on-click="_timelineCreate">Submit</paper-button>
@@ -57,7 +57,7 @@
 
           count: {
             type: Number,
-            value: 1
+            value: 0
           },
 
           maxCount: {
@@ -68,7 +68,7 @@
 
         add_item: function(){
           if(this.maxCount < 3) {
-            var addedFormDiv = this.$.addedFormDiv;
+            var addedTimelineDiv = this.$.addedTimelineDiv;
             var self = this;
             var idx = this.count;
 
@@ -96,7 +96,7 @@
             addedDiv.appendChild(btn);
             addedDiv.appendChild(label);
             addedDiv.appendChild(file);
-            addedFormDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+            addedTimelineDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
 
             this.count++;
             this.maxCount++;
@@ -147,13 +147,14 @@
             document.getElementById(thumbnailId).src = "";
           }
           document.getElementById(deleteBtnId).hidden = false;
+          document.getElementById(fileId).disabled = true;
           reader.onload = function  () {
             self.createThumbnail(reader.result, idx);
           };
         },
 
         _deleteFile: function(idx) {
-          document.getElementById('addedFormDiv').removeChild(document.getElementById('added_' + idx));
+          document.getElementById('addedTimelineDiv').removeChild(document.getElementById('added_' + idx));
           this.maxCount--;
         },
 
@@ -163,6 +164,11 @@
         },
 
         _timelineCreate: function(e) {
+          var divList = document.getElementById('addedTimelineDiv');
+          for(var i = 0 ; i < divList.childNodes.length ; i++) {
+            divList.childNodes[i].childNodes[2].disabled = false;
+          }
+
           var form = this.$.timelineNewForm;
           var oData = new FormData(form);
           var self = this;
@@ -191,13 +197,13 @@
         _reset: function() {
           this.name = "";
           this.content = "";
-          var divList = document.getElementById('addedFormDiv');
+          var divList = document.getElementById('addedTimelineDiv');
           while ( divList.hasChildNodes() )
           {
             divList.removeChild( divList.firstChild );       
           }
           this.maxCount = 0;
-          this.count = 1;
+          this.count = 0;
         }
       })
     })();

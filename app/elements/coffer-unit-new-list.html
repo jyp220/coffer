@@ -66,7 +66,7 @@
         </paper-menu>
       </paper-dropdown-menu>
       <br>
-      <div id="addedFormDiv"></div>
+      <div id="addedUnitListDiv"></div>
       <input type="button" value=" 추가 " on-click="add_item"><br>
 
       <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button>
@@ -90,7 +90,7 @@
 
           count: {
             type: Number,
-            value: 1
+            value: 0
           },
 
           maxCount: {
@@ -101,7 +101,7 @@
 
         add_item: function(){
           if(this.maxCount < 3) {
-            var addedFormDiv = this.$.addedFormDiv;
+            var addedUnitListDiv = this.$.addedUnitListDiv;
             var self = this;
             var idx = this.count;
 
@@ -129,7 +129,7 @@
             addedDiv.appendChild(btn);
             addedDiv.appendChild(label);
             addedDiv.appendChild(file);
-            addedFormDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+            addedUnitListDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
 
             this.count++;
             this.maxCount++;
@@ -179,6 +179,7 @@
             document.getElementById(thumbnailId).src = "";
           }
           document.getElementById(deleteBtnId).hidden = false;
+          document.getElementById(fileId).disabled = true;
           reader.onload = function  () {
             self.createThumbnail(reader.result, idx);
           };
@@ -202,6 +203,10 @@
         },
 
         _unitCreate: function(e) {
+          var divList = document.getElementById('addedUnitListDiv');
+          for(var i = 0 ; i < divList.childNodes.length ; i++) {
+            divList.childNodes[i].childNodes[2].disabled = false;
+          }
 
           var form = this.$.unitNewForm;
           var oData = new FormData(form);
@@ -229,7 +234,7 @@
         },
 
         _deleteFile: function(idx) {
-          document.getElementById('addedFormDiv').removeChild(document.getElementById('added_' + idx));
+          document.getElementById('addedUnitListDiv').removeChild(document.getElementById('added_' + idx));
           this.maxCount--;
         },
 
@@ -238,14 +243,14 @@
           this.content = '';
           this.group = '';
 
-          var divList = document.getElementById('addedFormDiv');
+          var divList = document.getElementById('addedUnitListDiv');
           while ( divList.hasChildNodes() )
           {
             divList.removeChild( divList.firstChild );       
           }
 
           this.maxCount = 0;
-          this.count = 1;
+          this.count = 0;
         }
 
       })

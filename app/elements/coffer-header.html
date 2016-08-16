@@ -224,7 +224,7 @@
       <h2>New Unit</h2>
       <!-- <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button> -->
       <paper-dialog-scrollable>
-      <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]" thumbnail="[[thumbnailId]]"></coffer-unit-new>
+      <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" content="[[unitContent]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new>
       </paper-dialog-scrollable>
     </paper-dialog>
 
@@ -313,9 +313,9 @@
         this.unitData = 'update-unit-header';
 
         this.unitName = event.detail.name;
-        this.unitDescription = event.detail.content;
+        this.unitContent = event.detail.content;
         this.unitGroup = event.detail.coffer.name;
-        this.thumbnailId = event.detail.thumbnail_id;
+        this.unitThumbnail = event.detail.thumbnail_id;
         // console.log(this.unitName + " / " + this.unitDescription + " / " + this.unitGroup + " / " + this.thumbnailId);
         this.$["new-unit-home"].open();
       },

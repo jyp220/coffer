@@ -53,7 +53,7 @@
       paper-fab{
         @apply(--things-coffer-fab)
       }
-      paper-fullscreen-dialog{
+      paper-dialog{
         height:80% !important;
         margin-top:9%;
         overflow:hidden;
@@ -239,20 +239,18 @@
       <paper-fab noink="" id="add-timeline" icon="add" title="add timeline"></paper-fab>
       <paper-dialog id="new-timeline" modal>
         <h2>New Timeline</h2>
-        <paper-button id="create-timeline" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-unit-timeline-new id="new-timeline-data" data="coffer-timeline-create"></coffer-unit-timeline-new>
-      </paper-fullscreen-dialog>
+      </paper-dialog>
 
-      <paper-fullscreen-dialog id="update-timeline">
+      <paper-dialog id="update-timeline" modal>
         <h2>Update Timeline</h2>
-        <paper-button id="btn-update-timeline" affirmative="" dialog-confirm="">update</paper-button>
-        <coffer-unit-timeline-update id="update-timeline-data" name="[[timelineName]]", content="[[timelineContent]]"></coffer-unit-timeline-update>
-      </paper-fullscreen-dialog>
+        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" name="[[timelineName]]", content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
+      </paper-dialog>
 
-      <paper-fullscreen-dialog id="unit-image-viewer">
+<!--       <paper-fullscreen-dialog id="unit-image-viewer">
         <paper-button id="btn-unit-image-viewer" affirmative="" dialog-confirm=""></paper-button>
         <coffer-image-viewer unit-thumbnail="[[unitThumbnail]]"></coffer-image-viewer>
-      </paper-fullscreen-dialog>
+      </paper-fullscreen-dialog> -->
     </div>
 
   </template>
@@ -300,7 +298,6 @@
 
       listeners: {
         'add-timeline.tap': 'onTapAddTimeline',
-        'update-timeline.iron-overlay-closed': 'onUpdateTimelineDialogClosed',
         'create-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
         'create-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'delete-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
@@ -310,7 +307,9 @@
         'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
         'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'coffer-timeline-create-success' : '_onSuccessTimeline',
-        'coffer-timeline-create-close' : '_onCloseTimeline'
+        'coffer-timeline-create-close' : '_onCloseTimeline',
+        'coffer-timeline-update-success' : '_onSuccessTimeline',
+        'coffer-timeline-update-close' : '_onCloseTimeline'
       },
 
       _onFavorite: function(e) {
@@ -339,10 +338,6 @@
             this.$['coffer-search'].generateRequest();
           }
         } 
-      },
-
-      _showUnit: function(item) {
-        return true;
       },
 
       _toggle: function(e) {
@@ -405,20 +400,10 @@
         }
       },
 
-      /**
-       * 저장 성공시 액션
-       *
-       * @param {Object} event
-       */
       _handleSaveSuccess: function(event) {
         this.timelineListReload();
       },
 
-      /**
-       * 저장 실패시 액션
-       *
-       * @param {Object} event
-       */
       _handleSaveFailure: function(event) {
         alert('fail');
       },
@@ -438,14 +423,13 @@
         var ajax = this.$['delete-timeline-ajax'];
         this.deleteTimelineId = timeline.target.name;
         ajax.generateRequest();
-
-        // this.timelineListReload();
       },
 
       _handleSearchSuccess: function(event) {
         this.timelineName = event.detail.name;
         this.timelineContent = event.detail.content;
-        this.$['update-timeline'].toggle();
+        this.timelineThumbnail = event.detail.image_id;
+        this.$["update-timeline"].open();
       },
 
       _handleSearchFailure: function(event) {
@@ -478,17 +462,21 @@
         fsapi.toggleFullscreen();
       },
 
-      _qrData: function(unitItemId) {
-        return "http://192.168.35.96:5000/#!/unit-detail-list/" + unitItemId;
-      },
-
       _onSuccessTimeline: function(event) {
         this.timelineListReload();
-        this.$['new-timeline'].close();
+        if(event.target.id === 'new-timeline-data') {
+          this.$['new-timeline'].close();
+        } else {
+          this.$['update-timeline'].close();
+        }
       },
 
       _onCloseTimeline: function(event) {
-        this.$['new-timeline'].close();
+        if(event.target.id === 'new-timeline-data') {
+          this.$['new-timeline'].close();
+        } else {
+          this.$['update-timeline'].close();
+        }
       }
 
     });
