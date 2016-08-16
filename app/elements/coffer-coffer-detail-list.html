@@ -52,11 +52,12 @@
       <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
-      <paper-fullscreen-dialog id="new-unit">
+
+      <paper-dialog id="new-unit" modal>
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
-        <coffer-unit-new id="new-unit-data" data="coffer-detail-list"></coffer-unit-new>
-      </paper-fullscreen-dialog>
+        <coffer-unit-new-list id="new-unit-data" data="coffer-detail-list" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]"></coffer-unit-new-list>
+      </paper-dialog>
     </ul>
   </template>
 
@@ -90,9 +91,9 @@
 
       listeners: {
         'add-unit.tap': 'onTapAddUnit',
-        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
         'add-unit-search.things-ajax-response' : '_handleSaveSuccess',
         'add-unit-search.things-ajax-error' : '_handleSaveFailure',
+        'coffer-detail-list-success' : '_onSuccessUnit',
         'coffer-detail-list-close' : '_onCloseUnit'
       },
 
@@ -122,12 +123,10 @@
       },
 
       onTapAddUnit: function(e) {
+        this.unitName = '';
+        this.unitDescription = '';
+        this.unitGroup = '';
         this.$["new-unit"].open();
-      },
-
-      onNewUnitDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
       },
 
       unitListReload: function() {
@@ -170,9 +169,13 @@
         this.active = false;
       },
 
-      _onCloseUnit: function(event) {
+      _onSuccessUnit: function(event) {
         this.unitListReload();
         this.cofferListReload();
+        this.$['new-unit'].close();
+      },
+
+      _onCloseUnit: function(event) {
         this.$['new-unit'].close();
       }
 

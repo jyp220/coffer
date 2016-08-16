@@ -53,7 +53,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script type="text/javascript">
     var storage = window.localStorage;
-    storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
+    if(storage.getItem('setting.baseUrl') == null)
+      storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
 
 
     function executeApp(url) {
@@ -61,6 +62,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       if(userAgent.match('iphone') || userAgent.match('ipad') || userAgent.match('ipod')) {    //아이폰
          is_installed_app_ios(url,"362057947");
       }else if(userAgent.match('android')) {    //안드로이드 기기
+        alert("userAgent : " + userAgent);
         is_installed_app_and(url,"market://details?id=com.kakao.talk&hl=ko");
       } else {    //그 외
         alert("userAgent : " + userAgent);
@@ -81,18 +83,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         location.href = url;
     }
 
-    function executeApp(url) {
+    function exeApp(url) {
       var appUriScheme = url;
       document.location.href = appUriScheme;
     }
 
     function is_installed_app_and(url,marketUrl){
-      var openAt = new Date;
-        setTimeout(
-          function() {
-            if (new Date - openAt < 1000)
-              goAppStoreOrPlayStore();
-          }, 500);
+      var openAt = +new Date;
+      setTimeout(
+        function() {
+          if (+new Date - openAt < 1000)
+            location.href = marketUrl;
+        }, 500);
       exeApp(url);
       // and_GoStore(marketUrl);
       // $("#div_app").html("<iframe id='frm' src='"+url+"' width=0 height=0 frameborder=0></iframe>");
@@ -103,6 +105,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //     iframe.remove();
       //   }
       // },1000);
+    }
+
+    function goAppStoreOrPlayStore(marketUrl) {
+      location.replace(marketUrl);
     }
 
     function and_GoStore(marketUrl) {
@@ -199,9 +205,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-  <a href="kakaolink://" onclick="executeApp(this.href);return false;">카카오톡앱 실행</a><br />
   <br><br><br><br><br>
+  <a href="kakaolink://" onclick="executeApp(this.href);return false;">카카오톡앱 실행</a><br />
   <a href="cofferlink://" onclick="executeApp(this.href);return false;">Coffer앱 실행</a><br />
   <div id="div_app"></div>
   <!-- <a href="kakaolink://" onclick="executeApp(this.href);return false;">네이버앱 실행</a><br />

@@ -92,8 +92,10 @@
 
       _imageSrc: function(thumbnail) {
         if(thumbnail != null) {
+          var thumbnailIds = thumbnail.split(',');
+
           var setting = document.querySelector('#setting');
-          return setting.get('globals.baseUrl') + "/download/" + thumbnail
+          return setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
         }
       }
 

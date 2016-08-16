@@ -178,10 +178,17 @@
 
     <div id="content">
       <div class="detail">
-        <paper-card heading="[[unitResource.name]]" image="[[_imageSrc(unitResource.thumbnail_id)]]" class="white" elevation="0">
+        <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
+          <iron-swipeable-pages selected="0">
+            <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id)]]" as="unitSrc">
+              <iron-image id="example-full-width" src="[[unitSrc.src]]"></iron-image>
+            </template>
+          </iron-swipeable-pages>
+          
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
+           <favorite-star on-click="_onFavorite"></favorite-star>
           </div>
           <div class="card-actions">
             <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
@@ -209,6 +216,13 @@
               <span></span>
               {{timeline.updated_at}}
             </div>
+
+            <iron-swipeable-pages selected="0">
+              <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
+                <iron-image id="example-full-width" width="200" src="[[timelineSrc.src]]"></iron-image>
+              </template>
+            </iron-swipeable-pages>
+
             <div class="content">
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
@@ -223,10 +237,10 @@
       </div>
 
       <paper-fab noink="" id="add-timeline" icon="add" title="add timeline"></paper-fab>
-      <paper-fullscreen-dialog id="new-timeline">
+      <paper-dialog id="new-timeline" modal>
         <h2>New Timeline</h2>
         <paper-button id="create-timeline" affirmative="" dialog-confirm="">create</paper-button>
-        <coffer-unit-timeline-new id="new-timeline-data"></coffer-unit-timeline-new>
+        <coffer-unit-timeline-new id="new-timeline-data" data="coffer-timeline-create"></coffer-unit-timeline-new>
       </paper-fullscreen-dialog>
 
       <paper-fullscreen-dialog id="update-timeline">
@@ -286,7 +300,6 @@
 
       listeners: {
         'add-timeline.tap': 'onTapAddTimeline',
-        'new-timeline.iron-overlay-closed': 'onNewTimelineDialogClosed',
         'update-timeline.iron-overlay-closed': 'onUpdateTimelineDialogClosed',
         'create-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
         'create-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
@@ -295,7 +308,13 @@
         'timeline-item-search.things-ajax-response' : '_handleSearchSuccess',
         'timeline-item-search.things-ajax-error' : '_handleSearchFailure',
         'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure'
+        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
+        'coffer-timeline-create-success' : '_onSuccessTimeline',
+        'coffer-timeline-create-close' : '_onCloseTimeline'
+      },
+
+      _onFavorite: function(e) {
+        alert(e.currentTarget.hasAttribute('active'));
       },
 
       _routeChanged: function(id, visible) {
@@ -335,7 +354,7 @@
       },
 
       onTapAddTimeline: function(e) {
-        this.$["new-timeline"].toggle();
+        this.$["new-timeline"].open();
       },
 
       createResource: function(data, type) {
@@ -363,13 +382,6 @@
         }
       },
 
-      onNewTimelineDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
-
-        this.createResource(this.$['new-timeline-data'].object, 'create');
-      },
-
       onUpdateTimelineDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
@@ -379,8 +391,17 @@
 
       _imageSrc: function(thumbnail) {
         if(thumbnail != null) {
+          var thumbnailIds = thumbnail.split(',');
           var setting = document.querySelector('#setting');
-          return setting.get('globals.baseUrl') + "/download/" + thumbnail
+          var arr = [];
+
+
+          for(var i = 0 ; i < thumbnailIds.length ; i++) {
+            var obj = {'src' : setting.get('globals.baseUrl') + "/download/" + thumbnailIds[i]};
+            arr.push(obj);
+          }
+
+          return arr;
         }
       },
 
@@ -444,7 +465,8 @@
       },
 
       clickOnImage: function(e) {
-        this.unitThumbnail = setting.get('globals.baseUrl') + "/download/" + this.unitResource.thumbnail_id;
+        var thumbnailIds = this.unitResource.thumbnail_id.split(',');
+        this.unitThumbnail = setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
         this.$['unit-image-viewer'].open();
         
         // this.toggleFullscreen(event.target);
@@ -459,6 +481,15 @@
       _qrData: function(unitItemId) {
         return "http://192.168.35.96:5000/#!/unit-detail-list/" + unitItemId;
       },
+
+      _onSuccessTimeline: function(event) {
+        this.timelineListReload();
+        this.$['new-timeline'].close();
+      },
+
+      _onCloseTimeline: function(event) {
+        this.$['new-timeline'].close();
+      }
 
     });
 

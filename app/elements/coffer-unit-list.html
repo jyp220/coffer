@@ -64,11 +64,12 @@
       <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
-      <paper-fullscreen-dialog id="new-unit">
+
+      <paper-dialog id="new-unit" modal>
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
-        <coffer-unit-new id="new-unit-data" data="coffer-unit-list"></coffer-unit-new>
-      </paper-fullscreen-dialog>
+        <coffer-unit-new-list id="new-unit-data" data="coffer-unit-list""></coffer-unit-new-list>
+      </paper-dialog>
     </ul>
   </template>
 
@@ -107,9 +108,9 @@
 
       listeners: {
         'add-unit.tap': 'onTapAddUnit',
-        'new-unit.iron-overlay-closed': 'onNewUnitDialogClosed',
         'get-unit.things-ajax-response' : '_handleSaveSuccess',
         'get-unit.things-ajax-error' : '_handleSaveFailure',
+        'coffer-unit-list-success' : '_onSuccessUnit',
         'coffer-unit-list-close' : '_onCloseUnit'
       },
 
@@ -130,17 +131,15 @@
       },
 
       onTapAddUnit: function(e) {
+        this.unitName = '';
+        this.unitDescription = '';
+        this.unitGroup = '';
         this.$["new-unit"].open();
       },
 
       unitListReload: function() {
         var ajax = this.$['get-resource'];
         ajax.generateRequest();
-      },
-
-      onNewUnitDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
       },
 
       loadMoreData: function() {
@@ -172,9 +171,13 @@
         this.active = false;
       },
 
-      _onCloseUnit: function(event) {
+      _onSuccessUnit: function(event) {
         this.page = 1;
         this.unitListReload();
+        this.$['new-unit'].close();
+      },
+
+      _onCloseUnit: function(event) {
         this.$['new-unit'].close();
       }
 

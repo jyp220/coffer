@@ -130,7 +130,7 @@
         display: none;
       }
       /* small screen */
-      @media (max-width: 367px) {
+      @media (max-width: 267px) {
         :host {
           padding-top: 64px;
         }
@@ -152,7 +152,9 @@
       }
     </style>
 
-    <iron-media-query query="max-width: 367px" query-matches="{{smallScreen}}"></iron-media-query>
+    <iron-media-query query="max-width: 267px" query-matches="{{smallScreen}}"></iron-media-query>
+    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
+    </things-ajax>
 
     <app-header role="navigation" id="header" effects="waterfall" condenses="" reveals="">
       <app-toolbar>
@@ -209,34 +211,39 @@
           <template is="dom-if" if="{{_showQrCreate(route)}}">
             <paper-item id="qrCreate" on-tap="_moreMenuSelected" class="icon-more search">QR Create</paper-item>
           </template>
+          <template is="dom-if" if="{{_showEditItem(route)}}">
+            <paper-item id="edit" on-tap="_moreMenuSelected" class="icon-more search">Edit</paper-item>
+            <paper-item id="delete" on-tap="_moreMenuSelected" class="icon-more search">Delete</paper-item>
+          </template>
         </paper-menu>
       </paper-menu-button>
     </app-header>
 
-    
 
-    <paper-fullscreen-dialog id="new-unit-home">
-        <h2>New Unit</h2>
-        <!-- <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button> -->
-        <coffer-unit-new id="new-unit-data-home" data="create-unit-header"></coffer-unit-new>
-      </paper-fullscreen-dialog>
+    <paper-dialog id="new-unit-home" modal>
+      <h2>New Unit</h2>
+      <!-- <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button> -->
+      <paper-dialog-scrollable>
+      <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]" thumbnail="[[thumbnailId]]"></coffer-unit-new>
+      </paper-dialog-scrollable>
+    </paper-dialog>
 
-      <paper-fullscreen-dialog id="new-coffer-home">
-        <h2>New Coffer</h2>
-        <!-- <paper-button id="create-coffer" affirmative="" dialog-confirm=""></paper-button> -->
-        <coffer-coffer-new id="new-coffer-data-home" data="create-coffer-header"></coffer-coffer-new>
-      </paper-fullscreen-dialog>
+    <paper-fullscreen-dialog id="new-coffer-home">
+      <h2>New Coffer</h2>
+      <!-- <paper-button id="create-coffer" affirmative="" dialog-confirm=""></paper-button> -->
+      <coffer-coffer-new id="new-coffer-data-home" data="create-coffer-header"></coffer-coffer-new>
+    </paper-fullscreen-dialog>
 
-      <paper-fullscreen-dialog id="search-unit">
-        <h2>Search Unit</h2>
-        <paper-button id="btn-search-unit" affirmative=""></paper-button>
-        <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
-      </paper-fullscreen-dialog>
+    <paper-fullscreen-dialog id="search-unit">
+      <h2>Search Unit</h2>
+      <paper-button id="btn-search-unit" affirmative=""></paper-button>
+      <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
+    </paper-fullscreen-dialog>
 
-      <paper-fullscreen-dialog id="qrcode-viewer">
-        <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
-        <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
-      </paper-fullscreen-dialog>
+    <paper-fullscreen-dialog id="qrcode-viewer">
+      <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
+      <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
+    </paper-fullscreen-dialog>
   </template>
 
   <script>
@@ -260,16 +267,15 @@
       },
 
       listeners: {
-        'new-unit-home.iron-overlay-closed': 'onNewUnitDialogClosed',
         'new-coffer-home.iron-overlay-closed': 'onNewCofferDialogClosed',
         'close-search': '_onCloseSearch',
+        'create-unit-header-success' : '_onSuccessUnit',
         'create-unit-header-close' : '_onCloseUnit',
-        'create-coffer-header-close' : '_onCloseCoffer'
-      },
-
-      onNewUnitDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
+        'create-coffer-header-close' : '_onCloseCoffer',
+        'unit-search.things-ajax-response' : '_handleUnitSearchSuccess',
+        'unit-search.things-ajax-error' : '_handleUnitSearchFailure',
+        'update-unit-header-success' : '_onSuccessUpdateUnit',
+        'update-unit-header-close' : '_onCloseUpdateUnit'
       },
 
       onNewCofferDialogClosed: function(e) {
@@ -279,6 +285,8 @@
 
       _moreMenuSelected: function(e) {
         if(e.target.id === 'createUnit') {
+          this.unitData = 'create-unit-header';
+
           this.$["new-unit-home"].open();
         }else if(e.target.id === 'creteCoffer') {
           this.$["new-coffer-home"].open();
@@ -288,7 +296,32 @@
           this.$["search-unit"].open();
         }else if(e.target.id === 'qrCreate') {
           this.$["qrcode-viewer"].open();
+        }else if(e.target.id === 'edit') {
+          if(this.route === 'unit-detail-list') {
+            var ajax = this.$['unit-search'];
+            this.unitItemId = this.params.id;
+            ajax.generateRequest();
+          }else if(this.route === 'coffer-detail-list') {
+            this.$["new-coffer-home"].open();
+          }
+        }else if(e.target.id === 'delete') {
+          alert("진짜????????");
         }
+      },
+
+      _handleUnitSearchSuccess: function(event) {
+        this.unitData = 'update-unit-header';
+
+        this.unitName = event.detail.name;
+        this.unitDescription = event.detail.content;
+        this.unitGroup = event.detail.coffer.name;
+        this.thumbnailId = event.detail.thumbnail_id;
+        // console.log(this.unitName + " / " + this.unitDescription + " / " + this.unitGroup + " / " + this.thumbnailId);
+        this.$["new-unit-home"].open();
+      },
+
+      _handleUnitSearchFailure: function(event) {
+        alert('fail');
       },
 
       _showLogin: function(route) {
@@ -308,6 +341,14 @@
 
       _showQrCreate: function(route) {
         if(route === 'unit-detail-list') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+
+      _showEditItem: function(route) {
+        if(route === 'unit-detail-list' || route === 'coffer-detail-list') {
           return true;
         } else {
           return false;
@@ -338,11 +379,15 @@
         this.drawerOpened = !this.drawerOpened;
       },
 
-      _onCloseUnit: function(e) {
+      _onSuccessUnit: function(e) {
         if(this.route === 'unit-list') {
           page('/');
           page('/unit-list');
         }
+        this.$['new-unit-home'].close();
+      },
+
+      _onCloseUnit: function(e) {
         this.$['new-unit-home'].close();
       },
 
@@ -354,15 +399,25 @@
         this.$['new-coffer-home'].close();
       },
 
+      _onCloseUpdateUnit: function(e) {
+        this.$['new-unit-home'].close();
+      },
+
+      _onSuccessUpdateUnit: function(e) {
+        page("/unit-detail-list/" + this.params.id);
+        this.$['new-unit-home'].close();
+      },
+
       startScan: function() {
         var unitHome = this.$["new-unit-home"];
+        var self = this;
         page("/unit-list");
         cordova.plugins.barcodeScanner.scan(
             function (result) {
               alert(result);
                 var prefix = result.text.split('/');
                 if(prefix.length > 1) {
-                  this.sendAjax(prefix[1], prefix[2], result.text);
+                  self.sendAjax(prefix[1], prefix[2], result.text);
                 } else {
                   unitHome.open();
                 }
@@ -371,6 +426,28 @@
                 alert("Scanning failed: " + error);
             }
         );
+      },
+
+      sendAjax: function(route, unitId, path) {
+        var unitHome = this.$["new-unit-home"];
+        var myRequest = new XMLHttpRequest();
+        myRequest.onreadystatechange = function(){
+          if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+            var res = myRequest.responseText;
+            if(res == null) {
+              unitHome.open();
+            } else {
+              page("/unit-detail-list/" + unitId);
+              // document.querySelector("coffer-app").route.path = path;
+              // document.querySelector("coffer-app").page = page;
+            }
+          } 
+        };
+
+        var setting = document.querySelector('#setting');
+        myRequest.withCredentials = true;
+        myRequest.open('get', setting.get('globals.baseUrl') + '/units/' + unitId,true);
+        myRequest.send(null);
       }
     });
 

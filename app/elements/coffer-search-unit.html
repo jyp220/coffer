@@ -91,6 +91,8 @@
         },
 
         onClose: function(e) {
+          this.$.colors.value = "";
+          this.unitResource = null;
           this.fire('close-search', { title: 'close' });
         }
       });

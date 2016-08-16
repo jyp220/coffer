@@ -7,10 +7,16 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/iron-form/iron-form.html">
 
-<dom-module id="coffer-unit-new">
+<dom-module id="coffer-unit-new-list">
   <template>
 
     <style>
+      .imageDelete{
+        background:url("../images/icon-more.png") 50% -250px no-repeat;
+        width:25px;height:16px;
+        display:block;
+        float:left;
+      }
       ::shadow .fileUpload label {
         display: inline-block;
         padding: .5em .75em;
@@ -73,7 +79,7 @@
       'use strict';
 
       Polymer({
-        is: 'coffer-unit-new',
+        is: 'coffer-unit-new-list',
 
         properties: {
           cofferResource: Object,

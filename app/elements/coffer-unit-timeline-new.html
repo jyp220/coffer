@@ -7,13 +7,42 @@
   <template>
 
     <style>
+      ::shadow .fileUpload label {
+        display: inline-block;
+        padding: .5em .75em;
+        color: #999;
+        font-size: inherit;
+        line-height: normal;
+        vertical-align: middle;
+        background-color: #fdfdfd;
+        cursor: pointer;
+        border: 1px solid #ebebeb;
+        border-bottom-color: #e2e2e2;
+        border-radius: .25em;
+      }
+      /* 파일 필드 숨기기 */
+      ::shadow .fileUpload input[type="file"] {  
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip:rect(0,0,0,0);
+        border: 0;
+      }
     </style>
 
-    <paper-input label="name" type="string" value="{{name}}">
-    </paper-input>
+    <form is="iron-form" id="timelineNewForm" method="post" enctype="multipart/form-data">
+      <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
+      <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
 
-    <paper-textarea label="content" type="string" value="{{content}}">
-    </paper-textarea>
+      <div id="addedFormDiv"></div>
+      <input type="button" value=" 추가 " on-click="add_item"><br>
+
+      <paper-button id="submitButton" raised on-click="_timelineCreate">Submit</paper-button>
+      <paper-button id="closeButton" raised on-click="_timelineClose">close</paper-button>
+    </form>
   </template>
 
   <script>
@@ -24,21 +53,153 @@
         is: 'coffer-unit-timeline-new',
 
         properties: {
-          object: {
-            type: Object,
-            value: {},
-            notify: true,
-            computed: '_computeTimelineObject(name,content)'
+          data: String,
+
+          count: {
+            type: Number,
+            value: 1
+          },
+
+          maxCount: {
+            type: Number,
+            value: 0
           }
         },
 
-        _computeTimelineObject: function(name, content) {
-          return {
-            name: name,
-            content: content
+        add_item: function(){
+          if(this.maxCount < 3) {
+            var addedFormDiv = this.$.addedFormDiv;
+            var self = this;
+            var idx = this.count;
+
+            var label = document.createElement('label');
+            label.setAttribute('for', 'timelinegetfile' + this.count);
+            label.innerHTML = "<img id='timelinethumbnail"+this.count+"' src='' width='100'></label>";
+
+            var file = document.createElement('input');
+            file.id = 'timelinegetfile' + this.count;
+            file.name = 'file';
+            file.setAttribute('label', 'file');
+            file.type = 'file';
+            file.onchange = function(){self.fileOnChange(idx)}
+
+            var btn = document.createElement('input');
+            btn.hidden = 'true';
+            btn.id = 'timelineBtn' + this.count;
+            btn.type = 'button';
+            btn.value = '삭제';
+            btn.onclick = function(){self._deleteFile(idx)}
+
+            var addedDiv = document.createElement("div"); // 폼 생성
+            addedDiv.id = "added_" + this.count; // 폼 Div에 ID 부여 (삭제를 위해)
+            addedDiv.setAttribute('class', 'fileUpload');
+            addedDiv.appendChild(btn);
+            addedDiv.appendChild(label);
+            addedDiv.appendChild(file);
+            addedFormDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+
+            this.count++;
+            this.maxCount++;
           }
+          
+        },
+
+        createThumbnail: function(readerUri, idx) {
+          //썸네일 이미지 생성
+          var tempImage = new Image(); //drawImage 메서드에 넣기 위해 이미지 객체화
+          tempImage.src = readerUri; //data-uri를 이미지 객체에 주입
+          var self = this;
+          tempImage.onload = function() {
+            //리사이즈를 위해 캔버스 객체 생성
+            var canvas = document.createElement('canvas');
+            var canvasContext = canvas.getContext("2d");
+            
+            //캔버스 크기 설정
+            canvas.width = 100; //가로 100px
+            canvas.height = 100; //세로 100px
+            
+            //이미지를 캔버스에 그리기
+            canvasContext.fillStyle = "#FFFFFF";
+            canvasContext.fillRect(0, 0, 100, 100);
+            canvasContext.drawImage(this, 0, 0, 100, 100);
+            //캔버스에 그린 이미지를 다시 data-uri 형태로 변환
+            var dataURI = canvas.toDataURL("image/jpeg");
+            //썸네일 이미지 보여주기
+            
+            var thumbnailId = 'timelinethumbnail' + idx;
+            document.getElementById(thumbnailId).src = dataURI;
+          };
+          this.add_item();
+        },
+
+        fileOnChange: function(idx) {
+          var fileId = 'timelinegetfile' + idx;
+          var thumbnailId = 'timelinethumbnail' + idx;
+          var deleteBtnId = 'timelineBtn' + idx;
+          var fileList = document.getElementById(fileId).files;
+          // var fileList = this.$["timelinegetfile" + idx].files;
+          var self = this;
+          // var fileList = this.$.getfile.inputElement.files;
+          var reader = new FileReader();
+          if(fileList.length > 0) {
+            reader.readAsDataURL(fileList [0]);
+          } else {
+            document.getElementById(thumbnailId).src = "";
+          }
+          document.getElementById(deleteBtnId).hidden = false;
+          reader.onload = function  () {
+            self.createThumbnail(reader.result, idx);
+          };
+        },
+
+        _deleteFile: function(idx) {
+          document.getElementById('addedFormDiv').removeChild(document.getElementById('added_' + idx));
+          this.maxCount--;
+        },
+
+        _timelineClose:function(e) {
+          this._reset();
+          this.fire(this.data + '-close', { title: 'close' });
+        },
+
+        _timelineCreate: function(e) {
+          var form = this.$.timelineNewForm;
+          var oData = new FormData(form);
+          var self = this;
+
+          var result = {
+            'name' : form.elements['name'].value,
+            'unit_id' : app.params.id,
+            'content' : form.elements['content'].value,
+          };
+
+          oData.append('item', JSON.stringify(result));
+          var myRequest = new XMLHttpRequest();
+          myRequest.onreadystatechange = function(){
+            if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
+              self._reset();
+              self.fire(self.data + '-success', { title: 'close' });
+            } 
+          };
+
+          var setting = document.querySelector('#setting');
+          myRequest.withCredentials = true;
+          myRequest.open('post', setting.get('globals.baseUrl') + '/time_lines',true);
+          myRequest.send(oData);
+        },
+
+        _reset: function() {
+          this.name = "";
+          this.content = "";
+          var divList = document.getElementById('addedFormDiv');
+          while ( divList.hasChildNodes() )
+          {
+            divList.removeChild( divList.firstChild );       
+          }
+          this.maxCount = 0;
+          this.count = 1;
         }
-      });
+      })
     })();
   </script>
 </dom-module>
