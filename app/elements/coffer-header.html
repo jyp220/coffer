@@ -4,40 +4,29 @@
 
   <template>
     <style>
+    :host{
+      --paper-badge-background:#585858;
+    }
       app-header {
         @apply(--layout-fixed-top);
         z-index: 1;
         background-color:#d05251;
-        --app-header-shadow: {
-          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.2);
-          height: 10px;
-          bottom: -10px;
-        };
-      }
-      app-toolbar{
-        height:40px;
+        padding-top:7px;
       }
       #tabContainer {
-        position: relative;
         height:40px;
+        padding-top:5px;
       }
-      .alarm-btn{
-        position:absolute;
-        right:175px;
-        margin-top:-40px;
-        opacity:.5
-      }
-      .alarm-btn2:hover{opacity:1}
       paper-icon-button {
         color:#fff;
       }
-      .more-btn{
+      /*.more-btn{
         position:absolute;
         right:5px;
         margin-top:-40px;
         opacity:.5
       }
-      .more-btn:hover{opacity:1}
+      .more-btn:hover{opacity:1}*/
       paper-icon-button {
         color:#fff;
       }
@@ -45,32 +34,18 @@
         text-align: center;
       }
       .logo a {
-        font-size: 18px;
-        font-weight: 700;
-        color:#fff;
-        text-decoration: none;
-        /* required for IE 11, so this <a> can receive pointer events */
-        display: inline-block;
-        pointer-events: auto;
+        @apply(--things-coffer-logo)
       }
       coffer-tab a {
-        display: inline-block;
-        outline: none;
-        padding:5px 15px 3px 15px;
-        font-size: 13px;
-        font-weight: 500;
-        text-decoration: none;
-        color: var(--app-accent50p-color);
-      }
-      coffer-tab{
-        /*border:1px solid var(--app-accent50p-color);*/
-        border-radius:15px;
-      }
-      coffer-tabs{
-        background-color:var(--app-primary-color);
+        @apply(--things-coffer-tab-item)
       }
       coffer-tabs::shadow #overlay{
         display:none !important;
+      }
+      coffer-tabs::shadow #container{
+        border:1px solid var(--app-accent70p-color);
+        border-radius:15px;
+        margin-right:50px;
       }
       coffer-tab.iron-selected{
         border:1px solid #fff;
@@ -81,15 +56,22 @@
         font-weight:bold;
       }
       paper-menu-button{
-        width:130px;
+        float:right;
+        margin-top:-42px;margin-right:10px;
         padding:0;
       }
-      paper-menu-button paper-icon-button{
-        float:right;
+      .alarm-btn{left:-50px}
+      paper-menu-button::shadow .dropdown-content{
+        width:150px !important;
+        min-width:150px !important;
+        top:52px !important;
+      }
+      paper-menu-button::shadow iron-dropdown{
+        right:5px;
+        margin-left:-100px;
       }
       paper-item{
         padding:0 5px 0 10px;
-        min-width:120px;
         font-size:15px;
         color:var(--app-primary-text-color);
       }
@@ -118,12 +100,12 @@
       paper-menu{
         padding:0;
       }
+      paper-badge{
+        margin-top:7px;
+        margin-left:-5px;
+      }
       paper-item[focused]{
         background-color:#fff;
-      }
-
-      .left-bar-item {
-        width: 40px;
       }
 
       .menu-btn {
@@ -193,15 +175,8 @@
           </iron-selector>
         </app-drawer>
       </template>
-      <paper-menu-button class="alarm-btn">
-        <paper-icon-button id="alarm-btn" icon="menu" class="dropdown-trigger"></paper-icon-button>
-        <paper-menu class="dropdown-content">
-          <paper-item id="createUnit">Test</paper-item>
-        </paper-menu>
-      </paper-menu-button>
-      <paper-badge for="alarm-btn" label="4" class="blue"></paper-badge>
 
-      <paper-menu-button class="more-btn">
+      <paper-menu-button class="more-btn" dynamicAlign="true">
         <paper-icon-button icon="icons:more-horiz" class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
           <paper-item id="createUnit" on-tap="_moreMenuSelected" class="icon-more createunit">Create Unit</paper-item>
@@ -217,6 +192,15 @@
           </template>
         </paper-menu>
       </paper-menu-button>
+
+      <paper-menu-button class="alarm-btn">
+        <paper-icon-button id="alarm-btn" icon="social:notifications-none" class="dropdown-trigger"></paper-icon-button>
+        <paper-menu class="dropdown-content">
+          <paper-item id="createUnit">Test Test Test</paper-item>
+        </paper-menu>
+      </paper-menu-button>
+      <paper-badge for="alarm-btn" label="4"></paper-badge>
+
     </app-header>
 
 
@@ -374,7 +358,7 @@
       _computeShouldRenderDrawer: function(smallScreen) {
         return smallScreen;
       },
-      
+
       _toggleDrawer: function() {
         this.drawerOpened = !this.drawerOpened;
       },
@@ -421,7 +405,7 @@
                 } else {
                   unitHome.open();
                 }
-            }, 
+            },
             function (error) {
                 alert("Scanning failed: " + error);
             }
@@ -441,7 +425,7 @@
               // document.querySelector("coffer-app").route.path = path;
               // document.querySelector("coffer-app").page = page;
             }
-          } 
+          }
         };
 
         var setting = document.querySelector('#setting');
