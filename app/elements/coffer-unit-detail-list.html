@@ -33,21 +33,20 @@
         @apply(--layout-horizontal);
         @apply(--layout-center-justified);
       }
-      paper-card::shadow iron-image{
-        width:initial !important;
+      paper-card iron-image{
+        --iron-image-width:100%;
         max-height:450px;
-        margin-top:65px;
+        margin-top:35px;
       }
       paper-card{
         @apply(--things-coffer-detail-card);
       }
       paper-card::shadow .title-text{
-        top:10px;
-        left:15px;
+        top:15px;
         bottom:initial !important;
         padding:0 !important;
         color:var(--app-primary-color) !important;
-        font-size:20px !important;
+        font-size:24px !important;
         font-weight:bold !important;
       }
       paper-fab{
@@ -183,7 +182,7 @@
               <iron-image id="example-full-width" src="[[unitSrc.src]]"></iron-image>
             </template>
           </iron-swipeable-pages>
-          
+
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
@@ -196,7 +195,7 @@
               <div class="description">
                 <h2>Description</h2>
                 <p>[[unitResource.content]]</p>
-                
+
               </div>
             </iron-collapse>
           </div>
@@ -206,10 +205,10 @@
         <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
           <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]] / </a>
         </template>
-        
+
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
-          <li class$="{{timelineItem(timeline)}}"> 
+          <li class$="{{timelineItem(timeline)}}">
           <!-- <li class="timeline-item create">  -->
             <div class="timedot">
               <span></span>
@@ -331,7 +330,7 @@
             this.$['unit-search'].generateRequest();
             this.$['coffer-search'].generateRequest();
           }
-        } 
+        }
       },
 
       _toggle: function(e) {
@@ -447,7 +446,7 @@
         var thumbnailIds = this.unitResource.thumbnail_id.split(',');
         this.unitThumbnail = setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
         this.$['unit-image-viewer'].open();
-        
+
         // this.toggleFullscreen(event.target);
       },
 

@@ -42,7 +42,7 @@
       }
     </style>
 
-    
+
 
     <things-ajax auto="" id="get-resource" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{resource}}">
     </things-ajax>
@@ -119,7 +119,7 @@
           this.page = 1;
           this.unitListReload();
           this.fire('change-section', { title: 'unit' });
-        } 
+        }
       },
 
       _getPluralizedQuantity: function(quantity) {
@@ -147,7 +147,7 @@
           this.$.threshold.clearTriggers();
           if(this.visible) {
             if(this.resource.items.length >= this.resource.total) return;
-            
+
             this.active = true;
             this.page++;
             var ajax = this.$['get-unit'];

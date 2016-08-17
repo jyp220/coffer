@@ -6,35 +6,31 @@
   <template>
 
     <style>
-
       :host {
         @apply(--layout-vertical);
         @apply(--layout-center-justified);
         text-align: center;
+        border-bottom:1px solid rgba(0,0,0,.1);
+        padding:0 10px
       }
-
-      @media (max-width: 767px) {
-        :host {
-          margin: 0 12px;
-        }
-      }
-
-      paper-card.rate { 
-        @apply(--layout-horizontal); 
-      }
-      .rate-image {
-        width: 120px;
-        height: 90px;
-        margin-right:10px;
+      paper-card.rate {
+        @apply(--layout-horizontal);
       }
       .rate-content {
         @apply(--layout-flex);
         float: left;
       }
+      .rate-header{
+        @apply(--things-coffer-title);
+        margin:3px 0 3px 0
+      }
+      .rate-image {
+        @apply(--things-coffer-list-img);
+      }
       paper-card{
         max-width:100%;
         background-color:transparent;
-        padding:10px 0;
+        padding:5px 0;
         border-radius:0px;
         border:none;
         box-shadow:none
@@ -43,16 +39,14 @@
         padding:0;
         text-align:left
       }
-      .rate-header{
-        @apply(--things-coffer-title)
-      }
       .rate-desc{
-        height:40px;
+        height:25px;
         overflow:hidden;
         color:var(--app-primary-text-color);
       }
       .rate-info{
-        @apply(--things-coffer-desc)
+        @apply(--things-coffer-desc);
+        margin-bottom:1px
       }
       .rate-info iron-icon{
         @apply(--things-coffer-info-icon);
