@@ -187,7 +187,7 @@
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
-           <favorite-star on-click="_onFavorite"></favorite-star>
+           <!-- <favorite-star on-click="_onFavorite"></favorite-star> -->
           </div>
           <div class="card-actions">
             <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
@@ -243,13 +243,8 @@
 
       <paper-dialog id="update-timeline" modal>
         <h2>Update Timeline</h2>
-        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update", timeline-id="[[timelineId]]" name="[[timelineName]]", content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
+        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" timeline-id="[[timelineId]]" name="[[timelineName]]" content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
       </paper-dialog>
-
-<!--       <paper-fullscreen-dialog id="unit-image-viewer">
-        <paper-button id="btn-unit-image-viewer" affirmative="" dialog-confirm=""></paper-button>
-        <coffer-image-viewer unit-thumbnail="[[unitThumbnail]]"></coffer-image-viewer>
-      </paper-fullscreen-dialog> -->
     </div>
 
   </template>
