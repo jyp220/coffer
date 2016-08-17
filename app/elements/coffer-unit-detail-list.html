@@ -163,7 +163,7 @@
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[_setDateTime(unitResource.updated_at)]]</span>
-           <!-- <favorite-star on-click="_onFavorite"></favorite-star> -->
+           <iron-icon id="unitFavorite" icon="icons:star-border" on-click="_onFavorite"></iron-icon>
           </div>
           <div class="card-actions">
             <paper-icon-button icon="hardware:keyboard-arrow-up" title="more info" on-tap="_toggle">
@@ -285,11 +285,22 @@
       ],
 
       _onFavorite: function(e) {
+        if (e.currentTarget.hasAttribute('active')) {
+          e.currentTarget.removeAttribute('active');
+          e.currentTarget.icon = 'icons:star-border'
+        }
+        else {
+          e.currentTarget.setAttribute('active', '');
+          e.currentTarget.icon = 'icons:star'
+        }
         alert(e.currentTarget.hasAttribute('active'));
       },
 
       _routeChanged: function(id, visible) {
         if (visible) {
+          this.$.unitFavorite.setAttribute('active', '');
+          this.$.unitFavorite.icon = 'icons:star';
+
           this.timelineCnt = 1;
           this.page = 1;
 
