@@ -23,7 +23,10 @@ body {
 .focus-target {
   outline: none;
 }
-paper-dialog{border-top:2px solid #d05251}
+paper-dialog{
+  border-top:2px solid #d05251;
+  min-width:350px;
+}
 paper-dialog h2{
   margin-top:10px !important;
   color:#d05251;
@@ -31,4 +34,15 @@ paper-dialog h2{
 paper-dialog-scrollable{
   margin:10px 0 0 0 !important;
   background:#f0f0f0;
+  border-top:1px solid rgba(0,0,0,.1)
+}
+paper-dialog paper-button{float:right}
+paper-button{
+  background-color:#fff !important;
+  border:1px solid #d05251;
+  margin:20px 0 10px 7px !important;
+  padding:9px 10px 5px 10px !important;
+  color:#585858;
+  font-size:13px !important;
+  font-weight:bold !important;
 }
