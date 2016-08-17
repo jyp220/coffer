@@ -145,10 +145,17 @@
             file.type = 'file';
             file.onchange = function(){self.fileOnChange(idx)}
 
-            var btn = document.createElement('input');
-            btn.hidden = 'true';
+            // var btn = document.createElement('input');
+            // btn.hidden = 'true';
+            // btn.id = 'unitBtn' + this.count;
+            // btn.type = 'button';
+            // btn.onclick = function(){self._deleteFile(idx)}
+             
+            // <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button>
+            var btn = document.createElement('iron-icon');
             btn.id = 'unitBtn' + this.count;
-            btn.type = 'button';
+            btn.icon = 'icons:close';
+            btn.hidden = 'true';
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성

@@ -98,10 +98,16 @@
             file.type = 'file';
             file.onchange = function(){self.fileOnChange(idx)}
 
-            var btn = document.createElement('input');
+            // var btn = document.createElement('input');
+            // btn.hidden = 'true';
+            // btn.id = 'timelineBtn' + this.count;
+            // btn.type = 'button';
+            // btn.onclick = function(){self._deleteFile(idx)}
+            
+            var btn = document.createElement('iron-icon');
             btn.hidden = 'true';
             btn.id = 'timelineBtn' + this.count;
-            btn.type = 'button';
+            btn.icon = 'icons:close';
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성

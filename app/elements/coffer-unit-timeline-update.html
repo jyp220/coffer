@@ -38,7 +38,7 @@
     <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
     </things-ajax>
 
-    <form is="iron-form" id="timelineNewForm" method="post" enctype="multipart/form-data">
+    <form is="iron-form" id="timelineUpdateForm" method="post" enctype="multipart/form-data">
       <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
       <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
 
@@ -109,9 +109,9 @@
         },
 
         setThumbnail: function(thumbnail, idx) {
-          var thumbnailId = 'timelinethumbnail' + idx;
-          var fileId = 'timelinegetfile' + idx;
-          var deleteBtnId = 'timelineBtn' + idx;
+          var thumbnailId = 'timelineUpdateThumbnail' + idx;
+          var fileId = 'timelineUpdateGetfile' + idx;
+          var deleteBtnId = 'timelineUpdateBtn' + idx;
           var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
 
           document.getElementById(thumbnailId).src = src;
@@ -126,20 +126,26 @@
             var idx = this.count;
 
             var label = document.createElement('label');
-            label.setAttribute('for', 'timelinegetfile' + this.count);
-            label.innerHTML = "<img id='timelinethumbnail"+this.count+"' src='' width='100'></label>";
+            label.setAttribute('for', 'timelineUpdateGetfile' + this.count);
+            label.innerHTML = "<img id='timelineUpdateThumbnail"+this.count+"' src='' width='100'></label>";
 
             var file = document.createElement('input');
-            file.id = 'timelinegetfile' + this.count;
+            file.id = 'timelineUpdateGetfile' + this.count;
             file.name = 'file';
             file.setAttribute('label', 'file');
             file.type = 'file';
             file.onchange = function(){self.fileOnChange(idx)}
 
-            var btn = document.createElement('input');
+            // var btn = document.createElement('input');
+            // btn.hidden = 'true';
+            // btn.id = 'timelineUpdateBtn' + this.count;
+            // btn.type = 'button';
+            // btn.onclick = function(){self._deleteFile(idx)}
+            
+            var btn = document.createElement('iron-icon');
             btn.hidden = 'true';
-            btn.id = 'timelineBtn' + this.count;
-            btn.type = 'button';
+            btn.id = 'timelineUpdateBtn' + this.count;
+            btn.icon = 'icons:close';
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성
@@ -178,16 +184,16 @@
             var dataURI = canvas.toDataURL("image/jpeg");
             //썸네일 이미지 보여주기
             
-            var thumbnailId = 'timelinethumbnail' + idx;
+            var thumbnailId = 'timelineUpdateThumbnail' + idx;
             document.getElementById(thumbnailId).src = dataURI;
           };
           this.add_item();
         },
 
         fileOnChange: function(idx) {
-          var fileId = 'timelinegetfile' + idx;
-          var thumbnailId = 'timelinethumbnail' + idx;
-          var deleteBtnId = 'timelineBtn' + idx;
+          var fileId = 'timelineUpdateGetfile' + idx;
+          var thumbnailId = 'timelineUpdateThumbnail' + idx;
+          var deleteBtnId = 'timelineUpdateBtn' + idx;
           var fileList = document.getElementById(fileId).files;
           // var fileList = this.$["timelinegetfile" + idx].files;
           var self = this;
@@ -230,7 +236,7 @@
             divList.childNodes[i].childNodes[2].disabled = false;
           }
 
-          var form = this.$.timelineNewForm;
+          var form = this.$.timelineUpdateForm;
           var oData = new FormData(form);
           var self = this;
 

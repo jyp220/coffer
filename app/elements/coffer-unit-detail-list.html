@@ -217,7 +217,7 @@
 
       <paper-dialog id="update-timeline" modal>
         <h2>Update Timeline</h2>
-        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" timeline-id="[[timelineId]]" name="[[timelineName]]" content="[[timelineContent]]" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-update>
+        <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" timeline-id="[[timelineId]]" name="[[timelineName]]" content="[[timelineContent]]" timeline-thumbnail="[[timelineUpdateThumbnail]]"></coffer-unit-timeline-update>
       </paper-dialog>
     </div>
 
@@ -373,7 +373,7 @@
       _handleSearchSuccess: function(event) {
         this.timelineName = event.detail.name;
         this.timelineContent = event.detail.content;
-        this.timelineThumbnail = event.detail.image_id;
+        this.timelineUpdateThumbnail = event.detail.image_id;
         this.timelineId = event.detail.id;
 
         this.$["update-timeline"].open();
