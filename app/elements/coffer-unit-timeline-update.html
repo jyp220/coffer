@@ -33,6 +33,9 @@
       }
     </style>
 
+    <things-ajax id="delete-timeline-thumbnail-ajax" resource-action="delete" resource-url="time_lines/delete_thumbnail/[[timelineThumbnailId]]">
+    </things-ajax>
+
     <form is="iron-form" id="timelineNewForm" method="post" enctype="multipart/form-data">
       <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
       <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
@@ -64,12 +67,22 @@
           maxCount: {
             type: Number,
             value: 0
+          },
+
+          deleteIdx: {
+            type: String,
+            value: '-1'
           }
         },
 
         observers: [
           '_thumbnailChanged(timelineThumbnail)'
         ],
+
+        listeners: {
+          'delete-timeline-thumbnail-ajax.things-ajax-response' : '_handleThumbnailDeleteSuccess',
+          'delete-timeline-thumbnail-ajax.things-ajax-error' : '_handleThumbnailDeleteFailure'
+        },
 
         _thumbnailChanged: function(thumbnail) {
           if(thumbnail != null && thumbnail != "") {
@@ -182,8 +195,11 @@
         },
 
         _deleteFile: function(idx) {
-          document.getElementById('addedFormDiv').removeChild(document.getElementById('added_' + idx));
-          this.maxCount--;
+          var thumbnailIds = this.timelineThumbnail.split(',');
+          var ajax = this.$['delete-timeline-thumbnail-ajax'];
+          this.timelineThumbnailId = thumbnailIds[idx];
+          this.deleteIdx = idx;
+          ajax.generateRequest();
         },
 
         _timelineClose:function(e) {
@@ -223,17 +239,6 @@
         },
 
         _timelineTest: function(e) {
-          var thumbnailIds = this.timelineThumbnail.split(',');
-          var img = [];
-
-          for(var i = 0 ; i < thumbnailIds.length ; i++) {
-            if(document.getElementById('added_' + i)) {
-              img.push(thumbnailIds[i]);
-            }
-          }
-          console.log(this.timelineId);
-          console.log(img);
-
           var divList = document.getElementById('addedFormDiv');
           for(var i = 0 ; i < divList.childNodes.length ; i++) {
             divList.childNodes[i].childNodes[2].disabled = false;
@@ -246,8 +251,7 @@
           var result = {
             'name' : form.elements['name'].value,
             'unit_id' : app.params.id,
-            'content' : form.elements['content'].value,
-            'img' : img
+            'content' : form.elements['content'].value
           };
 
           oData.append('item', JSON.stringify(result));
@@ -277,7 +281,19 @@
           this.timelineId = "";
           this.maxCount = 0;
           this.count = 0;
-        }
+          this.deleteIdx = '-1';
+        },
+
+        _handleThumbnailDeleteSuccess: function(event) {
+          if(this.deleteIdx != '-1') {
+            document.getElementById('addedFormDiv').removeChild(document.getElementById('added_' + this.deleteIdx));
+            this.maxCount--;
+          }
+        },
+
+        _handleThumbnailDeleteFailure: function(event) {
+          alert('Thumbnail Delete Fail');
+        },
       })
     })();
   </script>

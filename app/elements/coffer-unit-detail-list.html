@@ -169,9 +169,6 @@
     <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
     </things-ajax>
 
-    <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
-    </things-ajax>
-
     <fullscreen-api id="fsapi"></fullscreen-api>
 
     <div id="content">
@@ -297,8 +294,6 @@
         'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'timeline-item-search.things-ajax-response' : '_handleSearchSuccess',
         'timeline-item-search.things-ajax-error' : '_handleSearchFailure',
-        'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'coffer-timeline-create-success' : '_onSuccessTimeline',
         'coffer-timeline-create-close' : '_onCloseTimeline',
         'coffer-timeline-update-success' : '_onSuccessTimeline',
@@ -343,38 +338,6 @@
 
       onTapAddTimeline: function(e) {
         this.$["new-timeline"].open();
-      },
-
-      createResource: function(data, type) {
-        if(type == 'create') {
-          var row = {
-            'name' : data.name,
-            'unit_id' : app.params.id,
-            'content' : data.content
-          };
-
-          var ajax = this.$['create-timeline-ajax'];
-          ajax.body = row;
-          ajax.generateRequest();
-        } else if(type == 'update') {
-          var row = {
-            'id' : this.timelineItemId,
-            'name' : data.name,
-            'unit_id' : app.params.id,
-            'content' : data.content
-          };
-
-          var ajax = this.$['update-timeline-ajax'];
-          ajax.body = row;
-          ajax.generateRequest();
-        }
-      },
-
-      onUpdateTimelineDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
-
-        this.createResource(this.$['update-timeline-data'].object, 'update');
       },
 
       _imageSrc: function(thumbnail) {
@@ -469,6 +432,7 @@
         if(event.target.id === 'new-timeline-data') {
           this.$['new-timeline'].close();
         } else {
+          this.timelineListReload();
           this.$['update-timeline'].close();
         }
       }

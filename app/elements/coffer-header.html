@@ -261,6 +261,10 @@
       _moreMenuSelected: function(e) {
         if(e.target.id === 'createUnit') {
           this.unitData = 'create-unit-header';
+          this.unitName = '';
+          this.unitContent = '';
+          this.unitGroup = '';
+          this.unitThumbnail = '';
 
           this.$["new-unit-home"].open();
         }else if(e.target.id === 'creteCoffer') {
@@ -291,7 +295,7 @@
         this.unitContent = event.detail.content;
         this.unitGroup = event.detail.coffer.name;
         this.unitThumbnail = event.detail.thumbnail_id;
-        // console.log(this.unitName + " / " + this.unitDescription + " / " + this.unitGroup + " / " + this.thumbnailId);
+        
         this.$["new-unit-home"].open();
       },
 
