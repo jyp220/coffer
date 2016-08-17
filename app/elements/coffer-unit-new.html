@@ -97,6 +97,10 @@
           '_thumbnailChanged(unitThumbnail)'
         ],
 
+        behaviors: [
+          Things.GlobalBehavior
+        ],
+
         _thumbnailChanged: function(thumbnail) {
           if(thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
@@ -112,8 +116,7 @@
           var thumbnailId = 'unitthumbnail' + idx;
           var fileId = 'unitgetfile' + idx;
           var deleteBtnId = 'unitBtn' + idx;
-          var setting = document.querySelector('#setting');
-          var src = setting.get('globals.baseUrl') + "/download/" + thumbnail;
+          var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
 
           document.getElementById(thumbnailId).src = src;
           document.getElementById(fileId).disabled = true;
@@ -247,9 +250,8 @@
             } 
           };
 
-          var setting = document.querySelector('#setting');
           myRequest.withCredentials = true;
-          myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
+          myRequest.open('post', this.get('globals.baseUrl') + '/units',true);
           myRequest.send(oData);
         },
 

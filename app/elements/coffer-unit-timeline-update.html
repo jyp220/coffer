@@ -84,6 +84,10 @@
           'delete-timeline-thumbnail-ajax.things-ajax-error' : '_handleThumbnailDeleteFailure'
         },
 
+        behaviors: [
+          Things.GlobalBehavior
+        ],
+
         _thumbnailChanged: function(thumbnail) {
           if(thumbnail != null && thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
@@ -99,8 +103,7 @@
           var thumbnailId = 'timelinethumbnail' + idx;
           var fileId = 'timelinegetfile' + idx;
           var deleteBtnId = 'timelineBtn' + idx;
-          var setting = document.querySelector('#setting');
-          var src = setting.get('globals.baseUrl') + "/download/" + thumbnail;
+          var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
 
           document.getElementById(thumbnailId).src = src;
           document.getElementById(fileId).disabled = true;
@@ -232,9 +235,8 @@
             } 
           };
 
-          var setting = document.querySelector('#setting');
           myRequest.withCredentials = true;
-          myRequest.open('post', setting.get('globals.baseUrl') + '/time_lines',true);
+          myRequest.open('post', this.get('globals.baseUrl') + '/time_lines',true);
           myRequest.send(oData);
         },
 
@@ -263,9 +265,8 @@
             } 
           };
 
-          var setting = document.querySelector('#setting');
           myRequest.withCredentials = true;
-          myRequest.open('post', setting.get('globals.baseUrl') + '/time_lines/' + this.timelineId,true);
+          myRequest.open('post', this.get('globals.baseUrl') + '/time_lines/' + this.timelineId,true);
           myRequest.send(oData);
         },
 

@@ -87,6 +87,10 @@
         'get-unit.things-ajax-error' : '_handleSaveFailure'
       },
 
+      behaviors: [
+        Things.GlobalBehavior
+      ],
+
       _visibleChanged: function(visible) {
         if (visible) {
           this.page = 1;
@@ -105,8 +109,7 @@
       _imageSrc: function(thumbnail) {
         if(thumbnail != null) {
           var thumbnailIds = thumbnail.split(',');
-          var setting = document.querySelector('#setting');
-          return setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
+          return this.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
         }
       },
 

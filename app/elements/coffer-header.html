@@ -112,6 +112,11 @@
       }*/
     </style>
 
+    <things-ajax id="delete-unit-ajax" resource-action="delete" resource-url="units/[[deleteUnitId]]">
+    </things-ajax>
+    <things-ajax id="delete-coffer-ajax" resource-action="delete" resource-url="coffers/[[deleteCofferId]]">
+    </things-ajax>
+
     <iron-media-query query="max-width: 267px" query-matches="{{smallScreen}}"></iron-media-query>
     <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
     </things-ajax>
@@ -219,6 +224,14 @@
       <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
       <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
     </paper-fullscreen-dialog>
+
+    <paper-dialog id="item-delete">
+      <h2>Delete????</h2>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-dismiss on-click="itemDelete">OK</paper-button>
+      </div>
+    </paper-dialog>
   </template>
 
   <script>
@@ -250,8 +263,16 @@
         'unit-search.things-ajax-response' : '_handleUnitSearchSuccess',
         'unit-search.things-ajax-error' : '_handleUnitSearchFailure',
         'update-unit-header-success' : '_onSuccessUpdateUnit',
-        'update-unit-header-close' : '_onCloseUpdateUnit'
+        'update-unit-header-close' : '_onCloseUpdateUnit',
+        'delete-unit-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'delete-unit-ajax.things-ajax-error' : '_handleSaveFailure',
+        'delete-coffer-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'delete-coffer-ajax.things-ajax-error' : '_handleSaveFailure'
       },
+
+      behaviors: [
+        Things.GlobalBehavior
+      ],
 
       onNewCofferDialogClosed: function(e) {
         if(!e.detail.confirmed)
@@ -284,7 +305,7 @@
             this.$["new-coffer-home"].open();
           }
         }else if(e.target.id === 'delete') {
-          alert("진짜????????");
+          this.$["item-delete"].open();
         }
       },
 
@@ -423,10 +444,29 @@
           }
         };
 
-        var setting = document.querySelector('#setting');
         myRequest.withCredentials = true;
-        myRequest.open('get', setting.get('globals.baseUrl') + '/units/' + unitId,true);
+        myRequest.open('get', this.get('globals.baseUrl') + '/units/' + unitId,true);
         myRequest.send(null);
+      },
+
+      itemDelete: function(e) {
+        if(this.route === 'unit-detail-list') {
+          var ajax = this.$['delete-unit-ajax'];
+          this.deleteUnitId = this.params.id;
+          ajax.generateRequest();
+        } else if(this.route === 'coffer-detail-list') {
+          var ajax = this.$['delete-coffer-ajax'];
+          this.deleteCofferId = this.params.id;
+          ajax.generateRequest();
+        }
+      },
+
+      _handleSaveSuccess: function(event) {
+        page('/');
+      },
+
+      _handleSaveFailure: function(event) {
+        alert('delete fail');
       }
     });
 

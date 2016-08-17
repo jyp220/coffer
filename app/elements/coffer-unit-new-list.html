@@ -99,6 +99,10 @@
           }
         },
 
+        behaviors: [
+          Things.GlobalBehavior
+        ],
+
         add_item: function(){
           if(this.maxCount < 3) {
             var addedUnitListDiv = this.$.addedUnitListDiv;
@@ -227,9 +231,8 @@
             } 
           };
 
-          var setting = document.querySelector('#setting');
           myRequest.withCredentials = true;
-          myRequest.open('post', setting.get('globals.baseUrl') + '/units',true);
+          myRequest.open('post', this.get('globals.baseUrl') + '/units',true);
           myRequest.send(oData);
         },
 

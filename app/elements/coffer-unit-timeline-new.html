@@ -66,6 +66,10 @@
           }
         },
 
+        behaviors: [
+          Things.GlobalBehavior
+        ],
+
         add_item: function(){
           if(this.maxCount < 3) {
             var addedTimelineDiv = this.$.addedTimelineDiv;
@@ -188,9 +192,8 @@
             } 
           };
 
-          var setting = document.querySelector('#setting');
           myRequest.withCredentials = true;
-          myRequest.open('post', setting.get('globals.baseUrl') + '/time_lines',true);
+          myRequest.open('post', this.get('globals.baseUrl') + '/time_lines',true);
           myRequest.send(oData);
         },
 
