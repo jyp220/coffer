@@ -187,14 +187,14 @@
 
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
-          <li class$="{{timelineItem(timeline)}}">
+          <li class$="{{timelineItem(timeline)}}" name="[[timeline.id]]" on-click="_edit">
           <!-- <li class="timeline-item create">  -->
             <div class="timedot">
               <span></span>
               [[_setDateTime(timeline.updated_at)]]
             </div>
 
-            <iron-swipeable-pages selected="0" name="[[timeline.id]]" on-click="_edit">
+            <iron-swipeable-pages selected="0">
               <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
                 <iron-image id="example-full-width" src="[[timelineSrc.src]]"></iron-image>
               </template>
