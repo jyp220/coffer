@@ -19,7 +19,6 @@
   <template>
 
     <style>
-
       :host {
         display: block;
       }
@@ -34,20 +33,18 @@
         @apply(--layout-center-justified);
       }
       paper-card iron-image{
-        --iron-image-width:100%;
+        width:initial !important;
         max-height:450px;
-        margin-top:35px;
+        margin-top:30px;
+      }
+      paper-card iron-image::shadow img{
+        max-width:100%
       }
       paper-card{
         @apply(--things-coffer-detail-card);
       }
       paper-card::shadow .title-text{
-        top:15px;
-        bottom:initial !important;
-        padding:0 !important;
-        color:var(--app-primary-color) !important;
-        font-size:24px !important;
-        font-weight:bold !important;
+        @apply(--things-coffer-detail-title);
       }
       paper-fab{
         @apply(--things-coffer-fab)
@@ -67,7 +64,7 @@
         @apply(--things-coffer-info-icon);
       }
       .card-actions{
-        background-color:#f6f6f6;
+        background-color:rgba(221,212,196,.7);
         text-align:left;
       }
       .card-actions paper-icon-button{
@@ -78,14 +75,14 @@
       .card-actions h2{
         margin:0;
         padding:5px 0 0 0;
-        font-size:14px;
+        font-size:16px;
         color:var(--app-primary-text-color);
       }
       .card-actions p{
         color:var(--app-primary-text-color);
         opacity:.7;
-        margin:0 0 0px 0;
-        font-size:12px;
+        margin:2px 0 5px 0;
+        font-size:14px;
       }
       ul{
         list-style: none;
@@ -109,7 +106,8 @@
       }
       .timedot{
         padding-left:30px;
-        font-size:11px;
+        font-size:12px;
+        line-height:1.4;
         color:var(--app-primary-text-color);
       }
       .timedot span{
@@ -149,6 +147,26 @@
         display:block;
         float:left;
       }
+      .cofferlist{
+        background-color:rgba(221,212,196,.7);
+        padding:0 10px 5px 15px;
+      }
+      .cofferlist label{
+        display:block;
+        color:#666;
+        font-size:13px;
+        font-weight:bold;
+      }
+      .cofferlist a{
+        opacity:.7;
+        display:inline-block;
+        padding:3px 10px 2px 1px;
+        color:#333;
+      }
+      .cofferlist iron-icon{
+        @apply(--things-coffer-info-icon);
+        opacity:.5
+      }
     </style>
 
 
@@ -167,6 +185,9 @@
     </things-ajax>
 
     <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
+    </things-ajax>
+
+    <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
     </things-ajax>
 
     <fullscreen-api id="fsapi"></fullscreen-api>
@@ -198,10 +219,12 @@
           </div>
         </paper-card>
 
-        <p>[[unitResource.creator.name]]`s Coffer List</p>
-        <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
-          <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]] / </a>
-        </template>
+        <div class="cofferlist">
+          <label>[[unitResource.creator.name]]`s Coffer List</label>
+          <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
+            <iron-icon icon="icons:assignment"></iron-icon><a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">[[coffer.name]] </a>
+          </template>
+        </div>
 
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
@@ -294,6 +317,8 @@
         'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'timeline-item-search.things-ajax-response' : '_handleSearchSuccess',
         'timeline-item-search.things-ajax-error' : '_handleSearchFailure',
+        'update-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'update-timeline-ajax.things-ajax-error' : '_handleSaveFailure',
         'coffer-timeline-create-success' : '_onSuccessTimeline',
         'coffer-timeline-create-close' : '_onCloseTimeline',
         'coffer-timeline-update-success' : '_onSuccessTimeline',
@@ -338,6 +363,38 @@
 
       onTapAddTimeline: function(e) {
         this.$["new-timeline"].open();
+      },
+
+      createResource: function(data, type) {
+        if(type == 'create') {
+          var row = {
+            'name' : data.name,
+            'unit_id' : app.params.id,
+            'content' : data.content
+          };
+
+          var ajax = this.$['create-timeline-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        } else if(type == 'update') {
+          var row = {
+            'id' : this.timelineItemId,
+            'name' : data.name,
+            'unit_id' : app.params.id,
+            'content' : data.content
+          };
+
+          var ajax = this.$['update-timeline-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        }
+      },
+
+      onUpdateTimelineDialogClosed: function(e) {
+        if(!e.detail.confirmed)
+          return
+
+        this.createResource(this.$['update-timeline-data'].object, 'update');
       },
 
       _imageSrc: function(thumbnail) {
@@ -432,7 +489,6 @@
         if(event.target.id === 'new-timeline-data') {
           this.$['new-timeline'].close();
         } else {
-          this.timelineListReload();
           this.$['update-timeline'].close();
         }
       },

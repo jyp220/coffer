@@ -68,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         alert("userAgent : " + userAgent);
       }
     }
-   
+
     function is_installed_app_ios(bundleId,appstoreId)
     {
       var appstoreUrl = "http://itunes.apple.com/kr/app/id"+appstoreId+"?mt=8";
@@ -112,15 +112,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     function and_GoStore(marketUrl) {
-      var clickedAt = new Date();                                         
+      var clickedAt = new Date();
       setTimeout(function() {
         if (new Date() - clickedAt < 2000){
           location.href = marketUrl;
         }
       }, 1500);
     }
-    
-    
+
+
   </script>
 <!--   <script src="bower_components/qrjs/qr.js"></script>
   <script src="bower_components/qr-code/src/qr-code.js"></script> -->
@@ -136,7 +136,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- For shared styles, shared-styles.html import in elements.html -->
   <!-- <style is="custom-style" include="shared-styles"></style> -->
   <style>
-    
+
     :host {
       display: block;
       position: relative;
@@ -145,7 +145,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
     iron-pages {
       max-width: 1440px;
-      margin: 0 auto;margin-top:15px;
+      margin: 0 auto;margin-top:75px;
     }
 
     .announcer {
@@ -205,10 +205,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
-  <br><br><br><br><br>
+  <!-- <br><br><br><br><br>
   <a href="kakaolink://" onclick="executeApp(this.href);return false;">카카오톡앱 실행</a><br />
   <a href="cofferlink://" onclick="executeApp(this.href);return false;">Coffer앱 실행</a><br />
-  <div id="div_app"></div>
+  <div id="div_app"></div> -->
   <!-- <a href="kakaolink://" onclick="executeApp(this.href);return false;">네이버앱 실행</a><br />
   <div id="div_app"></div> -->
 
