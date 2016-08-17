@@ -61,7 +61,7 @@
           <div class="rate-header">[[item.name]]</div>
           <div class="rate-info">
             <iron-icon icon="icons:assignment"></iron-icon>[[item.coffer.name]]
-            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[item.updated_at]]</span>
+            <iron-icon icon="icons:alarm-on"></iron-icon><span>[[_setDateTime(item.updated_at)]]</span>
           </div>
           <div class="rate-desc">[[item.content]]</div>
         </div>
@@ -91,6 +91,10 @@
           var setting = document.querySelector('#setting');
           return setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
         }
+      },
+
+      _setDateTime: function(updatedAt) {
+        return updatedAt.substring(0, 16);
       }
 
     });

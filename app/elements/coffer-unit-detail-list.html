@@ -182,7 +182,7 @@
 
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
-           <iron-icon icon="icons:alarm-on"></iron-icon><span>[[unitResource.updated_at]]</span>
+           <iron-icon icon="icons:alarm-on"></iron-icon><span>[[_setDateTime(unitResource.updated_at)]]</span>
            <!-- <favorite-star on-click="_onFavorite"></favorite-star> -->
           </div>
           <div class="card-actions">
@@ -209,7 +209,7 @@
           <!-- <li class="timeline-item create">  -->
             <div class="timedot">
               <span></span>
-              {{timeline.updated_at}}
+              [[_setDateTime(timeline.updated_at)]]
             </div>
 
             <iron-swipeable-pages selected="0">
@@ -435,6 +435,10 @@
           this.timelineListReload();
           this.$['update-timeline'].close();
         }
+      },
+
+      _setDateTime: function(updatedAt) {
+        return updatedAt.substring(0, 16);
       }
 
     });
