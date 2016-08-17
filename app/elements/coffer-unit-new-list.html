@@ -67,7 +67,7 @@
       </paper-dropdown-menu>
       <br>
       <div id="addedUnitListDiv"></div>
-      <input type="button" value=" 추가 " on-click="add_item"><br>
+      <!-- <input type="button" value=" 추가 " on-click="add_item"><br> -->
 
       <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button>
       <paper-button id="closeButton" raised on-click="_unitClose">close</paper-button>
@@ -99,9 +99,19 @@
           }
         },
 
+        observers: [
+          '_thumbnailChanged(unitThumbnail)'
+        ],
+
         behaviors: [
           Things.GlobalBehavior
         ],
+
+        _thumbnailChanged: function(thumbnail) {
+          if(thumbnail == "") {
+            this.add_item();
+          }
+        },
 
         add_item: function(){
           if(this.maxCount < 3) {
@@ -124,7 +134,6 @@
             btn.hidden = 'true';
             btn.id = 'unitBtn' + this.count;
             btn.type = 'button';
-            btn.value = '삭제';
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성
@@ -251,7 +260,7 @@
           {
             divList.removeChild( divList.firstChild );       
           }
-
+          this.unitThumbnail = '';
           this.maxCount = 0;
           this.count = 0;
         }

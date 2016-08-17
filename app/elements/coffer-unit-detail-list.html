@@ -212,7 +212,7 @@
       <paper-fab noink="" id="add-timeline" icon="add" title="add timeline"></paper-fab>
       <paper-dialog id="new-timeline" modal>
         <h2>New Timeline</h2>
-        <coffer-unit-timeline-new id="new-timeline-data" data="coffer-timeline-create"></coffer-unit-timeline-new>
+        <coffer-unit-timeline-new id="new-timeline-data" data="coffer-timeline-create" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-new>
       </paper-dialog>
 
       <paper-dialog id="update-timeline" modal>
@@ -332,39 +332,8 @@
       },
 
       onTapAddTimeline: function(e) {
+        this.timelineThumbnail = '';
         this.$["new-timeline"].open();
-      },
-
-      createResource: function(data, type) {
-        if(type == 'create') {
-          var row = {
-            'name' : data.name,
-            'unit_id' : app.params.id,
-            'content' : data.content
-          };
-
-          var ajax = this.$['create-timeline-ajax'];
-          ajax.body = row;
-          ajax.generateRequest();
-        } else if(type == 'update') {
-          var row = {
-            'id' : this.timelineItemId,
-            'name' : data.name,
-            'unit_id' : app.params.id,
-            'content' : data.content
-          };
-
-          var ajax = this.$['update-timeline-ajax'];
-          ajax.body = row;
-          ajax.generateRequest();
-        }
-      },
-
-      onUpdateTimelineDialogClosed: function(e) {
-        if(!e.detail.confirmed)
-          return
-
-        this.createResource(this.$['update-timeline-data'].object, 'update');
       },
 
       _imageSrc: function(thumbnail) {

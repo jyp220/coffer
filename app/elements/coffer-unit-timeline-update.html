@@ -43,7 +43,7 @@
       <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
 
       <div id="addedFormDiv"></div>
-      <input type="button" value=" 추가 " on-click="add_item"><br>
+      <!-- <input type="button" value=" 추가 " on-click="add_item"><br> -->
 
       <paper-button id="updateButton" raised on-click="_timelineUpdate">Update</paper-button>
       <paper-button id="closeButton" raised on-click="_timelineClose">close</paper-button>
@@ -95,11 +95,16 @@
         _thumbnailChanged: function(thumbnail) {
           if(thumbnail != null && thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
-
+            console.log(thumbnailIds);
             for(var i = 0 ; i < thumbnailIds.length ; i++) {
               this.add_item();
               this.setThumbnail(thumbnailIds[i], i);
+              if(i + 1 == thumbnailIds.length) {
+                this.add_item();
+              }
             }
+          } else {
+            this.add_item();
           }
         },
 
@@ -135,7 +140,6 @@
             btn.hidden = 'true';
             btn.id = 'timelineBtn' + this.count;
             btn.type = 'button';
-            btn.value = '삭제';
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성

@@ -56,7 +56,7 @@
       <paper-dialog id="new-unit" modal>
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
-        <coffer-unit-new-list id="new-unit-data" data="coffer-detail-list" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]"></coffer-unit-new-list>
+        <coffer-unit-new-list id="new-unit-data" data="coffer-detail-list" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new-list>
       </paper-dialog>
     </ul>
   </template>
@@ -126,6 +126,7 @@
         this.unitName = '';
         this.unitDescription = '';
         this.unitGroup = '';
+        this.unitThumbnail = '';
         this.$["new-unit"].open();
       },
 
