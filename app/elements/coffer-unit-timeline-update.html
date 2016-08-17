@@ -35,6 +35,8 @@
 
     <things-ajax id="delete-timeline-thumbnail-ajax" resource-action="delete" resource-url="time_lines/delete_thumbnail/[[timelineThumbnailId]]">
     </things-ajax>
+    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
+    </things-ajax>
 
     <form is="iron-form" id="timelineNewForm" method="post" enctype="multipart/form-data">
       <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
@@ -43,9 +45,9 @@
       <div id="addedFormDiv"></div>
       <input type="button" value=" 추가 " on-click="add_item"><br>
 
-      <paper-button id="submitButton" raised on-click="_timelineCreate">Submit</paper-button>
+      <paper-button id="updateButton" raised on-click="_timelineUpdate">Update</paper-button>
       <paper-button id="closeButton" raised on-click="_timelineClose">close</paper-button>
-      <paper-button id="testButton" raised on-click="_timelineTest">test</paper-button>
+      <paper-button id="submitButton" raised on-click="_timelineDelete">Delete</paper-button>
     </form>
   </template>
 
@@ -81,7 +83,9 @@
 
         listeners: {
           'delete-timeline-thumbnail-ajax.things-ajax-response' : '_handleThumbnailDeleteSuccess',
-          'delete-timeline-thumbnail-ajax.things-ajax-error' : '_handleThumbnailDeleteFailure'
+          'delete-timeline-thumbnail-ajax.things-ajax-error' : '_handleThumbnailDeleteFailure',
+          'delete-timeline-ajax.things-ajax-response' : '_handleSaveSuccess',
+          'delete-timeline-ajax.things-ajax-error' : '_handleSaveFailure'
         },
 
         behaviors: [
@@ -205,42 +209,18 @@
           ajax.generateRequest();
         },
 
-        _timelineClose:function(e) {
+        _timelineDelete: function(e) {
+          var ajax = this.$['delete-timeline-ajax'];
+          this.deleteTimelineId = this.timelineId;
+          ajax.generateRequest();
+        },
+
+        _timelineClose: function(e) {
           this._reset();
           this.fire(this.data + '-close', { title: 'close' });
         },
 
-        _timelineCreate: function(e) {
-          var divList = document.getElementById('addedFormDiv');
-          for(var i = 0 ; i < divList.childNodes.length ; i++) {
-            divList.childNodes[i].childNodes[2].disabled = false;
-          }
-
-          var form = this.$.timelineNewForm;
-          var oData = new FormData(form);
-          var self = this;
-
-          var result = {
-            'name' : form.elements['name'].value,
-            'unit_id' : app.params.id,
-            'content' : form.elements['content'].value,
-          };
-
-          oData.append('item', JSON.stringify(result));
-          var myRequest = new XMLHttpRequest();
-          myRequest.onreadystatechange = function(){
-            if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-              self._reset();
-              self.fire(self.data + '-success', { title: 'close' });
-            } 
-          };
-
-          myRequest.withCredentials = true;
-          myRequest.open('post', this.get('globals.baseUrl') + '/time_lines',true);
-          myRequest.send(oData);
-        },
-
-        _timelineTest: function(e) {
+        _timelineUpdate: function(e) {
           var divList = document.getElementById('addedFormDiv');
           for(var i = 0 ; i < divList.childNodes.length ; i++) {
             divList.childNodes[i].childNodes[2].disabled = false;
@@ -295,6 +275,15 @@
         _handleThumbnailDeleteFailure: function(event) {
           alert('Thumbnail Delete Fail');
         },
+
+        _handleSaveSuccess: function(event) {
+          this._reset();
+          this.fire(this.data + '-close', { title: 'close' });
+        },
+
+        _handleSaveFailure: function(event) {
+          alert('Timeline Delete fail');
+        }
       })
     })();
   </script>

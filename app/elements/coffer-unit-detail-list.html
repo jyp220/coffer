@@ -194,19 +194,15 @@
               [[_setDateTime(timeline.updated_at)]]
             </div>
 
-            <iron-swipeable-pages selected="0">
+            <iron-swipeable-pages selected="0" name="[[timeline.id]]" on-click="_edit">
               <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
-                <iron-image id="example-full-width" width="200" src="[[timelineSrc.src]]"></iron-image>
+                <iron-image id="example-full-width" src="[[timelineSrc.src]]"></iron-image>
               </template>
             </iron-swipeable-pages>
 
             <div class="content">
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
-              <div>
-                <paper-button raised="" name="[[timeline.id]]" class="edit" on-click="_edit"></paper-button>
-                <paper-button raised="" name="[[timeline.id]]" class="delete" on-click="_delete"></paper-button>
-              </div>
             </div>
           </li>
         </template>
@@ -388,12 +384,6 @@
         ajax.generateRequest();
       },
 
-      _edit: function(timeline) {
-        var ajax = this.$['timeline-item-search'];
-        this.timelineItemId = timeline.target.name;
-        ajax.generateRequest();
-      },
-
       _delete: function(timeline) {
         var ajax = this.$['delete-timeline-ajax'];
         this.deleteTimelineId = timeline.target.name;
@@ -405,6 +395,7 @@
         this.timelineContent = event.detail.content;
         this.timelineThumbnail = event.detail.image_id;
         this.timelineId = event.detail.id;
+
         this.$["update-timeline"].open();
       },
 
@@ -451,12 +442,19 @@
         if(event.target.id === 'new-timeline-data') {
           this.$['new-timeline'].close();
         } else {
+          this.timelineListReload();
           this.$['update-timeline'].close();
         }
       },
 
       _setDateTime: function(updatedAt) {
         return updatedAt.substring(0, 16);
+      },
+
+      _edit: function(timeline) {
+        var ajax = this.$['timeline-item-search'];
+        this.timelineItemId = timeline.currentTarget.name;
+        ajax.generateRequest();
       }
 
     });
