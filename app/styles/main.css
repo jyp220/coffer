@@ -51,8 +51,12 @@ paper-button{
   width:100px;height:100px;
   margin-right:5px;
 }
-#addedUnitDiv div input[type=button]{
+#addedUnitDiv div iron-icon{
   position:absolute;
+  background:#333;
+  opacity:.5;
+  margin:1px 0 0 77px;
+  color:#fff;
 }
 #addedUnitDiv div label{
   padding:0 !important;
