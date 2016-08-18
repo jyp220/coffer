@@ -53,7 +53,7 @@
                          vertical-align="top"
                          horizontal-align="left">
 
-        <paper-menu class="dropdown-content" selected="{{selectedGroup(group)}}">
+        <paper-menu id="selectedCoffer" class="dropdown-content" selected="{{selectedGroup(group)}}">
           <template is="dom-repeat" items="{{cofferResource.items}}">
             <paper-item>{{item.name}}</paper-item>
           </template>
@@ -93,6 +93,11 @@
           }
         },
 
+        listeners: {
+          'get-resource.things-ajax-response' : '_handleSuccess',
+          'get-resource.things-ajax-error' : '_handleFailure'
+        },
+
         observers: [
           '_thumbnailChanged(unitThumbnail)'
         ],
@@ -101,31 +106,76 @@
           Things.GlobalBehavior
         ],
 
+        _handleSuccess: function(event) {
+          // alert('delete success');
+          var select = this.selectedGroup(this.group);
+
+          this.$.selectedCoffer.selected = select;
+        },
+
+        _handleFailure: function(event) {
+          alert('delete fail');
+        },
+
         _thumbnailChanged: function(thumbnail) {
+          console.log(thumbnail);
           if(thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
-
             for(var i = 0 ; i < thumbnailIds.length ; i++) {
-              this.add_item();
-              this.setThumbnail(thumbnailIds[i], i);
+              this.setThumbnailAdd(thumbnailIds[i], i);
               if(i + 1 == thumbnailIds.length) {
                 this.add_item();
               }
             }
-          } else {
+          } else if(thumbnail == "") {
             this.add_item();
           }
         },
 
-        setThumbnail: function(thumbnail, idx) {
-          var thumbnailId = 'unitthumbnail' + idx;
-          var fileId = 'unitgetfile' + idx;
-          var deleteBtnId = 'unitBtn' + idx;
-          var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
+        setThumbnailAdd: function(thumbnail, idx) {
+          if(this.maxCount < 3) {
+            var addedUnitDiv = this.$.addedUnitDiv;
+            var self = this;
+            var idx = this.count;
+            var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
 
-          document.getElementById(thumbnailId).src = src;
-          document.getElementById(fileId).disabled = true;
-          document.getElementById(deleteBtnId).hidden = false;
+            var label = document.createElement('label');
+            label.setAttribute('for', 'unitgetfile' + this.count);
+            label.innerHTML = "<img id='unitthumbnail"+this.count+"' src='" +src + "' width='100'></label>";
+
+            var file = document.createElement('input');
+            file.id = 'unitgetfile' + this.count;
+            file.name = 'file';
+            file.setAttribute('label', 'file');
+            file.type = 'file';
+            file.disabled = 'true';
+            file.onchange = function(){self.fileOnChange(idx)}
+
+            // var btn = document.createElement('input');
+            // btn.hidden = 'true';
+            // btn.id = 'unitBtn' + this.count;
+            // btn.type = 'button';
+            // btn.onclick = function(){self._deleteFile(idx)}
+             
+            // <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button> 
+            // //paper-icon-button
+            var btn = document.createElement('iron-icon');
+            btn.id = 'unitBtn' + this.count;
+            btn.icon = 'icons:close';
+            btn.hidden = false;
+            btn.onclick = function(){self._deleteFile(idx)}
+
+            var addedDiv = document.createElement("div"); // 폼 생성
+            addedDiv.id = "added_" + this.count; // 폼 Div에 ID 부여 (삭제를 위해)
+            addedDiv.setAttribute('class', 'fileUpload');
+            addedDiv.appendChild(btn);
+            addedDiv.appendChild(label);
+            addedDiv.appendChild(file);
+            addedUnitDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+
+            this.count++;
+            this.maxCount++;
+          }
         },
 
         add_item: function(){
@@ -151,11 +201,12 @@
             // btn.type = 'button';
             // btn.onclick = function(){self._deleteFile(idx)}
              
-            // <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button>
+            // <paper-button id="submitButton" raised on-click="_unitCreate">Submit</paper-button> 
+            // //paper-icon-button
             var btn = document.createElement('iron-icon');
             btn.id = 'unitBtn' + this.count;
             btn.icon = 'icons:close';
-            btn.hidden = 'true';
+            btn.hidden = true;
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성
@@ -232,7 +283,6 @@
         },
 
         _unitClose:function(e) {
-          this._reset();
           this.fire(this.data + '-close', { title: 'close' });
         },
 
@@ -256,7 +306,6 @@
           var myRequest = new XMLHttpRequest();
           myRequest.onreadystatechange = function(){
             if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-              self._reset();
               self.fire(self.data + '-success', { title: 'close' });
             } 
           };
@@ -269,23 +318,7 @@
         _deleteFile: function(idx) {
           document.getElementById('addedUnitDiv').removeChild(document.getElementById('added_' + idx));
           this.maxCount--;
-        },
-
-        _reset: function() {
-          this.name = '';
-          this.content = '';
-          this.group = '';
-
-          var divList = document.getElementById('addedUnitDiv');
-          while ( divList.hasChildNodes() )
-          {
-            divList.removeChild( divList.firstChild );       
-          }
-          this.unitThumbnail = '';
-          this.maxCount = 0;
-          this.count = 0;
         }
-
       })
     })();
   </script>

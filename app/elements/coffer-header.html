@@ -202,15 +202,15 @@
 
     <paper-dialog id="new-unit-home" modal>
       <h2>New Unit</h2>
-      <!-- <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button> -->
       <paper-dialog-scrollable>
-      <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" content="[[unitContent]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new>
+        <div id="dynamicNewUnit">
+<!--           <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" content="[[unitContent]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new> -->
+        </div>
       </paper-dialog-scrollable>
     </paper-dialog>
 
     <paper-fullscreen-dialog id="new-coffer-home">
       <h2>New Coffer</h2>
-      <!-- <paper-button id="create-coffer" affirmative="" dialog-confirm=""></paper-button> -->
       <coffer-coffer-new id="new-coffer-data-home" data="create-coffer-header"></coffer-coffer-new>
     </paper-fullscreen-dialog>
 
@@ -281,11 +281,15 @@
 
       _moreMenuSelected: function(e) {
         if(e.target.id === 'createUnit') {
-          this.unitData = 'create-unit-header';
-          this.unitName = '';
-          this.unitContent = '';
-          this.unitGroup = '';
-          this.unitThumbnail = '';
+          var unitNew = this.$["dynamicNewUnit"];
+          var label = document.createElement('coffer-unit-new');
+          label.id = 'new-unit-data-home';
+          label.data = 'create-unit-header';
+          label.name = '';
+          label.content = '';
+          label.group = '';
+          label.unitThumbnail = '';
+          unitNew.appendChild(label);
 
           this.$["new-unit-home"].open();
         }else if(e.target.id === 'creteCoffer') {
@@ -310,12 +314,15 @@
       },
 
       _handleUnitSearchSuccess: function(event) {
-        this.unitData = 'update-unit-header';
-
-        this.unitName = event.detail.name;
-        this.unitContent = event.detail.content;
-        this.unitGroup = event.detail.coffer.name;
-        this.unitThumbnail = event.detail.thumbnail_id;
+        var unitNew = this.$["dynamicNewUnit"];
+        var label = document.createElement('coffer-unit-new');
+        label.id = 'new-unit-data-home';
+        label.data = 'update-unit-header';
+        label.name = event.detail.name;
+        label.content = event.detail.content;
+        label.group = event.detail.coffer.name;
+        label.unitThumbnail = event.detail.thumbnail_id;
+        unitNew.appendChild(label);
         
         this.$["new-unit-home"].open();
       },
@@ -384,10 +391,12 @@
           page('/');
           page('/unit-list');
         }
+        this._unitNewModalDelete();
         this.$['new-unit-home'].close();
       },
 
       _onCloseUnit: function(e) {
+        this._unitNewModalDelete();
         this.$['new-unit-home'].close();
       },
 
@@ -400,11 +409,13 @@
       },
 
       _onCloseUpdateUnit: function(e) {
+        this._unitNewModalDelete();
         this.$['new-unit-home'].close();
       },
 
       _onSuccessUpdateUnit: function(e) {
         page("/unit-detail-list/" + this.params.id);
+        this._unitNewModalDelete();
         this.$['new-unit-home'].close();
       },
 
@@ -467,6 +478,14 @@
 
       _handleSaveFailure: function(event) {
         alert('delete fail');
+      },
+
+      _unitNewModalDelete: function() {
+        var divList = this.$["dynamicNewUnit"];
+        while ( divList.hasChildNodes() )
+        {
+          divList.removeChild( divList.firstChild );       
+        }
       }
     });
 

@@ -51,7 +51,7 @@
       last-response="{{cofferResource}}">
     </things-ajax>
 
-    <form is="iron-form" id="unitNewForm" method="post" enctype="multipart/form-data">
+    <form is="iron-form" id="unitNewListForm" method="post" enctype="multipart/form-data">
       <paper-input name="name" label="name" type="string" value="{{name}}"></paper-input>
       <paper-textarea name="content" label="content" type="string" value="{{content}}"></paper-textarea>
       <paper-dropdown-menu label="group" name="group" 
@@ -227,7 +227,7 @@
             divList.childNodes[i].childNodes[2].disabled = false;
           }
 
-          var form = this.$.unitNewForm;
+          var form = this.$.unitNewListForm;
           var oData = new FormData(form);
           var self = this;
 

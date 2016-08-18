@@ -75,7 +75,6 @@
         ],
 
         _thumbnailChanged: function(thumbnail) {
-          console.log('test');
           if(thumbnail == "") {
             this.add_item();
           }
@@ -179,7 +178,6 @@
         },
 
         _timelineClose:function(e) {
-          this._reset();
           this.fire(this.data + '-close', { title: 'close' });
         },
 
@@ -203,7 +201,6 @@
           var myRequest = new XMLHttpRequest();
           myRequest.onreadystatechange = function(){
             if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-              self._reset();
               self.fire(self.data + '-success', { title: 'close' });
             } 
           };
@@ -211,19 +208,6 @@
           myRequest.withCredentials = true;
           myRequest.open('post', this.get('globals.baseUrl') + '/time_lines',true);
           myRequest.send(oData);
-        },
-
-        _reset: function() {
-          this.name = "";
-          this.content = "";
-          var divList = document.getElementById('addedTimelineDiv');
-          while ( divList.hasChildNodes() )
-          {
-            divList.removeChild( divList.firstChild );       
-          }
-          this.timelineThumbnail = "";
-          this.maxCount = 0;
-          this.count = 0;
         }
       })
     })();

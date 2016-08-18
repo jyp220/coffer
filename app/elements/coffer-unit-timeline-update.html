@@ -93,12 +93,10 @@
         ],
 
         _thumbnailChanged: function(thumbnail) {
-          if(thumbnail != null && thumbnail != "") {
+          if(thumbnail != "") {
             var thumbnailIds = thumbnail.split(',');
-            console.log(thumbnailIds);
             for(var i = 0 ; i < thumbnailIds.length ; i++) {
-              this.add_item();
-              this.setThumbnail(thumbnailIds[i], i);
+              this.setThumbnailAdd(thumbnailIds[i], i);
               if(i + 1 == thumbnailIds.length) {
                 this.add_item();
               }
@@ -108,15 +106,49 @@
           }
         },
 
-        setThumbnail: function(thumbnail, idx) {
-          var thumbnailId = 'timelineUpdateThumbnail' + idx;
-          var fileId = 'timelineUpdateGetfile' + idx;
-          var deleteBtnId = 'timelineUpdateBtn' + idx;
-          var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
+        setThumbnailAdd: function(thumbnail, idx){
+          if(this.maxCount < 3) {
+            var addedFormDiv = this.$.addedFormDiv;
+            var self = this;
+            var idx = this.count;
+            var src = this.get('globals.baseUrl') + "/download/" + thumbnail;
 
-          document.getElementById(thumbnailId).src = src;
-          document.getElementById(fileId).disabled = true;
-          document.getElementById(deleteBtnId).hidden = false;
+            var label = document.createElement('label');
+            label.setAttribute('for', 'timelineUpdateGetfile' + this.count);
+            label.innerHTML = "<img id='timelineUpdateThumbnail"+this.count+"' src='" +src + "' width='100'></label>";
+
+            var file = document.createElement('input');
+            file.id = 'timelineUpdateGetfile' + this.count;
+            file.name = 'file';
+            file.setAttribute('label', 'file');
+            file.type = 'file';
+            file.disabled = 'true';
+            file.onchange = function(){self.fileOnChange(idx)}
+
+            // var btn = document.createElement('input');
+            // btn.hidden = 'true';
+            // btn.id = 'timelineUpdateBtn' + this.count;
+            // btn.type = 'button';
+            // btn.onclick = function(){self._deleteFile(idx)}
+            
+            var btn = document.createElement('iron-icon');
+            btn.id = 'timelineUpdateBtn' + this.count;
+            btn.icon = 'icons:close';
+            btn.hidden = false;
+            btn.onclick = function(){self._deleteFile(idx)}
+
+            var addedDiv = document.createElement("div"); // 폼 생성
+            addedDiv.id = "added_" + this.count; // 폼 Div에 ID 부여 (삭제를 위해)
+            addedDiv.setAttribute('class', 'fileUpload');
+            addedDiv.appendChild(btn);
+            addedDiv.appendChild(label);
+            addedDiv.appendChild(file);
+            addedFormDiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+
+            this.count++;
+            this.maxCount++;
+          }
+          
         },
 
         add_item: function(){
@@ -143,9 +175,9 @@
             // btn.onclick = function(){self._deleteFile(idx)}
             
             var btn = document.createElement('iron-icon');
-            btn.hidden = 'true';
             btn.id = 'timelineUpdateBtn' + this.count;
             btn.icon = 'icons:close';
+            btn.hidden = true;
             btn.onclick = function(){self._deleteFile(idx)}
 
             var addedDiv = document.createElement("div"); // 폼 생성
@@ -226,7 +258,6 @@
         },
 
         _timelineClose: function(e) {
-          this._reset();
           this.fire(this.data + '-close', { title: 'close' });
         },
 
@@ -250,7 +281,6 @@
           var myRequest = new XMLHttpRequest();
           myRequest.onreadystatechange = function(){
             if(myRequest.readyState == 4 && (myRequest.status == 200 || myRequest.status == 201)){
-              self._reset();
               self.fire(self.data + '-success', { title: 'close' });
             } 
           };
@@ -258,21 +288,6 @@
           myRequest.withCredentials = true;
           myRequest.open('post', this.get('globals.baseUrl') + '/time_lines/' + this.timelineId,true);
           myRequest.send(oData);
-        },
-
-        _reset: function() {
-          this.name = "";
-          this.content = "";
-          var divList = document.getElementById('addedFormDiv');
-          while ( divList.hasChildNodes() )
-          {
-            divList.removeChild( divList.firstChild );       
-          }
-          this.timelineThumbnail = "";
-          this.timelineId = "";
-          this.maxCount = 0;
-          this.count = 0;
-          this.deleteIdx = '-1';
         },
 
         _handleThumbnailDeleteSuccess: function(event) {
@@ -287,7 +302,6 @@
         },
 
         _handleSaveSuccess: function(event) {
-          this._reset();
           this.fire(this.data + '-close', { title: 'close' });
         },
 
