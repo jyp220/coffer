@@ -26,9 +26,11 @@
           button-ready="{{buttonReady}}"
           person="{{person}}"
           error="{{error}}"
+          onLoad="{{onLoad}}"
           o-auth-data="{{oAuthData}}">
         </linkedin-signin>
         <template is="dom-if" if="[[signedIn]]">
+          asdfasdfasdfa / [[oAuthData]] / [[person]]
           <img src$="[[person.pictureUrl]]">
           <paper-button raised on-click="clickLogout">LogOut</paper-button>
         </template>
@@ -71,6 +73,10 @@
         },
 
         clickLogout: function(e) {
+          console.log(this.oAuthData);
+          console.log(this.person);
+          console.log(this.authorize);
+          console.log(this.onLoad);
           document.querySelector("#signin").signOut();
         }
 

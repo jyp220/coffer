@@ -65,10 +65,16 @@
 
       <paper-fab noink="" id="add-unit" icon="add" title="add unit"></paper-fab>
 
-      <paper-dialog id="new-unit" modal>
+      <!-- <paper-dialog id="new-unit" modal>
         <h2>New Unit</h2>
         <paper-button id="create-unit" affirmative="" dialog-confirm=""></paper-button>
         <coffer-unit-new-list id="new-unit-data" data="coffer-unit-list" name="[[unitName]]" description="[[unitDescription]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new-list>
+      </paper-dialog> -->
+      <paper-dialog id="new-unit" modal>
+        <h2>New Unit</h2>
+        <paper-dialog-scrollable>
+          <div id="dynamicNewUnit"></div>
+        </paper-dialog-scrollable>
       </paper-dialog>
     </ul>
   </template>
@@ -131,10 +137,16 @@
       },
 
       onTapAddUnit: function(e) {
-        this.unitName = '';
-        this.unitDescription = '';
-        this.unitGroup = '';
-        this.unitThumbnail = '';
+        var unitNew = this.$["dynamicNewUnit"];
+        var label = document.createElement('coffer-unit-new');
+        label.id = 'new-unit-data';
+        label.data = 'coffer-unit-list';
+        label.name = '';
+        label.content = '';
+        label.group = '';
+        label.unitThumbnail = '';
+        unitNew.appendChild(label);
+
         this.$["new-unit"].open();
       },
 
@@ -175,11 +187,21 @@
       _onSuccessUnit: function(event) {
         this.page = 1;
         this.unitListReload();
+        this._unitNewModalDelete();
         this.$['new-unit'].close();
       },
 
       _onCloseUnit: function(event) {
+        this._unitNewModalDelete();
         this.$['new-unit'].close();
+      },
+
+      _unitNewModalDelete: function() {
+        var divList = this.$["dynamicNewUnit"];
+        while ( divList.hasChildNodes() )
+        {
+          divList.removeChild( divList.firstChild );       
+        }
       }
 
     });

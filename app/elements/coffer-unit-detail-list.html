@@ -385,7 +385,12 @@
         label.data = 'coffer-timeline-update';
         label.name = event.detail.name;
         label.content = event.detail.content;
-        label.timelineThumbnail = event.detail.image_id;
+        if(event.detail.image_id) {
+          label.timelineThumbnail = event.detail.image_id;
+        } else {
+          label.timelineThumbnail = '';
+        }
+        
         label.timelineId = event.detail.id;
         timelineUpdate.appendChild(label);
 

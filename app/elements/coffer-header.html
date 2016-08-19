@@ -209,21 +209,21 @@
       </paper-dialog-scrollable>
     </paper-dialog>
 
-    <paper-fullscreen-dialog id="new-coffer-home">
+    <paper-dialog id="new-coffer-home">
       <h2>New Coffer</h2>
       <coffer-coffer-new id="new-coffer-data-home" data="create-coffer-header"></coffer-coffer-new>
-    </paper-fullscreen-dialog>
+    </paper-dialog>
 
-    <paper-fullscreen-dialog id="search-unit">
+    <paper-dialog id="search-unit">
       <h2>Search Unit</h2>
       <paper-button id="btn-search-unit" affirmative=""></paper-button>
       <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
-    </paper-fullscreen-dialog>
+    </paper-dialog>
 
-    <paper-fullscreen-dialog id="qrcode-viewer">
+    <paper-dialog id="qrcode-viewer">
       <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
       <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
-    </paper-fullscreen-dialog>
+    </paper-dialog>
 
     <paper-dialog id="item-delete">
       <h2>Delete????</h2>
@@ -321,7 +321,12 @@
         label.name = event.detail.name;
         label.content = event.detail.content;
         label.group = event.detail.coffer.name;
-        label.unitThumbnail = event.detail.thumbnail_id;
+        if(event.detail.thumbnail_id) {
+          label.unitThumbnail = event.detail.thumbnail_id;
+        } else {
+          label.unitThumbnail = '';
+        }
+
         unitNew.appendChild(label);
         
         this.$["new-unit-home"].open();
