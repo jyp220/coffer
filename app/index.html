@@ -56,16 +56,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     if(storage.getItem('setting.baseUrl') == null)
       storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
 
+    var userAgent = navigator.userAgent.toLowerCase();
+    this.executeApp('cofferlink://');
+
+    function importQrJs() {
+      var nowDate = new Date(); // 캐쉬문제로 인한 변수 호출
+      nowDate =nowDate.getTime();
+      var headID = document.getElementsByTagName("head")[0];  // 해더 사이에 위치 지정
+      var jsNode = document.createElement('script'); // 엘리멘터리 생성
+      jsNode.type = 'text/javascript'; // 속성 지정
+      jsNode.src = 'bower_components/qrjs/qr.js'; // 속성지정
+      headID.appendChild(jsNode); // 해더사이에 추가
+
+      jsNode = document.createElement('script'); // 엘리멘터리 생성
+      jsNode.type = 'text/javascript'; // 속성 지정
+      jsNode.src = 'bower_components/qr-code/src/qr-code.js'; // 속성지정
+      headID.appendChild(jsNode); // 해더사이에 추가
+    }
 
     function executeApp(url) {
-      var userAgent = navigator.userAgent.toLowerCase();
+      // var userAgent = navigator.userAgent.toLowerCase();
       if(userAgent.match('iphone') || userAgent.match('ipad') || userAgent.match('ipod')) {    //아이폰
-         is_installed_app_ios(url,"362057947");
+        // alert("userAgent : " + userAgent);
+        // is_installed_app_ios(url,"362057947");
       }else if(userAgent.match('android')) {    //안드로이드 기기
-        alert("userAgent : " + userAgent);
+        importQrJs();
+        // alert("userAgent : " + userAgent);
         is_installed_app_and(url,"market://details?id=com.kakao.talk&hl=ko");
       } else {    //그 외
-        alert("userAgent : " + userAgent);
+        // alert("userAgent : " + userAgent);
+        if(userAgent.indexOf("chrome") != -1) {
+          importQrJs();
+        } else if(userAgent.indexOf("safari") != -1) {
+          alert('safari');
+        } else if(userAgent.indexOf("firefox") != -1) {
+          alert('firefox');
+        } else if(userAgent.indexOf("msie 9") != -1 || userAgent.indexOf("msie 10") != -1 || userAgent.indexOf("msie 11") != -1) {
+          alert('IE');
+        } else {
+          alert('other');
+        }
       }
     }
 
@@ -122,9 +152,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
   </script>
-<!--   <script src="bower_components/qrjs/qr.js"></script>
-  <script src="bower_components/qr-code/src/qr-code.js"></script> -->
-
 
   <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
   <!-- endbuild -->

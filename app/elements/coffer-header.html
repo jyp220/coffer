@@ -200,11 +200,10 @@
     </app-header>
 
 
-    <paper-dialog id="new-unit-home" modal>
+    <paper-dialog id="new-unit-home" modal no-cancel-on-esc-key no-cancel-on-outside-click>
       <h2>New Unit</h2>
       <paper-dialog-scrollable>
         <div id="dynamicNewUnit">
-<!--           <coffer-unit-new id="new-unit-data-home" data="[[unitData]]" name="[[unitName]]" content="[[unitContent]]" group="[[unitGroup]]" unit-thumbnail="[[unitThumbnail]]"></coffer-unit-new> -->
         </div>
       </paper-dialog-scrollable>
     </paper-dialog>
@@ -327,6 +326,7 @@
           label.unitThumbnail = '';
         }
 
+        label.unitId = event.detail.id;
         unitNew.appendChild(label);
         
         this.$["new-unit-home"].open();

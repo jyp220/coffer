@@ -5,13 +5,12 @@
 
     <style>
     </style>
-    [[route]][[params.id]]
     <qr-code data="[[route]]/[[params.id]]"></qr-code>
     <h3>카카오톡 앱이 설치되어 있는 모바일 기기라면 아래의 링크가 동작합니다.</h3>
-    <a id="kakao-link-btn" href="javascript:;" on-click="qrTest">
+    <a id="kakao-link-btn" href="javascript:;" on-click="sendQrWeb">
       Web : <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
     </a>
-    <a id="kakao-link-btn" href="javascript:;" on-click="qrTest3">
+    <a id="kakao-link-btn" href="javascript:;" on-click="sendQrAndroid">
       Android : <img src="http://dn.api1.kage.kakao.co.kr/14/dn/btqa9B90G1b/GESkkYjKCwJdYOkLvIBKZ0/o.jpg"/>
     </a>
   </template>
@@ -32,7 +31,7 @@
           Kakao.init('a9d75d64bddba18c128e0da81a709e27');
         },
 
-        qrTest: function() {
+        sendQrWeb: function() {
           //cordova plugin scheme url 검색해보자
           Kakao.Link.createTalkLinkButton({
             container: '#kakao-link-btn',
@@ -49,7 +48,7 @@
           });
         },
 
-        qrTest3: function() {
+        sendQrAndroid: function() {
           var label = 'test';
           var image = {
             src: 'http://dn.api1.kage.kakao.co.kr/14/dn/btqaWmFftyx/tBbQPH764Maw2R6IBhXd6K/o.jpg',
