@@ -30,7 +30,6 @@
           o-auth-data="{{oAuthData}}">
         </linkedin-signin>
         <template is="dom-if" if="[[signedIn]]">
-          asdfasdfasdfa / [[oAuthData]] / [[person]]
           <img src$="[[person.pictureUrl]]">
           <paper-button raised on-click="clickLogout">LogOut</paper-button>
         </template>
@@ -59,7 +58,7 @@
 
           fields: {
             type: String,
-            value: 'id,first-name,last-name,email-address,headline'
+            value: ''     //'id,first-name,last-name,email-address,headline'
           },
 
           lang: {
