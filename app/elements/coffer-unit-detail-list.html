@@ -152,7 +152,7 @@
       <div class="detail">
         <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
           <iron-swipeable-pages selected="0">
-            <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id)]]" as="unitSrc">
+            <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id, unitResource.updated_at)]]" as="unitSrc">
               <iron-image id="example-full-width" src="[[unitSrc.src]]"></iron-image>
             </template>
           </iron-swipeable-pages>
@@ -190,7 +190,7 @@
               [[_setDateTime(timeline.updated_at)]]
             </div>
 
-            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id)]]" on-click="clickOnImage"></iron-image>
+            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id, timeline.updated_at)]]" on-click="clickOnImage"></iron-image>
 
 <!--             <iron-swipeable-pages selected="0">
               <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
@@ -345,14 +345,14 @@
         this.$["new-timeline"].open();
       },
 
-      _imageSrc: function(thumbnail) {
+      _imageSrc: function(thumbnail, updatedAt) {
         if(thumbnail != null) {
           var thumbnailIds = thumbnail.split(',');
           var arr = [];
 
 
           for(var i = 0 ; i < thumbnailIds.length ; i++) {
-            var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
+            var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i] + '?dc=' + updatedAt};
             arr.push(obj);
           }
 
@@ -379,10 +379,10 @@
         this.$['unit-image-viewer'].open();
       },
 
-      onImage: function(thumbnail) {
+      onImage: function(thumbnail, updatedAt) {
         if(thumbnail != null)  {
           var thumbnailIds = thumbnail.split(',');
-          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0];
+          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0]+ '?dc=' + updatedAt;
         }
       },
 

@@ -55,7 +55,7 @@
     </style>
 
     <paper-card class="rate">
-      <iron-image class="rate-image" sizing="contain" src="[[_imageSrc(item.thumbnail_id)]]"></iron-image>
+      <iron-image class="rate-image" sizing="contain" src="[[_imageSrc(item.thumbnail_id, item.updated_at)]]"></iron-image>
       <div class="rate-content">
         <div class="card-content">
           <div class="rate-header">[[item.name]]</div>
@@ -88,11 +88,11 @@
         Things.GlobalBehavior
       ],
 
-      _imageSrc: function(thumbnail) {
+      _imageSrc: function(thumbnail, updatedAt) {
         if(thumbnail != null) {
           var thumbnailIds = thumbnail.split(',');
 
-          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0];
+          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0]+ '?dc=' + updatedAt;
         }
       },
 

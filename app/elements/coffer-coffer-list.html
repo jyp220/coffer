@@ -58,7 +58,7 @@
               [[coffer.name]]
               <span>unit : [[coffer.count]]</span>
             </div>
-            <iron-image src="[[_imageSrc(coffer.thumbnail_id)]]"></iron-image>
+            <iron-image src="[[_imageSrc(coffer.thumbnail_id, coffer.updated_at)]]"></iron-image>
             <iron-image src="[[_imageSrc(coffer.thumbnail_id_sec)]]"></iron-image>
           </div>
         </a>
@@ -143,10 +143,10 @@
         ajax.generateRequest();
       },
 
-      _imageSrc: function(thumbnail) {
+      _imageSrc: function(thumbnail, updatedAt) {
         if(thumbnail != null) {
           var thumbnailIds = thumbnail.split(',');
-          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0];
+          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0] + '?dc=' + updatedAt;
         }
       },
 
