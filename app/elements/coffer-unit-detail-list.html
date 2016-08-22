@@ -12,7 +12,6 @@
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../bower_components/fullscreen-api/fullscreen-api.html">
 
 <dom-module id="coffer-unit-detail-list">
 
@@ -149,8 +148,6 @@
     <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
     </things-ajax>
 
-    <fullscreen-api id="fsapi"></fullscreen-api>
-
     <div id="content">
       <div class="detail">
         <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
@@ -187,20 +184,21 @@
 
         <ul>
         <template is="dom-repeat" items="[[timelineResource.items]]" as="timeline">
-          <li class$="{{timelineItem(timeline)}}" name="[[timeline.id]]" on-click="_edit">
-          <!-- <li class="timeline-item create">  -->
+          <li class$="{{timelineItem(timeline)}}">
             <div class="timedot">
               <span></span>
               [[_setDateTime(timeline.updated_at)]]
             </div>
 
-            <iron-swipeable-pages selected="0">
+            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id)]]" on-click="clickOnImage"></iron-image>
+
+<!--             <iron-swipeable-pages selected="0">
               <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
                 <iron-image id="example-full-width" src="[[timelineSrc.src]]"></iron-image>
               </template>
-            </iron-swipeable-pages>
+            </iron-swipeable-pages> -->
 
-            <div class="content">
+            <div class="content" name="[[timeline.id]]" on-click="_edit">
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
             </div>
@@ -213,13 +211,15 @@
       <paper-dialog id="new-timeline" modal>
         <h2>New Timeline</h2>
         <div id="dynamicNewTimeline"></div>
-        <!-- <coffer-unit-timeline-new id="new-timeline-data" data="coffer-timeline-create" timeline-thumbnail="[[timelineThumbnail]]"></coffer-unit-timeline-new> -->
       </paper-dialog>
 
       <paper-dialog id="update-timeline" modal>
         <h2>Update Timeline</h2>
         <div id="dynamicUpdateTimeline"></div>
-        <!-- <coffer-unit-timeline-update id="update-timeline-data" data="coffer-timeline-update" timeline-id="[[timelineId]]" name="[[timelineName]]" content="[[timelineContent]]" timeline-thumbnail="[[timelineUpdateThumbnail]]"></coffer-unit-timeline-update> -->
+      </paper-dialog>
+
+      <paper-dialog id="unit-image-viewer" modal>
+        <div id="dynamicThumbnailViewer"></div>
       </paper-dialog>
     </div>
 
@@ -279,7 +279,8 @@
         'coffer-timeline-create-success' : '_onSuccessTimeline',
         'coffer-timeline-create-close' : '_onCloseTimeline',
         'coffer-timeline-update-success' : '_onSuccessTimeline',
-        'coffer-timeline-update-close' : '_onCloseTimeline'
+        'coffer-timeline-update-close' : '_onCloseTimeline',
+        'thumbnail-viewer-close' : '_onCloseThumbnailViewer'
       },
 
       behaviors: [
@@ -351,12 +352,44 @@
 
 
           for(var i = 0 ; i < thumbnailIds.length ; i++) {
-            var obj = {'src' : this.get('globals.baseUrl') + "/download/" + thumbnailIds[i]};
+            var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
             arr.push(obj);
           }
 
           return arr;
         }
+      },
+
+      clickOnImage: function(e) {
+        var thumbnailIds = e.currentTarget.name.split(',');
+        var arr = [];
+
+        for(var i = 0 ; i < thumbnailIds.length ; i++) {
+          var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
+          arr.push(obj);
+        }
+
+        var thumbnailView = this.$["dynamicThumbnailViewer"];
+        var label = document.createElement('coffer-image-viewer');
+        label.id = 'timeline-thumbnail-view';
+        label.data = 'thumbnail-viewer';
+        label.itemThumbnail = arr;
+        thumbnailView.appendChild(label);
+
+        this.$['unit-image-viewer'].open();
+      },
+
+      onImage: function(thumbnail) {
+        if(thumbnail != null)  {
+          var thumbnailIds = thumbnail.split(',');
+          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0];
+        }
+      },
+
+      _edit: function(timeline) {
+        var ajax = this.$['timeline-item-search'];
+        this.timelineItemId = timeline.currentTarget.name;
+        ajax.generateRequest();
       },
 
       _handleSaveSuccess: function(event) {
@@ -413,27 +446,13 @@
         return result;
       },
 
-      clickOnImage: function(e) {
-        var thumbnailIds = this.unitResource.thumbnail_id.split(',');
-        this.unitThumbnail = setting.get('globals.baseUrl') + "/download/" + thumbnailIds[0];
-        this.$['unit-image-viewer'].open();
-
-        // this.toggleFullscreen(event.target);
-      },
-
-      toggleFullscreen: function(element) {
-        var fsapi = document.querySelector('#fsapi');
-        fsapi.target = element;
-        fsapi.toggleFullscreen();
-      },
-
       _onSuccessTimeline: function(event) {
         this.timelineListReload();
         if(event.target.id === 'new-timeline-data') {
-          this._timelineNewModalDelete();
+          this._modalDelete('dynamicNewTimeline');
           this.$['new-timeline'].close();
         } else {
-          this._timelineUpdateModalDelete();
+          this._modalDelete('dynamicUpdateTimeline');
           this.timelineListReload();
           this.$['update-timeline'].close();
         }
@@ -441,35 +460,26 @@
 
       _onCloseTimeline: function(event) {
         if(event.target.id === 'new-timeline-data') {
-          this._timelineNewModalDelete();
+          this._modalDelete('dynamicNewTimeline');
           this.$['new-timeline'].close();
         } else {
-          this._timelineUpdateModalDelete();
+          this._modalDelete('dynamicUpdateTimeline');
           this.timelineListReload();
           this.$['update-timeline'].close();
         }
+      },
+
+      _onCloseThumbnailViewer: function(event) {
+        this._modalDelete('dynamicThumbnailViewer');
+        this.$['unit-image-viewer'].close();
       },
 
       _setDateTime: function(updatedAt) {
         return updatedAt.substring(0, 16);
       },
 
-      _edit: function(timeline) {
-        var ajax = this.$['timeline-item-search'];
-        this.timelineItemId = timeline.currentTarget.name;
-        ajax.generateRequest();
-      },
-
-      _timelineNewModalDelete: function() {
-        var divList = this.$["dynamicNewTimeline"];
-        while ( divList.hasChildNodes() )
-        {
-          divList.removeChild( divList.firstChild );       
-        }
-      },
-
-      _timelineUpdateModalDelete: function() {
-        var divList = this.$["dynamicUpdateTimeline"];
+      _modalDelete: function(divName) {
+        var divList = this.$[divName];
         while ( divList.hasChildNodes() )
         {
           divList.removeChild( divList.firstChild );       

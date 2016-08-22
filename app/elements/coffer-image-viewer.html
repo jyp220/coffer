@@ -6,11 +6,13 @@
 
     <style>
     </style>
-    {{unitThumbnail}}
-    [[test]]
-<!--     <sc-swiper>
-      <iron-image src="{{unitThumbnail}}"></iron-image>
-    </sc-swiper> -->
+
+    <iron-swipeable-pages selected="0">
+      <template is="dom-repeat" items="[[itemThumbnail]]" as="timelineSrc">
+        <iron-image src="[[timelineSrc.src]]"></iron-image>
+      </template>
+    </iron-swipeable-pages>
+    <paper-button id="closeButton" raised on-click="_viewerClose">close</paper-button>
   </template>
 
   <script>
@@ -21,12 +23,10 @@
         is: 'coffer-image-viewer',
 
         properties: {
-          unitThumbnail: String,
+        },
 
-          test: {
-            type: String,
-            value: "341"
-          }
+        _viewerClose:function(e) {
+          this.fire(this.data + '-close', { title: 'close' });
         }
       });
     })();
