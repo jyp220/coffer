@@ -161,29 +161,29 @@
 
       <paper-menu-button class="more-btn" dynamicAlign="true">
         <paper-icon-button icon="icons:more-horiz" class="dropdown-trigger"></paper-icon-button>
-        <paper-menu class="dropdown-content">
-          <paper-item id="createUnit" on-tap="_moreMenuSelected">
+        <paper-menu id="header-menu" class="dropdown-content">
+          <paper-item id="createUnit" on-click="_moreMenuSelected">
             <iron-icon icon="icons:add-circle-outline"></iron-icon>Create Unit
           </paper-item>
-          <paper-item id="creteCoffer" on-tap="_moreMenuSelected">
+          <paper-item id="creteCoffer" on-click="_moreMenuSelected">
             <iron-icon icon="icons:folder-open"></iron-icon>Create Coffer
           </paper-item>
-          <paper-item id="qrScan" on-tap="_moreMenuSelected">
+          <paper-item id="qrScan" on-click="_moreMenuSelected">
             <iron-icon icon="image:crop-free"></iron-icon>QR Scan
           </paper-item>
-          <paper-item id="search" on-tap="_moreMenuSelected">
+          <paper-item id="search" on-click="_moreMenuSelected">
             <iron-icon icon="icons:search"></iron-icon>Search
           </paper-item>
           <template is="dom-if" if="{{_showQrCreate(route)}}">
-            <paper-item id="qrCreate" on-tap="_moreMenuSelected">
+            <paper-item id="qrCreate" on-click="_moreMenuSelected">
               <iron-icon icon="icons:select-all"></iron-icon>QR Create
             </paper-item>
           </template>
           <template is="dom-if" if="{{_showEditItem(route)}}">
-            <paper-item id="edit" on-tap="_moreMenuSelected">
+            <paper-item id="edit" on-click="_moreMenuSelected">
               <iron-icon icon="editor:border-color"></iron-icon>Edit
             </paper-item>
-            <paper-item id="delete" on-tap="_moreMenuSelected">
+            <paper-item id="delete" on-click="_moreMenuSelected">
               <iron-icon icon="icons:highlight-off"></iron-icon>Delete</paper-item>
           </template>
         </paper-menu>
@@ -203,8 +203,8 @@
     <paper-dialog id="new-unit-home" modal no-cancel-on-esc-key no-cancel-on-outside-click>
       <h2>New Unit</h2>
       <paper-dialog-scrollable>
-        <div id="dynamicNewUnit">
-        </div>
+        <div id="dynamicNewUnit"></div>
+        <div id="dynamicUpdateUnit"></div>
       </paper-dialog-scrollable>
     </paper-dialog>
 
@@ -310,10 +310,11 @@
         }else if(e.target.id === 'delete') {
           this.$["item-delete"].open();
         }
+        this.$["header-menu"].selected = "-1";
       },
 
       _handleUnitSearchSuccess: function(event) {
-        var unitNew = this.$["dynamicNewUnit"];
+        var unitNew = this.$["dynamicUpdateUnit"];
         var label = document.createElement('coffer-unit-new');
         label.id = 'new-unit-data-home';
         label.data = 'update-unit-header';
@@ -376,7 +377,7 @@
       },
 
       _computeShouldShowTabs: function(route, smallScreen) {
-        return (route === 'home' || route === 'unit-list' || route === 'unit-detail-list' || route === 'unit-detail' || route === 'coffer-list' || route === 'coffer-detail-list') && !smallScreen;
+        return (route === 'home' || route === 'unit-list' || route === 'unit-detail-list' || route === 'unit-detail' || route === 'coffer-list' || route === 'coffer-detail-list' || route === 'favorite-list') && !smallScreen;
       },
 
       _computeShouldRenderTabs: function(_shouldShowTabs) {
@@ -395,13 +396,16 @@
         if(this.route === 'unit-list') {
           page('/');
           page('/unit-list');
+        } else if(this.route === '/' || this.route === 'home') {
+          page('/unit-list');
+          page('/home');
         }
-        this._unitNewModalDelete();
+        this._unitNewModalDelete('dynamicNewUnit');
         this.$['new-unit-home'].close();
       },
 
       _onCloseUnit: function(e) {
-        this._unitNewModalDelete();
+        this._unitNewModalDelete('dynamicNewUnit');
         this.$['new-unit-home'].close();
       },
 
@@ -414,13 +418,13 @@
       },
 
       _onCloseUpdateUnit: function(e) {
-        this._unitNewModalDelete();
+        this._unitNewModalDelete('dynamicUpdateUnit');
         this.$['new-unit-home'].close();
       },
 
       _onSuccessUpdateUnit: function(e) {
         page("/unit-detail-list/" + this.params.id);
-        this._unitNewModalDelete();
+        this._unitNewModalDelete('dynamicUpdateUnit');
         this.$['new-unit-home'].close();
       },
 
@@ -485,8 +489,8 @@
         alert('delete fail');
       },
 
-      _unitNewModalDelete: function() {
-        var divList = this.$["dynamicNewUnit"];
+      _unitNewModalDelete: function(divName) {
+        var divList = this.$[divName];
         while ( divList.hasChildNodes() )
         {
           divList.removeChild( divList.firstChild );       

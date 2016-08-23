@@ -32,13 +32,22 @@
     <things-ajax auto="" id="get-resource" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{unitResource}}">
     </things-ajax>
 
-    <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
-    </things-ajax>
-
     <things-ajax id="get-unit" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{addUnit}}">
     </things-ajax>
 
+    <things-ajax id="count-unit-ajax" method="GET" resource-url="units/count" last-response="{{countUnit}}"></things-ajax>
+    <things-ajax id="count-coffer-ajax" method="GET" resource-url="coffers/count" last-response="{{countCoffer}}"></things-ajax>
+    <things-ajax id="count-favorite-ajax" method="GET" resource-url="coffer_favorites/count" last-response="{{countFavorite}}"></things-ajax>
+
     <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
+
+    <div hidden$="[[!_showFavorite]]">
+      Unit Count : <strong>[[countUnit]]</strong>
+      Coffer Count : <strong>[[countCoffer]]</strong>
+      <div>
+        <a href="{{baseUrl}}favorite-list">Favorite Count : <strong>[[countFavorite]]</strong></a>
+      </div>
+    </div>
 
     <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
       <a href="{{baseUrl}}unit-detail-list/[[unitItem.id]]" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
@@ -78,7 +87,11 @@
 
         addUnit: Object,
 
-        unitResource: Object
+        unitResource: Object,
+
+        _showFavorite: {
+          computed: '_computeShowFavorite(visible)'
+        },
 
       },
 
@@ -91,11 +104,25 @@
         Things.GlobalBehavior
       ],
 
+      _computeShowFavorite: function(visible) {
+        if(visible && this.get('globals.user')) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+
       _visibleChanged: function(visible) {
         if (visible) {
           this.page = 1;
           this.unitListReload();
           this.fire('change-section', { title: 'Home' });
+
+          if(this.get('globals.user')) {
+            this.$["count-unit-ajax"].generateRequest();
+            this.$["count-coffer-ajax"].generateRequest();
+            this.$["count-favorite-ajax"].generateRequest();
+          }
         } else {
           // $('#reader').html5_qrcode_stop();
         }
@@ -104,78 +131,6 @@
       unitListReload: function() {
         var ajax = this.$['get-resource'];
         ajax.generateRequest();
-      },
-
-      // _imageSrc: function(thumbnail) {
-      //   if(thumbnail != null) {
-      //     var thumbnailIds = thumbnail.split(',');
-      //     return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0];
-      //   }
-      // },
-
-      _showCofferSummary: function(items) {
-        var arr = [];
-        var obj = {};
-        var cnt = items.length / 3;
-        cnt = parseInt(cnt);
-        var remainder = items.length % 3;
-        remainder = parseInt(remainder);
-
-        if(cnt == 0) {
-          if(remainder == 1) {
-            obj.coffer_id_one = items[i].id;
-            obj.coffer_name_one = items[i].name;
-            obj.coffer_count_one = items[i].count;
-
-            arr.push(obj);
-          } else if(remainder == 2) {
-            obj.coffer_id_one = items[i].id;
-            obj.coffer_name_one = items[i].name;
-            obj.coffer_count_one = items[i].count;
-            obj.coffer_id_two = items[i+1].id;
-            obj.coffer_name_two = items[i+1].name;
-            obj.coffer_count_two = items[i+1].count;
-
-            arr.push(obj);
-          }
-        } else {
-
-          for(var i = 0 ; i < cnt ; i++) {
-            obj = {};
-            var j = 3*i;
-
-            obj.coffer_id_one = items[j].id;
-            obj.coffer_name_one = items[j].name;
-            obj.coffer_count_one = items[j].count;
-            obj.coffer_id_two = items[j+1].id;
-            obj.coffer_name_two = items[j+1].name;
-            obj.coffer_count_two = items[j+1].count;
-            obj.coffer_id_three = items[j+2].id;
-            obj.coffer_name_three = items[j+2].name;
-            obj.coffer_count_three = items[j+2].count;
-
-            arr.push(obj);
-          }
-          obj = {};
-          if(remainder == 1) {
-            obj.coffer_id_one = items[cnt*3].id;
-            obj.coffer_name_one = items[cnt*3].name;
-            obj.coffer_count_one = items[cnt*3].count;
-
-            arr.push(obj);
-          } else if(remainder == 2) {
-            obj.coffer_id_one = items[cnt*3].id;
-            obj.coffer_name_one = items[cnt*3].name;
-            obj.coffer_count_one = items[cnt*3].count;
-            obj.coffer_id_two = items[cnt*3+1].id;
-            obj.coffer_name_two = items[cnt*3+1].name;
-            obj.coffer_count_two = items[cnt*3+1].count;
-
-            arr.push(obj);
-          }
-        }
-
-        return arr;
       },
 
       loadMoreData: function() {

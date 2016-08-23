@@ -1,0 +1,122 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="coffer-favorite-list">
+
+  <template>
+
+    <style>
+      a{
+        display:block;
+        text-decoration:none
+      }
+      a:nth-child(even){
+        background-color:rgba(0,0,0,.05) !important
+      }
+    </style>
+
+
+
+    <things-ajax id="favorite-list-ajax" method="GET" resource-action="index" resource-url="coffer_favorites" page="[[page]]" limit="[[limit]]" last-response="{{favoriteResource}}">
+    </things-ajax>
+
+    <things-ajax id="add-list-ajax" method="GET" resource-action="index" resource-url="coffer_favorites" page="[[page]]" limit="[[limit]]" last-response="{{addFavorite}}">
+    </things-ajax>
+
+    <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
+
+    <template is="dom-repeat" items="{{favoriteResource.items}}" as="favoriteItem">
+      <a href="{{baseUrl}}unit-detail-list/[[favoriteItem.id]]" name="[[favoriteItem.id]]"><coffer-unit-list-item item="[[favoriteItem]]"></coffer-unit-list-item></a>
+    </template>
+
+    <iron-scroll-threshold scroll-target="document" on-lower-threshold="loadMoreData" id="threshold">
+    </iron-scroll-threshold>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'coffer-favorite-list',
+
+      properties: {
+
+        visible: {
+          type: Boolean,
+          observer: '_visibleChanged'
+        },
+
+        page: {
+          type: Number,
+          value: 1
+        },
+
+        limit: {
+          type: Number,
+          value: 10
+        },
+
+        addFavorite: Object,
+
+        favoriteResource: Object
+
+      },
+
+      listeners: {
+        'add-list-ajax.things-ajax-response' : '_handleSaveSuccess',
+        'add-list-ajax.things-ajax-error' : '_handleSaveFailure'
+      },
+
+      behaviors: [
+        Things.GlobalBehavior
+      ],
+
+      _visibleChanged: function(visible) {
+        if (visible) {
+          this.page = 1;
+          this.favoriteListReload();
+          this.fire('change-section', { title: 'Home' });
+        } else {
+          // $('#reader').html5_qrcode_stop();
+        }
+      },
+
+      favoriteListReload: function() {
+        var ajax = this.$['favorite-list-ajax'];
+        ajax.generateRequest();
+      },
+
+      loadMoreData: function() {
+        this.async(function () {
+          this.$.threshold.clearTriggers();
+          if(this.visible && this.favoriteResource != null) {
+            if(this.favoriteResource.items.length >= this.favoriteResource.total) return;
+
+            this.page++;
+            this.active = true;
+            var ajax = this.$['add-list-ajax'];
+            ajax.generateRequest();
+          }
+        });
+      },
+
+      _handleSaveSuccess: function(event) {
+        if(this.addFavorite && this.addFavorite.items != null) {
+          for(var i = 0 ; i < this.addFavorite.items.length ; i++) {
+            this.push('favoriteResource.items',this.addFavorite.items[i]);
+          }
+          this.active = false;
+        }
+      },
+
+      _handleSaveFailure: function(event) {
+        alert('fail');
+        this.page--;
+        this.active = false;
+      },
+
+    });
+
+  </script>
+
+</dom-module>
