@@ -49,8 +49,10 @@
       .rate-info{
         @apply(--things-coffer-desc);
         position:absolute;
+        width:92%;
         top:40px;
         left:15px;
+        text-align:left;
       }
       .rate-info iron-icon{
         @apply(--things-coffer-info-icon);
@@ -58,6 +60,7 @@
       .card-actions{
         background-color:rgba(221,212,196,.7);
         text-align:left;
+        margin-top:-4px;
       }
       .card-actions paper-icon-button{
         @apply(--things-coffer-detail-cardaction-btn)
@@ -124,6 +127,9 @@
       .cofferlist iron-icon{
         @apply(--things-coffer-info-icon);
         opacity:.5
+      }
+      #unitFavorite{
+        @apply(--things-coffer-favor-icon)
       }
     </style>
 
@@ -423,7 +429,7 @@
         } else {
           label.timelineThumbnail = '';
         }
-        
+
         label.timelineId = event.detail.id;
         timelineUpdate.appendChild(label);
 
@@ -482,7 +488,7 @@
         var divList = this.$[divName];
         while ( divList.hasChildNodes() )
         {
-          divList.removeChild( divList.firstChild );       
+          divList.removeChild( divList.firstChild );
         }
       }
 
