@@ -187,12 +187,12 @@
               [[_setDateTime(timeline.updated_at)]]
             </div>
 
-            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id, timeline.updated_at)]]" on-click="clickOnImage"></iron-image>
-
             <div class="content" name="[[timeline.id]]" on-click="_edit">
               <strong>{{timeline.name}}</strong>
               {{timeline.content}}
             </div>
+
+            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id, timeline.updated_at)]]" on-click="clickOnImage"></iron-image>
           </li>
         </template>
         </ul>
