@@ -59,9 +59,22 @@ paper-button{
   color:#fff;
 }
 #addedUnitDiv div label{
+  display:inline-block;
   padding:0 !important;
   width:100%;height:100%;
   background:url(../images/icon-image.png) 50% 50% no-repeat #fff;
+  cursor: pointer;
+  border: 1px solid #ebebeb;
+}
+#addedUnitDiv div input[type="file"]{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip:rect(0,0,0,0);
+  border: 0;
 }
 #addedUnitDiv div label img{
   width:100%;
@@ -69,3 +82,77 @@ paper-button{
   border:none;
 }
 #addedUnitDiv div br{clear:both}
+
+#addedTimelineDiv div{
+  display:inline-block;
+  width:100px;height:100px;
+  margin-right:5px;
+}
+#addedTimelineDiv div iron-icon{
+  position:absolute;
+  background:#333;
+  opacity:.5;
+  margin:1px 0 0 77px;
+  color:#fff;
+}
+#addedTimelineDiv div label{
+  display:inline-block;
+  padding:0 !important;
+  width:100%;height:100%;
+  background:url(../images/icon-image.png) 50% 50% no-repeat #fff;
+  cursor: pointer;
+  border: 1px solid #ebebeb;
+}
+#addedTimelineDiv div input[type="file"]{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip:rect(0,0,0,0);
+  border: 0;
+}
+#addedTimelineDiv div label img{
+  width:100%;
+  height:100%;
+  border:none;
+}
+#addedTimelineDiv div br{clear:both}
+
+#addedFormDiv div{
+  display:inline-block;
+  width:100px;height:100px;
+  margin-right:5px;
+}
+#addedFormDiv div iron-icon{
+  position:absolute;
+  background:#333;
+  opacity:.5;
+  margin:1px 0 0 77px;
+  color:#fff;
+}
+#addedFormDiv div label{
+  display:inline-block;
+  padding:0 !important;
+  width:100%;height:100%;
+  background:url(../images/icon-image.png) 50% 50% no-repeat #fff;
+  cursor: pointer;
+  border: 1px solid #ebebeb;
+}
+#addedFormDiv div input[type="file"]{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip:rect(0,0,0,0);
+  border: 0;
+}
+#addedFormDiv div label img{
+  width:100%;
+  height:100%;
+  border:none;
+}
+#addedFormDiv div br{clear:both}
