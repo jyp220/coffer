@@ -25,6 +25,17 @@
       a:nth-child(even){
         background-color:rgba(0,0,0,.05) !important
       }
+      .home-side{
+        @apply(--things-coffer-homeside-container);
+        margin-top:-2px;
+      }
+      .home-side a{
+        @apply(--things-coffer-homeside-linktag);
+      }
+      .home-side a iron-icon{
+        @apply(--things-coffer-favor-icon);
+        float:left;
+      }
     </style>
 
 
@@ -41,12 +52,10 @@
 
     <paper-spinner alt="Loading contacts list" active="[[active]]"></paper-spinner>
 
-    <div hidden$="[[!_showFavorite]]">
-      Unit Count : <strong>[[countUnit]]</strong>
-      Coffer Count : <strong>[[countCoffer]]</strong>
-      <div>
-        <a href="{{baseUrl}}favorite-list">Favorite Count : <strong>[[countFavorite]]</strong></a>
-      </div>
+    <div hidden$="[[!_showFavorite]]" class="home-side">
+      Unit : <strong>[[countUnit]]</strong> /
+      Coffer : <strong>[[countCoffer]]</strong>
+      <a href="{{baseUrl}}favorite-list"><iron-icon icon="star"></iron-icon> My Favorite unit : <strong>[[countFavorite]]</strong></a>
     </div>
 
     <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
