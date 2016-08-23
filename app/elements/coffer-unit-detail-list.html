@@ -128,25 +128,16 @@
     </style>
 
 
-    <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers/coffer_list" last-response="{{cofferResource}}">
-    </things-ajax>
-
-    <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}">
-    </things-ajax>
-    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
-    </things-ajax>
-
-    <things-ajax id="timeline-item-search" method="GET" resource-action="index" resource-url="time_lines/[[timelineItemId]]" last-response="{{timelineItemResource}}">
-    </things-ajax>
-
-    <things-ajax id="create-timeline-ajax" resource-action="create" resource-url="time_lines">
-    </things-ajax>
-
-    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]">
-    </things-ajax>
-
-    <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]">
-    </things-ajax>
+    <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers/coffer_list" last-response="{{cofferResource}}"></things-ajax>
+    <things-ajax id="timeline-search" method="GET" resource-action="index" resource-url="time_lines" query-fields="[[timelineQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{timelineResource}}"></things-ajax>
+    <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}"></things-ajax>
+    <things-ajax id="timeline-item-search" method="GET" resource-action="index" resource-url="time_lines/[[timelineItemId]]" last-response="{{timelineItemResource}}"></things-ajax>
+    <things-ajax id="create-timeline-ajax" resource-action="create" resource-url="time_lines"></things-ajax>
+    <things-ajax id="delete-timeline-ajax" resource-action="delete" resource-url="time_lines/[[deleteTimelineId]]"></things-ajax>
+    <things-ajax id="update-timeline-ajax" resource-action="update" resource-url="time_lines/[[timelineItemId]]"></things-ajax>
+    <things-ajax id="exist-favorite-ajax" resource-action="exist" resource-url="coffer_favorites/[[favoriteUnitId]]/exist"></things-ajax>
+    <things-ajax id="create-favorite-ajax" resource-action="create" resource-url="coffer_favorites"></things-ajax>
+    <things-ajax id="delete-favorite-ajax" resource-action="delete" resource-url="coffer_favorites/delete_by_unit/[[deleteFavoriteUnitId]]"></things-ajax>
 
     <div id="content">
       <div class="detail">
@@ -191,12 +182,6 @@
             </div>
 
             <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id, timeline.updated_at)]]" on-click="clickOnImage"></iron-image>
-
-<!--             <iron-swipeable-pages selected="0">
-              <template is="dom-repeat" items="[[_imageSrc(timeline.image_id)]]" as="timelineSrc">
-                <iron-image id="example-full-width" src="[[timelineSrc.src]]"></iron-image>
-              </template>
-            </iron-swipeable-pages> -->
 
             <div class="content" name="[[timeline.id]]" on-click="_edit">
               <strong>{{timeline.name}}</strong>
@@ -280,7 +265,13 @@
         'coffer-timeline-create-close' : '_onCloseTimeline',
         'coffer-timeline-update-success' : '_onSuccessTimeline',
         'coffer-timeline-update-close' : '_onCloseTimeline',
-        'thumbnail-viewer-close' : '_onCloseThumbnailViewer'
+        'thumbnail-viewer-close' : '_onCloseThumbnailViewer',
+        'exist-favorite-ajax.things-ajax-response' : '_handleFavoriteSuccess',
+        'exist-favorite-ajax.things-ajax-error' : '_handleFavoriteFailure',
+        'create-favorite-ajax.things-ajax-response' : '_handleFavoriteSaveSuccess',
+        'create-favorite-ajax.things-ajax-error' : '_handleFavoriteSaveFailure',
+        'delete-favorite-ajax.things-ajax-response' : '_handleFavoriteDeleteSuccess',
+        'delete-favorite-ajax.things-ajax-error' : '_handleFavoriteDeleteFailure'
       },
 
       behaviors: [
@@ -288,21 +279,37 @@
       ],
 
       _onFavorite: function(e) {
-        if (e.currentTarget.hasAttribute('active')) {
-          e.currentTarget.removeAttribute('active');
-          e.currentTarget.icon = 'icons:star-border'
+        if(!this.get('globals.user')) {
+          alert('login');
+          page('/login');
+          return;
         }
-        else {
-          e.currentTarget.setAttribute('active', '');
-          e.currentTarget.icon = 'icons:star'
+
+        if (e.currentTarget.hasAttribute('active')) { //delete
+          this.deleteFavoriteUnitId = this.params.id;
+          this.$["delete-favorite-ajax"].generateRequest();
         }
-        alert(e.currentTarget.hasAttribute('active'));
+        else { //create
+          var row = {
+            'unit_id' : this.params.id
+          };
+
+          var ajax = this.$['create-favorite-ajax'];
+          ajax.body = row;
+          ajax.generateRequest();
+        }
       },
 
       _routeChanged: function(id, visible) {
         if (visible) {
-          this.$.unitFavorite.setAttribute('active', '');
-          this.$.unitFavorite.icon = 'icons:star';
+
+          if(this.get('globals.user')) {
+            this.favoriteUnitId = id;
+            this.$["exist-favorite-ajax"].generateRequest();
+          } else {
+            this.$.unitFavorite.removeAttribute('active');
+            this.$.unitFavorite.icon = 'icons:star-border'
+          }
 
           this.timelineCnt = 1;
           this.page = 1;
@@ -392,14 +399,6 @@
         ajax.generateRequest();
       },
 
-      _handleSaveSuccess: function(event) {
-        this.timelineListReload();
-      },
-
-      _handleSaveFailure: function(event) {
-        alert('fail');
-      },
-
       timelineListReload: function() {
         var ajax = this.$['timeline-search'];
         ajax.generateRequest();
@@ -409,29 +408,6 @@
         var ajax = this.$['delete-timeline-ajax'];
         this.deleteTimelineId = timeline.target.name;
         ajax.generateRequest();
-      },
-
-      _handleSearchSuccess: function(event) {
-        var timelineUpdate = this.$["dynamicUpdateTimeline"];
-        var label = document.createElement('coffer-unit-timeline-update');
-        label.id = 'update-timeline-data';
-        label.data = 'coffer-timeline-update';
-        label.name = event.detail.name;
-        label.content = event.detail.content;
-        if(event.detail.image_id) {
-          label.timelineThumbnail = event.detail.image_id;
-        } else {
-          label.timelineThumbnail = '';
-        }
-        
-        label.timelineId = event.detail.id;
-        timelineUpdate.appendChild(label);
-
-        this.$["update-timeline"].open();
-      },
-
-      _handleSearchFailure: function(event) {
-        alert('fail');
       },
 
       timelineItem: function(timeline) {
@@ -484,6 +460,74 @@
         {
           divList.removeChild( divList.firstChild );       
         }
+      },
+
+      _handleSaveSuccess: function(event) {
+        this.timelineListReload();
+      },
+
+      _handleSaveFailure: function(event) {
+        alert('fail');
+      },
+
+      _handleSearchSuccess: function(event) {
+        var timelineUpdate = this.$["dynamicUpdateTimeline"];
+        var label = document.createElement('coffer-unit-timeline-update');
+        label.id = 'update-timeline-data';
+        label.data = 'coffer-timeline-update';
+        label.name = event.detail.name;
+        label.content = event.detail.content;
+        if(event.detail.image_id) {
+          label.timelineThumbnail = event.detail.image_id;
+        } else {
+          label.timelineThumbnail = '';
+        }
+        
+        label.timelineId = event.detail.id;
+        timelineUpdate.appendChild(label);
+
+        this.$["update-timeline"].open();
+      },
+
+      _handleSearchFailure: function(event) {
+        alert('fail');
+      },
+
+      _handleFavoriteSuccess: function(event) {
+        if(event.detail) {
+          this.$.unitFavorite.setAttribute('active', '');
+          this.$.unitFavorite.icon = 'icons:star'
+        } else {
+          this.$.unitFavorite.removeAttribute('active');
+          this.$.unitFavorite.icon = 'icons:star-border'
+        }
+      },
+
+      _handleFavoriteFailure: function(event) {
+        alert('Favorite Fail');
+      },
+
+      _handleFavoriteSaveSuccess: function(event) {
+        this.$.unitFavorite.setAttribute('active', '');
+        this.$.unitFavorite.icon = 'icons:star'
+      },
+
+      _handleFavoriteSaveFailure: function(event) {
+        alert('Favorite Save Failure');
+      },
+
+      _handleFavoriteDeleteSuccess: function(event) {
+        if(event.detail) {
+          this.$.unitFavorite.removeAttribute('active');
+          this.$.unitFavorite.icon = 'icons:star-border'
+        } else {
+          this.$.unitFavorite.setAttribute('active', '');
+          this.$.unitFavorite.icon = 'icons:star'
+        }
+      },
+
+      _handleFavoriteDeleteFailure: function(event) {
+        alert('Favorite Delete Failure');
       }
 
     });
