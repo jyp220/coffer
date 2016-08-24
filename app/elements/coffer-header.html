@@ -215,7 +215,6 @@
 
     <paper-dialog id="search-unit">
       <h2>Search Unit</h2>
-      <paper-button id="btn-search-unit" affirmative=""></paper-button>
       <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
     </paper-dialog>
 
@@ -329,7 +328,7 @@
 
         label.unitId = event.detail.id;
         unitNew.appendChild(label);
-        
+
         this.$["new-unit-home"].open();
       },
 
@@ -493,7 +492,7 @@
         var divList = this.$[divName];
         while ( divList.hasChildNodes() )
         {
-          divList.removeChild( divList.firstChild );       
+          divList.removeChild( divList.firstChild );
         }
       }
     });
