@@ -59,6 +59,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     var userAgent = navigator.userAgent.toLowerCase();
     // this.executeApp('cofferlink://');
 
+    function checkLogin() {
+      if(storage.getItem('setting.user')) {
+        return true;
+      } else {
+        alert('login 부터 해라~~~~~');
+        page('/login');
+        return false;
+      }
+    }
+
     function importQrJs() {
       var nowDate = new Date(); // 캐쉬문제로 인한 변수 호출
       nowDate =nowDate.getTime();
@@ -86,6 +96,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       } else {    //그 외
         // alert("userAgent : " + userAgent);
         if(userAgent.indexOf("chrome") != -1) {
+          // sendTokenId();
           importQrJs();
         } else if(userAgent.indexOf("safari") != -1) {
           alert('safari');
@@ -232,12 +243,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
-  <!-- <br><br><br><br><br>
-  <a href="kakaolink://" onclick="executeApp(this.href);return false;">카카오톡앱 실행</a><br />
-  <a href="cofferlink://" onclick="executeApp(this.href);return false;">Coffer앱 실행</a><br />
-  <div id="div_app"></div> -->
-  <!-- <a href="kakaolink://" onclick="executeApp(this.href);return false;">네이버앱 실행</a><br />
-  <div id="div_app"></div> -->
 
   <span id="browser-sync-binding"></span>
 
@@ -264,9 +269,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <coffer-unit-detail-list data-route="unit-detail-list" route="[[route]]" params="[[params]]"></coffer-unit-detail-list>
         <coffer-coffer-list data-route="coffer-list"></coffer-coffer-list>
         <coffer-coffer-detail-list data-route="coffer-detail-list" route="[[route]]" params="[[params]]"></coffer-coffer-detail-list>
-        <coffer-linkedin-login data-route="login"></coffer-linkedin-login>
-        <!-- <things-login data-route="login" route="[[route]]" title="Things" login-path="login" content-type="application/x-www-form-urlencoded" success-route="/" username-input-label="ID" password-input-label="Password" submit-label="sign_up" reset-label="Reset"></things-login> -->
-        <!-- <things-logout data-route="logout" action="logout" icon="exit-to-app"></things-logout> -->
+        <!-- <coffer-linkedin-login data-route="login"></coffer-linkedin-login> -->
+        <things-login data-route="login" route="[[route]]" title="Things" login-path="login" content-type="application/x-www-form-urlencoded" success-route="/" username-input-label="ID" password-input-label="Password" submit-label="sign_up" reset-label="Reset"></things-login>
       </iron-pages>
     </div>
 

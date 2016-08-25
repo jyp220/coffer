@@ -302,11 +302,17 @@
         },
 
         _deleteFile: function(idx) {
-          var thumbnailIds = this.unitThumbnail.split(',');
-          var ajax = this.$['delete-unit-thumbnail-ajax'];
-          this.unitThumbnailId = thumbnailIds[idx];
-          this.deleteIdx = idx;
-          ajax.generateRequest();
+          if(this.data === 'update-unit-header') {
+            var thumbnailIds = this.unitThumbnail.split(',');
+            var ajax = this.$['delete-unit-thumbnail-ajax'];
+            this.unitThumbnailId = thumbnailIds[idx];
+            this.deleteIdx = idx;
+            ajax.generateRequest();
+          } else {
+            this.deleteIdx = idx;
+            document.getElementById('addedUnitDiv').removeChild(document.getElementById('added_' + this.deleteIdx));
+            this.maxCount--;
+          }
         },
 
         _handleThumbnailDeleteSuccess: function(event) {

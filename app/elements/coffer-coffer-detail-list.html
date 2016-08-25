@@ -123,18 +123,20 @@
         }
       },
 
-      onTapAddUnit: function(e) {        
-        var unitNew = this.$["dynamicNewUnit"];
-        var label = document.createElement('coffer-unit-new');
-        label.id = 'new-unit-data';
-        label.data = 'coffer-detail-list';
-        label.name = '';
-        label.content = '';
-        label.group = '';
-        label.unitThumbnail = '';
-        unitNew.appendChild(label);
+      onTapAddUnit: function(e) {
+        if(checkLogin()) {    
+          var unitNew = this.$["dynamicNewUnit"];
+          var label = document.createElement('coffer-unit-new');
+          label.id = 'new-unit-data';
+          label.data = 'coffer-detail-list';
+          label.name = '';
+          label.content = '';
+          label.group = '';
+          label.unitThumbnail = '';
+          unitNew.appendChild(label);
 
-        this.$["new-unit"].open();
+          this.$["new-unit"].open();
+        }
       },
 
       unitListReload: function() {

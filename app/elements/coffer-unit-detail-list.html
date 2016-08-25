@@ -348,14 +348,16 @@
       },
 
       onTapAddTimeline: function(e) {
-        var timelineNew = this.$["dynamicNewTimeline"];
-        var label = document.createElement('coffer-unit-timeline-new');
-        label.id = 'new-timeline-data';
-        label.data = 'coffer-timeline-create';
-        label.timelineThumbnail = '';
-        timelineNew.appendChild(label);
+        if(checkLogin()) {
+          var timelineNew = this.$["dynamicNewTimeline"];
+          var label = document.createElement('coffer-unit-timeline-new');
+          label.id = 'new-timeline-data';
+          label.data = 'coffer-timeline-create';
+          label.timelineThumbnail = '';
+          timelineNew.appendChild(label);
 
-        this.$["new-timeline"].open();
+          this.$["new-timeline"].open();
+        }
       },
 
       _imageSrc: function(thumbnail, updatedAt) {
@@ -477,22 +479,24 @@
       },
 
       _handleSearchSuccess: function(event) {
-        var timelineUpdate = this.$["dynamicUpdateTimeline"];
-        var label = document.createElement('coffer-unit-timeline-update');
-        label.id = 'update-timeline-data';
-        label.data = 'coffer-timeline-update';
-        label.name = event.detail.name;
-        label.content = event.detail.content;
-        if(event.detail.image_id) {
-          label.timelineThumbnail = event.detail.image_id;
-        } else {
-          label.timelineThumbnail = '';
+        if(checkLogin()) {
+          var timelineUpdate = this.$["dynamicUpdateTimeline"];
+          var label = document.createElement('coffer-unit-timeline-update');
+          label.id = 'update-timeline-data';
+          label.data = 'coffer-timeline-update';
+          label.name = event.detail.name;
+          label.content = event.detail.content;
+          if(event.detail.image_id) {
+            label.timelineThumbnail = event.detail.image_id;
+          } else {
+            label.timelineThumbnail = '';
+          }
+
+          label.timelineId = event.detail.id;
+          timelineUpdate.appendChild(label);
+
+          this.$["update-timeline"].open();
         }
-
-        label.timelineId = event.detail.id;
-        timelineUpdate.appendChild(label);
-
-        this.$["update-timeline"].open();
       },
 
       _handleSearchFailure: function(event) {

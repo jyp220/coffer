@@ -130,7 +130,9 @@
       },
 
       onTapAddCoffer: function(e) {
-        this.$["new-coffer"].open();
+        if(checkLogin()) {
+          this.$["new-coffer"].open();
+        }
       },
 
       onNewCofferDialogClosed: function(e) {

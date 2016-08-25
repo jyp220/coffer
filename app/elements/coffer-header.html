@@ -184,8 +184,12 @@
               <iron-icon icon="editor:border-color"></iron-icon>Edit
             </paper-item>
             <paper-item id="delete" on-click="_moreMenuSelected">
-              <iron-icon icon="icons:highlight-off"></iron-icon>Delete</paper-item>
+              <iron-icon icon="icons:highlight-off"></iron-icon>Delete
+            </paper-item>
           </template>
+          <paper-item id="login" on-click="_moreMenuSelected">
+            <iron-icon icon="icons:highlight-off"></iron-icon>[[logInOut]]
+          </paper-item>
         </paper-menu>
       </paper-menu-button>
 
@@ -215,12 +219,10 @@
 
     <paper-dialog id="search-unit">
       <h2>Search Unit</h2>
-      <paper-button id="btn-search-unit" affirmative=""></paper-button>
       <coffer-search-unit id="search-unit-data" visible="true"></coffer-search-unit>
     </paper-dialog>
 
     <paper-dialog id="qrcode-viewer">
-      <paper-button id="btn-qrcode-viewer" affirmative="" dialog-confirm=""></paper-button>
       <coffer-qrcode-viewer route="[[route]]" params="[[params]]"></coffer-qrcode-viewer>
     </paper-dialog>
 
@@ -250,6 +252,11 @@
 
         _shouldRenderDrawer: {
           computed: '_computeShouldRenderDrawer(smallScreen)'
+        },
+
+        logInOut: {
+          type: String,
+          value: 'LogIn'
         }
       },
 
@@ -280,19 +287,24 @@
 
       _moreMenuSelected: function(e) {
         if(e.target.id === 'createUnit') {
-          var unitNew = this.$["dynamicNewUnit"];
-          var label = document.createElement('coffer-unit-new');
-          label.id = 'new-unit-data-home';
-          label.data = 'create-unit-header';
-          label.name = '';
-          label.content = '';
-          label.group = '';
-          label.unitThumbnail = '';
-          unitNew.appendChild(label);
+          if(checkLogin()) {
+            var unitNew = this.$["dynamicNewUnit"];
+            var label = document.createElement('coffer-unit-new');
+            label.id = 'new-unit-data-home';
+            label.data = 'create-unit-header';
+            label.name = '';
+            label.content = '';
+            label.group = '';
+            label.unitThumbnail = '';
+            unitNew.appendChild(label);
 
-          this.$["new-unit-home"].open();
+            this.$["new-unit-home"].open();
+          }
+          
         }else if(e.target.id === 'creteCoffer') {
-          this.$["new-coffer-home"].open();
+          if(checkLogin()) {
+            this.$["new-coffer-home"].open();
+          }
         }else if(e.target.id === 'qrScan') {
           this.startScan();
         }else if(e.target.id === 'search') {
@@ -300,17 +312,64 @@
         }else if(e.target.id === 'qrCreate') {
           this.$["qrcode-viewer"].open();
         }else if(e.target.id === 'edit') {
-          if(this.route === 'unit-detail-list') {
-            var ajax = this.$['unit-search'];
-            this.unitItemId = this.params.id;
-            ajax.generateRequest();
-          }else if(this.route === 'coffer-detail-list') {
-            this.$["new-coffer-home"].open();
+          if(checkLogin()) {
+            if(this.route === 'unit-detail-list') {
+              var ajax = this.$['unit-search'];
+              this.unitItemId = this.params.id;
+              ajax.generateRequest();
+            }else if(this.route === 'coffer-detail-list') {
+              this.$["new-coffer-home"].open();
+            }
           }
         }else if(e.target.id === 'delete') {
-          this.$["item-delete"].open();
+          if(checkLogin()) {
+            this.$["item-delete"].open();
+          }
+        }else if(e.target.id === 'login') {
+          if(this.get('globals.user')) {
+            if (this.isSignedIn()) {
+              this.signout(this.get('globals.baseUrl') + '/logout');
+            }
+          } else {
+            page('/login');
+          }
         }
         this.$["header-menu"].selected = "-1";
+      },
+
+      isSignedIn: function() {
+        return this.get('globals.user') ? true : false;
+      },
+
+      signout: function(logoutUrl) {
+        this.set('_signoutAjax', document.createElement('iron-ajax'));
+        this.listen(this._signoutAjax, 'response', '_signoutSuccess');
+        this.listen(this._signoutAjax, 'error', '_signoutFailure');
+
+        this._signoutAjax.url = logoutUrl;
+        this._signoutAjax.method = 'POST';
+        this._signoutAjax.withCredentials = true;
+        this._signoutAjax.generateRequest();
+      },
+
+      _signoutSuccess: function(event) {
+        this.set('globals.user', null);
+        this.fire('things-logout-succeed');
+        this.unlisten(this._signoutAjax, 'response', '_signoutSuccess');
+        this.unlisten(this._signoutAjax, 'error', '_signoutFailure');
+
+        this.logInOut = 'LogIn';
+        page('/unit-list');
+        page('/home');
+        // location.reload(true);
+      },
+
+      _signoutFailure: function(event) {
+        if (event && event.detail && event.detail.error && event.detail.error.target && event.detail.error.target.statusText) {
+          this.openInfoMsg(event.detail.error.target.statusText);
+        } else {
+          this.openInfoMsg('Failed to Logout');
+        }
       },
 
       _handleUnitSearchSuccess: function(event) {

@@ -65,6 +65,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.route = 'login';
     });
 
+    page('/logout', function() {
+      app.route = 'logout';
+    });
+
     page('/coffer-detail-list/:id', function(data) {
       app.params = data.params;
       app.route = 'coffer-detail-list';
