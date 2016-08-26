@@ -157,11 +157,14 @@
     <div id="content">
       <div class="detail">
         <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
-          <iron-swipeable-pages selected="0">
-            <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id, unitResource.updated_at)]]" as="unitSrc">
-              <iron-image id="example-full-width" src="[[unitSrc.src]]"></iron-image>
-            </template>
-          </iron-swipeable-pages>
+          <template is="dom-if" if="{{_showImg(visible)}}">
+            <iron-swipeable-pages id="swipeable-page" selected="0" no-cycle>
+              <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id, unitResource.updated_at)]]" as="unitSrc">
+                <iron-image src="[[unitSrc.src]]"></iron-image>
+              </template>
+            </iron-swipeable-pages>
+          </template>
+          
 
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
@@ -292,6 +295,10 @@
       behaviors: [
         Things.GlobalBehavior
       ],
+
+      _showImg: function(visible) {
+        return visible;
+      },
 
       _onFavorite: function(e) {
         if(!this.get('globals.user')) {
