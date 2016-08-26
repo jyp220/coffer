@@ -111,7 +111,6 @@
         --search-width: 500px;
       }*/
     </style>
-
     <things-ajax id="delete-unit-ajax" resource-action="delete" resource-url="units/[[deleteUnitId]]">
     </things-ajax>
     <things-ajax id="delete-coffer-ajax" resource-action="delete" resource-url="coffers/[[deleteCofferId]]">
@@ -196,10 +195,12 @@
       <paper-menu-button class="alarm-btn">
         <paper-icon-button id="alarm-btn" icon="social:notifications-none" class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
-          <paper-item id="createUnit">Test Test Test</paper-item>
+          <template is="dom-repeat" items="[[notifyArr]]" as="notification">
+            <paper-item name="[[notification.title]]" on-click="_notificationSelected">[[notification.title]]     /      [[notification.message]]</paper-item>
+          </template>
         </paper-menu>
       </paper-menu-button>
-      <paper-badge for="alarm-btn" label="4"></paper-badge>
+      <paper-badge for="alarm-btn" label="[[_shouldBadgeCount]]"></paper-badge>
 
     </app-header>
 
@@ -257,7 +258,18 @@
         logInOut: {
           type: String,
           value: 'LogIn'
-        }
+        },
+
+        badge: {
+          type: Object,
+          value: JSON.parse(window.localStorage.getItem('coffer.notification')).length
+        },
+
+        _shouldBadgeCount: {
+          computed: '_computeShouldBadgeCount(badge)'
+        },
+
+        notifyArr: Array
       },
 
       listeners: {
@@ -280,9 +292,27 @@
         Things.GlobalBehavior
       ],
 
+      _computeShouldBadgeCount: function(cnt) {
+        this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
+        return cnt;
+      },
+
       onNewCofferDialogClosed: function(e) {
         if(!e.detail.confirmed)
           return
+      },
+
+      _notificationSelected: function(e) {
+        var arr = this.notifyArr;
+        var currentArr = [];
+        for(var i = 0 ; i < arr.length ; i++) {
+          if(arr[i]['title'] != e.target.name) {
+            currentArr.push(arr[i]);
+          }
+        }
+        storage.setItem('coffer.notification', JSON.stringify(currentArr));
+        this.badge = currentArr.length;
+        page('/unit-list');
       },
 
       _moreMenuSelected: function(e) {

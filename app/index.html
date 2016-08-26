@@ -58,6 +58,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     var userAgent = navigator.userAgent.toLowerCase();
     // this.executeApp('cofferlink://');
+    
+    // this.addTest();
+    // function addTest() {
+    //   var obj = {
+    //     'title' : 'title_test',
+    //     'message' : 'message_test'
+    //   }
+    //   var arr = JSON.parse(storage.getItem('coffer.notification'));
+
+    //   if(arr) {
+    //     arr.push(obj);
+    //   } else {
+    //     arr = [];
+    //     arr.push(obj);
+    //   }
+
+    //   storage.setItem('coffer.notification', JSON.stringify(arr));
+    //   var app = document.querySelector('#app');
+    //   if(app) {
+    //     app.$["coffer-header"].locale = JSON.parse(storage.getItem('coffer.notification')).length;
+    //   }
+    // }
 
     function checkLogin() {
       if(storage.getItem('setting.user')) {
@@ -258,8 +280,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
       });
     </script> -->
-
-    <coffer-header categories="[[categories]]" route="[[route]]" params="[[params]]"></coffer-header>
+    <coffer-header id="coffer-header" categories="[[categories]]" route="[[route]]" params="[[params]]"></coffer-header>
 
     <div class="content">
       <iron-pages role="main" attr-for-selected="data-route" selected="{{route}}" selected-attribute="visible">

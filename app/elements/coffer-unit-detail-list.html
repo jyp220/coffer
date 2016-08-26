@@ -157,13 +157,13 @@
     <div id="content">
       <div class="detail">
         <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
-          <template is="dom-if" if="{{_showImg(visible)}}">
+          <div id="tabContainer" primary$="[[_shouldShowPage]]" hidden$="[[!_shouldShowPage]]">
             <iron-swipeable-pages id="swipeable-page" selected="0" no-cycle>
               <template is="dom-repeat" items="[[_imageSrc(unitResource.thumbnail_id, unitResource.updated_at)]]" as="unitSrc">
                 <iron-image src="[[unitSrc.src]]"></iron-image>
               </template>
             </iron-swipeable-pages>
-          </template>
+          </div>
           
 
           <div class="rate-info">
@@ -261,6 +261,10 @@
         timelineCnt: {
           type: Number,
           value: 1
+        },
+
+        _shouldShowPage: {
+          computed: '_computeShouldShowPages(visible, unitResource)'
         }
 
       },
@@ -296,7 +300,11 @@
         Things.GlobalBehavior
       ],
 
-      _showImg: function(visible) {
+      _computeShouldShowPages: function(visible, unitResource) {
+        if(!unitResource.thumbnail_id) {
+          return false;
+        }
+
         return visible;
       },
 

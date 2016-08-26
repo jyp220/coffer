@@ -13,7 +13,7 @@
       }
     </style>
 
-    <!-- <template is="dom-if" if="[[initialized]]">
+    <template is="dom-if" if="[[initialized]]">
       <h4>Standard LinkedIn button</h4>
       <div class="vertical-section">
         <linkedin-signin
@@ -34,42 +34,7 @@
           <paper-button raised on-click="clickLogout">LogOut</paper-button>
         </template>
       </div>
-    </template> -->
-    <script>
-      function onLinkedInLoad() {
-        IN.Event.on(IN, "auth", getProfileData);
-      }
-
-      // Handle the successful return from the API call
-      function onSuccess(data) {
-          console.log(data);
-      }
-
-      // Handle an error response from the API call
-      function onError(error) {
-          console.log(error);
-      }
-
-      // Use the API call wrapper to request the member's basic profile data
-      function getProfileData() {
-          IN.API.Profile("me").fields("id,firstName,lastName,email-address,picture-urls::(original),public-profile-url,location:(name)").result(function (me) {
-            var profile = me.values[0];
-            var id = profile.id;
-            var firstName = profile.firstName;
-            var lastName = profile.lastName;
-            var emailAddress = profile.emailAddress;
-            var pictureUrl = profile.pictureUrls.values[0];
-            var profileUrl = profile.publicProfileUrl;
-            var country = profile.location.name;
-        }).result(onSuccess).error(onError);
-      }
-    </script>
-    <script type="text/javascript" src="//platform.linkedin.com/in.js">
-      api_key: 75tql789or1lu1
-      onLoad: onLinkedInLoad
-      authorize: true
-    </script>
-    <script type="in/Login"></script>
+    </template>
   </template>
 
   <script>
