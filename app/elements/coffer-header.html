@@ -262,7 +262,7 @@
 
         badge: {
           type: Object,
-          value: JSON.parse(window.localStorage.getItem('coffer.notification')).length
+          value: 1
         },
 
         _shouldBadgeCount: {
@@ -285,16 +285,25 @@
         'delete-unit-ajax.things-ajax-response' : '_handleSaveSuccess',
         'delete-unit-ajax.things-ajax-error' : '_handleSaveFailure',
         'delete-coffer-ajax.things-ajax-response' : '_handleSaveSuccess',
-        'delete-coffer-ajax.things-ajax-error' : '_handleSaveFailure'
+        'delete-coffer-ajax.things-ajax-error' : '_handleSaveFailure',
+        'badge-count-change' : '_onBadgeCount'
       },
 
       behaviors: [
         Things.GlobalBehavior
       ],
 
+      _onBadgeCount: function(e) {
+        alert(e.detail);
+        this.badge = e.detail.count;
+      },
+
       _computeShouldBadgeCount: function(cnt) {
-        this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
-        return cnt;
+        if(storage.getItem('setting.user')) {
+          this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
+          return this.notifyArr.length;
+        }
+        return "";
       },
 
       onNewCofferDialogClosed: function(e) {

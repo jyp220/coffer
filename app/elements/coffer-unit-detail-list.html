@@ -400,22 +400,22 @@
       },
 
       clickOnImage: function(e) {
-        var thumbnailIds = e.currentTarget.name.split(',');
-        var arr = [];
+        // var thumbnailIds = e.currentTarget.name.split(',');
+        // var arr = [];
 
-        for(var i = 0 ; i < thumbnailIds.length ; i++) {
-          var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
-          arr.push(obj);
-        }
+        // for(var i = 0 ; i < thumbnailIds.length ; i++) {
+        //   var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
+        //   arr.push(obj);
+        // }
 
-        var thumbnailView = this.$["dynamicThumbnailViewer"];
-        var label = document.createElement('coffer-image-viewer');
-        label.id = 'timeline-thumbnail-view';
-        label.data = 'thumbnail-viewer';
-        label.itemThumbnail = arr;
-        thumbnailView.appendChild(label);
+        // var thumbnailView = this.$["dynamicThumbnailViewer"];
+        // var label = document.createElement('coffer-image-viewer');
+        // label.id = 'timeline-thumbnail-view';
+        // label.data = 'thumbnail-viewer';
+        // label.itemThumbnail = arr;
+        // thumbnailView.appendChild(label);
 
-        this.$['unit-image-viewer'].open();
+        // this.$['unit-image-viewer'].open();
       },
 
       onImage: function(thumbnail, updatedAt) {
