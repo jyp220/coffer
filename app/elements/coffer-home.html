@@ -127,9 +127,7 @@
           this.unitListReload();
 
           if(this.get('globals.user')) {
-            // var cnt = JSON.parse(storage.getItem('coffer.notification')).length;
-            // console.log(cnt);
-            this.fire('badge-count-change', { title: '2' });
+            app.$["coffer-header"].badge += 1;
             this.$["count-unit-ajax"].generateRequest();
             this.$["count-coffer-ajax"].generateRequest();
             this.$["count-favorite-ajax"].generateRequest();
