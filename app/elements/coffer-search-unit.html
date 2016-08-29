@@ -4,6 +4,13 @@
   <template>
 
     <style>
+      paper-search-input::shadow .paper-search-input{
+        background-color:#ccc;
+        padding:0
+      }
+      paper-search-input::shadow .paper-search-input input{
+        padding:7px 15px !important;
+      }
     </style>
 
     <things-ajax id="unit-search" method="GET" resource-action="index" resource-url="units" query-fields="[[unitQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{unitResource}}">
