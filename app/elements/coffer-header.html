@@ -300,8 +300,8 @@
 
       _computeShouldBadgeCount: function(cnt) {
         if(storage.getItem('setting.user')) {
-          this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
-          return this.notifyArr.length;
+          // this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
+          // return this.notifyArr.length;
         }
         return "";
       },
@@ -339,7 +339,7 @@
 
             this.$["new-unit-home"].open();
           }
-          
+
         }else if(e.target.id === 'creteCoffer') {
           if(checkLogin()) {
             this.$["new-coffer-home"].open();

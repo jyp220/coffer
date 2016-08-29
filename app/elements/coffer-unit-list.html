@@ -40,6 +40,10 @@
         top:30%;
         left:50%;
       }
+      .home-side{
+        @apply(--things-coffer-homeside-container);
+        margin-top:-2px;
+      }
     </style>
 
 
@@ -49,9 +53,7 @@
     <things-ajax id="get-unit" method="GET" resource-action="index" resource-url="units" page="[[page]]" limit="[[limit]]" last-response="{{addUnit}}">
     </things-ajax>
 
-    <header>
-      <span>[[_getPluralizedQuantity(resource.total)]]</span>
-    </header>
+    <div class="home-side">[[_getPluralizedQuantity(resource.total)]]</div>
 
     <ul>
       <template is="dom-repeat" items="{{resource.items}}" as="unitItem">
@@ -197,7 +199,7 @@
         var divList = this.$["dynamicNewUnit"];
         while ( divList.hasChildNodes() )
         {
-          divList.removeChild( divList.firstChild );       
+          divList.removeChild( divList.firstChild );
         }
       }
 
