@@ -17,7 +17,9 @@
     </things-ajax>
 
     <div id="popup-test">
-      <paper-search-input id="colors"></paper-search-input>
+      <!-- <paper-search-input id="colors"></paper-search-input> -->
+      <iron-icon icon="icons:search"></iron-icon>Search
+      <paper-input label="name" type="string" value="{{name}}"></paper-input>
       <paper-button raised on-click="clickSearch">Search</paper-button>
 
       <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
@@ -36,15 +38,12 @@
         is: 'coffer-search-unit',
 
         properties: {
-          name: String,
-
-          content: String,
 
           object: {
             type: Object,
             value: {},
             notify: true,
-            computed: '_computeTimelineObject(name,content)'
+            computed: '_computeTimelineObject(name)'
           },
 
           visible: {
@@ -66,13 +65,12 @@
         },
 
         listeners: {
-          'colors.paper-search-input-execute': 'onSearchDialog'
+          // 'colors.paper-search-input-execute': 'onSearchDialog'
         },
 
-        _computeTimelineObject: function(name, content) {
+        _computeTimelineObject: function(name) {
           return {
-            name: name,
-            content: content
+            name: name
           }
         },
 
@@ -82,19 +80,16 @@
           }
         },
 
-        onSearchDialog: function(e) {
+        clickSearch: function(e) {
+          // this.$['colors'].executeSearch();
           this.unitQueryFields = [ {
             name: 'name',
             operator: 'like',
-            value: e.detail.value
+            value: this.object.name
           } ];
 
           var ajax = this.$['unit-search'];
           ajax.generateRequest();
-        },
-
-        clickSearch: function(e) {
-          this.$['colors'].executeSearch();
         },
 
         onClose: function(e) {
