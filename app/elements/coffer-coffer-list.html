@@ -17,49 +17,42 @@
         overflow:hidden;
       }
       iron-image{
-        width:48%;
+        width:46%;
         max-height:200px;
+			margin-left:5px
       }
       iron-image *{margin:auto;}
       iron-image::shadow img{
         max-width:200px;
         max-height:200px;
       }
-      ul,ol{list-style:none;margin:0;padding:0;}
-      ul{
-        overflow:hidden
-      }
-      .tile__list{
-        width:47%;
-        margin:20px 0 0 2%;
-        float:left;
-        border-bottom:1px solid #efefef;
-      }
-      .title-name{
-        @apply(--things-coffer-title)
-      }
-      .title-name span{
-        @apply(--things-coffer-desc);
-        float:right;
-      }
+      a{
+				@apply(--things-coffer-list-cell)
+			}
+			.coffer-list .coffer-info{
+				@apply(--things-coffer-list-info)
+			}
+			.coffer-list .coffer-info span{
+				float:right;
+				font-size:12px;
+				line-height:1.4;
+				opacity:.7
+			}
     </style>
-
-    
 
     <things-ajax auto="" id="coffer-search" method="GET" resource-action="index" resource-url="coffers" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
     </things-ajax>
 
-    <ul>
-      <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
-        <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">
-          <div class="tile__list">
-            <div class="tile__name title-name">
-              [[coffer.name]]
-              <span>unit : [[coffer.count]]</span>
-            </div>
-            <iron-image src="[[_imageSrc(coffer.thumbnail_id, coffer.updated_at)]]"></iron-image>
-            <iron-image src="[[_imageSrc(coffer.thumbnail_id_sec, coffer.updated_at)]]"></iron-image>
+    <template is="dom-repeat" items="[[cofferResource.items]]" as="coffer">
+      <a href="{{baseUrl}}/coffer-detail-list/[[coffer.id]]" name="[[coffer.id]]">
+        <div class="coffer-list">
+				<iron-image src="[[_imageSrc(coffer.thumbnail_id, coffer.updated_at)]]"></iron-image>
+          <iron-image src="[[_imageSrc(coffer.thumbnail_id_sec, coffer.updated_at)]]"></iron-image>
+          <div class="coffer-info">
+            [[coffer.name]]
+            <span>item : [[coffer.count]]</span>
           </div>
+        </div>
         </a>
       </template>
 
@@ -69,7 +62,6 @@
         <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-coffer-new id="new-coffer-data" data="create-coffer-list"></coffer-coffer-new>
       </paper-fullscreen-dialog>
-    </ul>
   </template>
 
   <script>
@@ -117,7 +109,7 @@
         if (visible) {
           this.cofferListReload();
           this.fire('change-section', { title: 'coffer' });
-        } 
+        }
       },
 
       _getPluralizedQuantity: function(quantity) {

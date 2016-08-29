@@ -19,7 +19,18 @@
         margin-top:9%;
         overflow:hidden;
       }
-
+      .home-side{
+        @apply(--things-coffer-homeside-container);
+        margin-top:-2px;
+      }
+      .home-side span{
+        display:inline-block;
+        float:right;
+        opacity:.7;
+        padding-right:7px;
+        font-size:13px;
+      }
+      a{text-decoration:none}
     </style>
 
     <things-ajax id="coffer-search" method="GET" resource-action="index" resource-url="coffers" query-fields="[[cofferQueryFields]]" page="[[page]]" limit="[[limit]]" last-response="{{cofferResource}}">
@@ -32,16 +43,14 @@
     </things-ajax>
 
 
-    <header>
+    <div class="home-side">
       <template is="dom-repeat" items="[[cofferResource.items]]">
-        <h1>Coffer Color : [[item.coffer_color]]</h1>
-        <h1>Coffer Title : [[item.name]]</h1>
-        <h1>Unit Count : [[item.count]]</h1>
-        <h1>Create Date : [[item.created_at]]</h1>
+        <!-- <h1>Coffer Color : [[item.coffer_color]]</h1> -->
+        <strong>[[item.name]] ([[item.count]])</strong>
+        <span>Create : [[item.created_at]]</span>
       </template>
-    </header>
+    </div>
 
-    <ul>
       <template is="dom-repeat" items="{{unitResource.items}}" as="unitItem">
         <a href="{{baseUrl}}unit-detail-list/[[unitItem.id]]" name="[[unitItem.id]]"><coffer-unit-list-item item="[[unitItem]]"></coffer-unit-list-item></a>
       </template>
@@ -59,7 +68,6 @@
           <div id="dynamicNewUnit"></div>
         </paper-dialog-scrollable>
       </paper-dialog>
-    </ul>
   </template>
 
   <script>
@@ -119,12 +127,12 @@
             } ];
 
             this.cofferListReload();
-          } 
+          }
         }
       },
 
       onTapAddUnit: function(e) {
-        if(checkLogin()) {    
+        if(checkLogin()) {
           var unitNew = this.$["dynamicNewUnit"];
           var label = document.createElement('coffer-unit-new');
           label.id = 'new-unit-data';
@@ -154,10 +162,10 @@
           this.$.threshold.clearTriggers();
           if(this.visible) {
             if(this.unitResource != null && this.unitResource.items.length >= this.unitResource.total) return;
-            
+
             this.active = true;
             this.page++;
-            
+
             var ajax = this.$['add-unit-search'];
             ajax.generateRequest();
           }
@@ -195,7 +203,7 @@
         var divList = this.$["dynamicNewUnit"];
         while ( divList.hasChildNodes() )
         {
-          divList.removeChild( divList.firstChild );       
+          divList.removeChild( divList.firstChild );
         }
       }
 
