@@ -12,6 +12,7 @@
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/fullscreen-api/fullscreen-api.html">
 
 <dom-module id="coffer-unit-detail-list">
 
@@ -154,6 +155,8 @@
     <things-ajax id="create-favorite-ajax" resource-action="create" resource-url="coffer_favorites"></things-ajax>
     <things-ajax id="delete-favorite-ajax" resource-action="delete" resource-url="coffer_favorites/delete_by_unit/[[deleteFavoriteUnitId]]"></things-ajax>
 
+    <fullscreen-api id="fsapi"></fullscreen-api>
+
     <div id="content">
       <div class="detail">
         <paper-card heading="[[unitResource.name]]" class="white" elevation="0">
@@ -204,7 +207,9 @@
               {{timeline.content}}
             </div>
 
-            <iron-image id="example-full-width" name="[[timeline.image_id]]" src="[[onImage(timeline.image_id, timeline.updated_at)]]" on-click="clickOnImage"></iron-image>
+            <template is="dom-repeat" items="[[_imageSrc(timeline.image_id, timeline.updated_at)]]" as="timelineSrc">
+              <iron-image src="[[timelineSrc.src]]" on-click="clickOnImage"></iron-image>
+            </template>
           </li>
         </template>
         </ul>
@@ -399,32 +404,6 @@
         }
       },
 
-      clickOnImage: function(e) {
-        // var thumbnailIds = e.currentTarget.name.split(',');
-        // var arr = [];
-
-        // for(var i = 0 ; i < thumbnailIds.length ; i++) {
-        //   var obj = {'src' : this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[i]};
-        //   arr.push(obj);
-        // }
-
-        // var thumbnailView = this.$["dynamicThumbnailViewer"];
-        // var label = document.createElement('coffer-image-viewer');
-        // label.id = 'timeline-thumbnail-view';
-        // label.data = 'thumbnail-viewer';
-        // label.itemThumbnail = arr;
-        // thumbnailView.appendChild(label);
-
-        // this.$['unit-image-viewer'].open();
-      },
-
-      onImage: function(thumbnail, updatedAt) {
-        if(thumbnail != null)  {
-          var thumbnailIds = thumbnail.split(',');
-          return this.get('globals.baseUrl') + "/download/public/" + thumbnailIds[0]+ '?dc=' + updatedAt;
-        }
-      },
-
       _edit: function(timeline) {
         var ajax = this.$['timeline-item-search'];
         this.timelineItemId = timeline.currentTarget.name;
@@ -562,7 +541,18 @@
 
       _handleFavoriteDeleteFailure: function(event) {
         alert('Favorite Delete Failure');
-      }
+      },
+
+      clickOnImage: function(e) {
+        // alert('eee');
+        this.toggleFullscreen(event.target);
+      },
+
+      toggleFullscreen: function(element) {
+        var fsapi = document.querySelector('#fsapi');
+        fsapi.target = element;
+        fsapi.toggleFullscreen();
+      },
 
     });
 

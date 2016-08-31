@@ -202,7 +202,9 @@
           </template>
         </paper-menu>
       </paper-menu-button>
-      <paper-badge for="alarm-btn" label="[[notiResource.items.length]]"></paper-badge>
+      <template is="dom-if" if="[[_showPaperBadge]]">
+        <paper-badge for="alarm-btn" label="[[notiResource.items.length]]"></paper-badge>
+      </template>
 
     </app-header>
 
@@ -255,6 +257,10 @@
 
         _shouldRenderDrawer: {
           computed: '_computeShouldRenderDrawer(smallScreen)'
+        },
+
+        _showPaperBadge: {
+          computed: '_computeShowPaperBadge(route)'
         },
 
         logInOut: {
@@ -482,6 +488,16 @@
 
       _computeShouldRenderDrawer: function(smallScreen) {
         return smallScreen;
+      },
+
+      _computeShowPaperBadge: function(route) {
+        if(this.get('globals.user')) {
+          this.logInOut = 'LogOut';
+          return true;
+        } else {
+          this.logInOut = 'LogIn';
+          return false;
+        }
       },
 
       _toggleDrawer: function() {
