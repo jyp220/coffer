@@ -42,6 +42,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     var setting = document.querySelector('#setting');
     if (setting){
       setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+      // setting.set('globals.baseUrl', 'http://coffer.hatiolab.com/rest');
+      // setting.set('globals.baseUrl', 'http://192.168.35.155:8010/rest');
     }
   });
 

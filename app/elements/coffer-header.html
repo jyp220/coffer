@@ -293,11 +293,6 @@
       ],
 
       _computeShouldBadgeCount: function(cnt) {
-        // if(storage.getItem('setting.user')) {
-        //   // this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
-        //   // return this.notifyArr.length;
-        // }
-        // return "";
         if(this.get('globals.user')) {
           this.notiQueryFields = [ {
               name: 'creator_id',
@@ -540,6 +535,18 @@
                 if(prefix.length > 1) {
                   self.sendAjax(prefix[1], prefix[2], result.text);
                 } else {
+                  var unitNew = this.$["dynamicNewUnit"];
+                  var label = document.createElement('coffer-unit-new');
+                  label.id = 'new-unit-data-home';
+                  label.data = 'create-unit-header';
+                  label.name = '';
+                  label.content = '';
+                  label.group = '';
+                  label.unitThumbnail = '';
+                  unitNew.appendChild(label);
+
+                  // this.$["new-unit-home"].open();
+
                   unitHome.open();
                 }
             },

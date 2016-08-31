@@ -54,7 +54,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script type="text/javascript">
     var storage = window.localStorage;
     if(storage.getItem('setting.baseUrl') == null)
-      storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
+    storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
+    // storage.setItem('setting.baseUrl', 'http://coffer.hatiolab.com:8001/rest');
 
     var userAgent = navigator.userAgent.toLowerCase();
     // this.executeApp('cofferlink://');
@@ -276,7 +277,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var setting = document.querySelector('#setting');
       window.addEventListener('WebComponentsReady', function() {
           if (setting){
-            setting.set('globals.baseUrl', 'http://192.168.35.96:8001/rest');
+            setting.set('globals.baseUrl', 'http://factory.hatiolab.com:8001/rest');
           }
       });
     </script> -->
@@ -291,7 +292,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <coffer-coffer-list data-route="coffer-list"></coffer-coffer-list>
         <coffer-coffer-detail-list data-route="coffer-detail-list" route="[[route]]" params="[[params]]"></coffer-coffer-detail-list>
         <!-- <coffer-linkedin-login data-route="login"></coffer-linkedin-login> -->
-        <things-login data-route="login" route="[[route]]" title="Things" login-path="login" content-type="application/x-www-form-urlencoded" success-route="/" username-input-label="ID" password-input-label="Password" submit-label="sign_up" reset-label="Reset"></things-login>
+        <things-login id="coffer-login" data-route="login" route="[[route]]" title="Things" login-path="login" content-type="application/x-www-form-urlencoded" success-route="/" username-input-label="ID" password-input-label="Password" submit-label="sign_up" reset-label="Reset"></things-login>
       </iron-pages>
     </div>
 

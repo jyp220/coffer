@@ -7,39 +7,11 @@
   <template>
 
     <style>
-      paper-button.red {
-        background-color: var(--paper-red-500);
-        color: white;
-      }
-      paper-button.blue {
-        background-color: var(--paper-blue-500);
-        color: white;
-      }
-      paper-button.green {
-        background-color: var(--paper-green-500);
-        color: white;
-      }
-      paper-button.yellow {
-        background-color: var(--paper-yellow-500);
-        color: white;
-      }
-      paper-button.pink {
-        background-color: var(--paper-pink-500);
-        color: white;
-      }
     </style>
 
     <things-ajax id="create-coffer-ajax" resource-action="create" resource-url="coffers"></things-ajax>
 
     <paper-input label="name" type="string" value="{{name}}"></paper-input>
-
-    <paper-button class="red" raised id="btn_red" on-click="clickColor">1</paper-button>
-    <paper-button class="blue" raised id="btn_blue" on-click="clickColor">2</paper-button>
-    <paper-button class="green" raised id="btn_green" on-click="clickColor">3</paper-button>
-    <paper-button class="yellow" raised id="btn_yellow" on-click="clickColor">4</paper-button>
-    <paper-button class="pink" raised id="btn_pink" on-click="clickColor">5</paper-button>
-
-    <paper-textarea label="color" type="string" value="{{color}}" readonly></paper-textarea>
 
     <paper-button id="submitButton" raised on-click="_cofferCreate">Submit</paper-button>
   </template>
@@ -56,12 +28,10 @@
             type: Object,
             value: {},
             notify: true,
-            computed: '_computeCofferObject(name,color)'
+            computed: '_computeCofferObject(name)'
           },
 
-          data: String,
-
-          color: Object
+          data: String
         },
 
         listeners: {
@@ -69,32 +39,16 @@
           'create-coffer-ajax.things-ajax-error' : '_handleSaveFailure',
         },
 
-        _computeCofferObject: function(name, color) {
+        _computeCofferObject: function(name) {
           return {
-            name: name,
-            color: color
-          }
-        },
-
-        clickColor: function(e) {
-          if(e.currentTarget.id == 'btn_red') {
-            this.color = 'red';
-          } else if(e.currentTarget.id == 'btn_blue') {
-            this.color = 'blue';
-          } else if(e.currentTarget.id == 'btn_green') {
-            this.color = 'green';
-          } else if(e.currentTarget.id == 'btn_yellow') {
-            this.color = 'yellow';
-          } else if(e.currentTarget.id == 'btn_pink') {
-            this.color = 'pink';
+            name: name
           }
         },
 
         _cofferCreate: function(e) {
           var data = this.object;
           var row = {
-            'name' : data.name,
-            'coffer_color' : data.color
+            'name' : data.name
           };
 
           var ajax = this.$['create-coffer-ajax'];
