@@ -203,9 +203,9 @@
         <paper-icon-button id="alarm-btn" icon="social:notifications-none" class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
           <template is="dom-repeat" items="[[notifyArr]]" as="notification">
-            <paper-item name="[[notification.title]]" on-click="_notificationSelected">
-              [[notification.title]]     /      [[notification.message]]
-              <div class="notice-time"><iron-icon icon="icons:alarm-on"></iron-icon>0000-00-00 00:00</div>
+            <paper-item name="[[notification.id]]" on-click="_notificationSelected">
+              [[notification.message]]
+              <div class="notice-time"><iron-icon icon="icons:alarm-on"></iron-icon>[[notification.time]]</div>
             </paper-item>
           </template>
         </paper-menu>
@@ -268,7 +268,7 @@
         },
 
         _showPaperBadge: {
-          computed: '_computeShowPaperBadge(route)'
+          computed: '_computeShowPaperBadge(route, badge)'
         },
 
         logInOut: {
@@ -311,7 +311,8 @@
       _computeShouldBadgeCount: function(cnt) {
         if(this.get('globals.user')) {
           this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
-          return this.notifyArr.length;
+          if(this.notifyArr != null)
+            return this.notifyArr.length;
         }
         this.badge = "";
       },
@@ -325,13 +326,13 @@
         var arr = this.notifyArr;
         var currentArr = [];
         for(var i = 0 ; i < arr.length ; i++) {
-          if(arr[i]['title'] != e.target.name) {
+          if(arr[i]['id'] != e.target.name) {
             currentArr.push(arr[i]);
           }
         }
         storage.setItem('coffer.notification', JSON.stringify(currentArr));
         this.badge = currentArr.length;
-        page('/unit-list');
+        page('/unit-list' + e.target.name);
       },
 
       _moreMenuSelected: function(e) {
@@ -496,11 +497,11 @@
         return smallScreen;
       },
 
-      _computeShowPaperBadge: function(route) {
+      _computeShowPaperBadge: function(route, badge) {
         if(this.get('globals.user')) {
           this.logInOut = 'LogOut';
           this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
-          if(this.notifyArr.length > 0) {
+          if(this.notifyArr != null && this.notifyArr.length > 0) {
             return true;
           }
           return false;
