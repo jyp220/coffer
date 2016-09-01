@@ -93,8 +93,30 @@
       }
       .notice-time{
         display:block;
+        width:100%;
         color:#999;
         font-size:12px;
+      }
+      .alarm-btn paper-item{
+        @apply(--layout-vertical);
+        padding:7px 7px 3px 7px;
+        border-bottom:1px solid rgba(0,0,0,.1);
+        font-size:13px;
+        line-height:1.3;
+        align-items:flex-start;
+      }
+      .alarm-btn paper-item iron-icon{
+        margin-right:2px;padding: 0;
+        width:14px;height:14px;
+        top:-2px;
+        color:#999
+      }
+      paper-menu-button.alarm-btn::shadow .dropdown-content{
+        width:240px !important;
+        min-width:240px !important;
+      }
+      paper-item[focused]{
+        background:#fff !important;
       }
       /* small screen */
       @media (max-width: 267px) {
@@ -204,7 +226,7 @@
         <paper-menu class="dropdown-content">
           <template is="dom-repeat" items="[[notifyArr]]" as="notification">
             <paper-item name="[[notification.title]]" on-click="_notificationSelected">
-              [[notification.title]]     /      [[notification.message]]
+              <strong>"[[notification.unit_id]]"</strong>also commented on<strong>"[[notification.content]]"</strong>
               <div class="notice-time"><iron-icon icon="icons:alarm-on"></iron-icon>0000-00-00 00:00</div>
             </paper-item>
           </template>
@@ -284,7 +306,7 @@
         _shouldBadgeCount: {
           computed: '_computeShouldBadgeCount(badge)'
         },
-        
+
         notifyArr: Array
       },
 
