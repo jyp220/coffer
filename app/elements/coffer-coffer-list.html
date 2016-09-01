@@ -58,11 +58,10 @@
       </template>
 
       <paper-fab noink="" id="add-coffer" icon="add" title="add coffer"></paper-fab>
-      <paper-fullscreen-dialog id="new-coffer">
+      <paper-dialog id="new-coffer">
         <h2>New Coffer</h2>
-        <paper-button id="create-coffer" affirmative="" dialog-confirm="">create</paper-button>
         <coffer-coffer-new id="new-coffer-data" data="create-coffer-list"></coffer-coffer-new>
-      </paper-fullscreen-dialog>
+      </paper-dialog>
   </template>
 
   <script>
@@ -110,6 +109,9 @@
         if (visible) {
           this.cofferListReload();
           this.fire('change-section', { title: 'coffer' });
+          if(this.get('globals.user')) {
+            app.$["coffer-header"].badge += 1;
+          }
         }
       },
 

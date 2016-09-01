@@ -54,8 +54,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script type="text/javascript">
     var storage = window.localStorage;
     if(storage.getItem('setting.baseUrl') == null)
-    storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
-    // storage.setItem('setting.baseUrl', 'http://coffer.hatiolab.com:8001/rest');
+    // storage.setItem('setting.baseUrl', 'http://192.168.35.96:8001/rest');
+    storage.setItem('setting.baseUrl', 'http://factory.hatiolab.com:8001/rest');
 
     var userAgent = navigator.userAgent.toLowerCase();
     // this.executeApp('cofferlink://');
@@ -78,7 +78,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     //   storage.setItem('coffer.notification', JSON.stringify(arr));
     //   var app = document.querySelector('#app');
     //   if(app) {
-    //     app.$["coffer-header"].locale = JSON.parse(storage.getItem('coffer.notification')).length;
+    //     app.$["coffer-header"].badge = JSON.parse(storage.getItem('coffer.notification')).length;
     //   }
     // }
 

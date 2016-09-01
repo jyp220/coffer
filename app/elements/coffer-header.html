@@ -115,8 +115,6 @@
     </things-ajax>
     <things-ajax id="delete-coffer-ajax" resource-action="delete" resource-url="coffers/[[deleteCofferId]]">
     </things-ajax>
-    <things-ajax id="select-notification-ajax" method="GET" resource-action="index" resource-url="coffer_notifications" query-fields="[[notiQueryFields]]" last-response="{{notiResource}}">
-    </things-ajax>
 
     <iron-media-query query="max-width: 267px" query-matches="{{smallScreen}}"></iron-media-query>
     <things-ajax id="unit-search" method="GET" resource-url="units/[[unitItemId]]" last-response="{{unitResource}}">
@@ -197,13 +195,13 @@
       <paper-menu-button class="alarm-btn">
         <paper-icon-button id="alarm-btn" icon="social:notifications-none" class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
-          <template is="dom-repeat" items="[[notiResource.items]]" as="notification">
-            <paper-item name="[[notification.title]]" on-click="_notificationSelected">[[notification.unit_id]]     /      [[notification.content]]</paper-item>
+          <template is="dom-repeat" items="[[notifyArr]]" as="notification">
+            <paper-item name="[[notification.title]]" on-click="_notificationSelected">[[notification.title]]     /      [[notification.message]]</paper-item>
           </template>
         </paper-menu>
       </paper-menu-button>
       <template is="dom-if" if="[[_showPaperBadge]]">
-        <paper-badge for="alarm-btn" label="[[notiResource.items.length]]"></paper-badge>
+        <paper-badge for="alarm-btn" label="[[_shouldBadgeCount]]"></paper-badge>
       </template>
 
     </app-header>
@@ -271,7 +269,13 @@
         badge: {
           type: Object,
           value: 1
-        }
+        },
+
+        _shouldBadgeCount: {
+          computed: '_computeShouldBadgeCount(badge)'
+        },
+        
+        notifyArr: Array
       },
 
       listeners: {
@@ -294,18 +298,10 @@
         Things.GlobalBehavior
       ],
 
-      observers: [
-        '_computeShouldBadgeCount(badge)'
-      ],
-
       _computeShouldBadgeCount: function(cnt) {
         if(this.get('globals.user')) {
-          this.notiQueryFields = [ {
-              name: 'creator_id',
-              operator: 'noteq',
-              value: this.get('globals.user').id
-            } ];
-          this.$["select-notification-ajax"].generateRequest();
+          this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
+          return this.notifyArr.length;
         }
         this.badge = "";
       },
@@ -316,15 +312,15 @@
       },
 
       _notificationSelected: function(e) {
-        // var arr = this.notifyArr;
-        // var currentArr = [];
-        // for(var i = 0 ; i < arr.length ; i++) {
-        //   if(arr[i]['title'] != e.target.name) {
-        //     currentArr.push(arr[i]);
-        //   }
-        // }
-        // storage.setItem('coffer.notification', JSON.stringify(currentArr));
-        // this.badge = currentArr.length;
+        var arr = this.notifyArr;
+        var currentArr = [];
+        for(var i = 0 ; i < arr.length ; i++) {
+          if(arr[i]['title'] != e.target.name) {
+            currentArr.push(arr[i]);
+          }
+        }
+        storage.setItem('coffer.notification', JSON.stringify(currentArr));
+        this.badge = currentArr.length;
         page('/unit-list');
       },
 
@@ -493,7 +489,11 @@
       _computeShowPaperBadge: function(route) {
         if(this.get('globals.user')) {
           this.logInOut = 'LogOut';
-          return true;
+          this.notifyArr = JSON.parse(storage.getItem('coffer.notification'));
+          if(this.notifyArr.length > 0) {
+            return true;
+          }
+          return false;
         } else {
           this.logInOut = 'LogIn';
           return false;

@@ -12,7 +12,7 @@
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../bower_components/fullscreen-api/fullscreen-api.html">
+<!-- <link rel="import" href="../bower_components/fullscreen-api/fullscreen-api.html"> -->
 
 <dom-module id="coffer-unit-detail-list">
 
@@ -155,7 +155,7 @@
     <things-ajax id="create-favorite-ajax" resource-action="create" resource-url="coffer_favorites"></things-ajax>
     <things-ajax id="delete-favorite-ajax" resource-action="delete" resource-url="coffer_favorites/delete_by_unit/[[deleteFavoriteUnitId]]"></things-ajax>
 
-    <fullscreen-api id="fsapi"></fullscreen-api>
+    <!-- <fullscreen-api id="fsapi"></fullscreen-api> -->
 
     <div id="content">
       <div class="detail">
@@ -544,15 +544,15 @@
       },
 
       clickOnImage: function(e) {
-        // alert('eee');
-        this.toggleFullscreen(event.target);
-      },
+        var thumbnailView = this.$["dynamicThumbnailViewer"];
+        var label = document.createElement('coffer-image-viewer');
+        label.id = 'timeline-thumbnail-view';
+        label.data = 'thumbnail-viewer';
+        label.itemThumbnail = e.target.src;
+        thumbnailView.appendChild(label);
 
-      toggleFullscreen: function(element) {
-        var fsapi = document.querySelector('#fsapi');
-        fsapi.target = element;
-        fsapi.toggleFullscreen();
-      },
+        this.$['unit-image-viewer'].open();
+      }
 
     });
 

@@ -117,11 +117,18 @@
         'coffer-unit-list-close' : '_onCloseUnit'
       },
 
+      behaviors: [
+        Things.GlobalBehavior
+      ],
+
       _visibleChanged: function(visible) {
         if (visible) {
           this.page = 1;
           this.unitListReload();
           this.fire('change-section', { title: 'unit' });
+          if(this.get('globals.user')) {
+            app.$["coffer-header"].badge += 1;
+          }
         }
       },
 

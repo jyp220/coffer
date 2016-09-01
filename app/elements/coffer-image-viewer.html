@@ -7,11 +7,7 @@
     <style>
     </style>
 
-    <iron-swipeable-pages selected="0">
-      <template is="dom-repeat" items="[[itemThumbnail]]" as="timelineSrc">
-        <iron-image src="[[timelineSrc.src]]"></iron-image>
-      </template>
-    </iron-swipeable-pages>
+    <iron-image src="[[itemThumbnail]]"></iron-image>
     <paper-button id="closeButton" raised on-click="_viewerClose">close</paper-button>
   </template>
 
