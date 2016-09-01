@@ -141,6 +141,20 @@
       paper-dialog#unit-image-viewer::shadow img{
         width:100%
       }
+      .timeline-thumb{
+        width:23%;
+        min-height:50px;
+        margin:5px 5px 0 0;
+        float:left;
+        border:1px solid rgba(0,0,0,.1);
+      }
+      .timeline-thumb:nth-of-type(1){
+        margin-left:100px
+      }
+      .timeline-thumb::shadow img{
+        max-width:200%;
+        margin:auto
+      }
     </style>
 
 
@@ -167,7 +181,7 @@
               </template>
             </iron-swipeable-pages>
           </div>
-          
+
 
           <div class="rate-info">
            <iron-icon icon="icons:assignment"></iron-icon>[[unitResource.coffer.name]]
@@ -208,7 +222,7 @@
             </div>
 
             <template is="dom-repeat" items="[[_imageSrc(timeline.image_id, timeline.updated_at)]]" as="timelineSrc">
-              <iron-image src="[[timelineSrc.src]]" on-click="clickOnImage"></iron-image>
+              <iron-image src="[[timelineSrc.src]]" on-click="clickOnImage" class="timeline-thumb"></iron-image>
             </template>
           </li>
         </template>
