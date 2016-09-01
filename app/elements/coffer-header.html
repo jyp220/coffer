@@ -12,6 +12,7 @@
         z-index: 1;
         background-color:#d05251;
         padding-top:7px;
+        min-height:35px;
       }
       #tabContainer {
         height:40px;
@@ -77,6 +78,7 @@
       paper-badge{
         margin-top:7px;
         margin-left:-5px;
+        top:23px;
       }
       paper-item[focused]{
         background-color:#fff;
@@ -88,6 +90,11 @@
       .left-bar-item{
         float:left;
         margin:9px 0 0 5px
+      }
+      .notice-time{
+        display:block;
+        color:#999;
+        font-size:12px;
       }
       /* small screen */
       @media (max-width: 267px) {
@@ -196,7 +203,10 @@
         <paper-icon-button id="alarm-btn" icon="social:notifications-none" class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
           <template is="dom-repeat" items="[[notifyArr]]" as="notification">
-            <paper-item name="[[notification.title]]" on-click="_notificationSelected">[[notification.title]]     /      [[notification.message]]</paper-item>
+            <paper-item name="[[notification.title]]" on-click="_notificationSelected">
+              [[notification.title]]     /      [[notification.message]]
+              <div class="notice-time"><iron-icon icon="icons:alarm-on"></iron-icon>0000-00-00 00:00</div>
+            </paper-item>
           </template>
         </paper-menu>
       </paper-menu-button>
