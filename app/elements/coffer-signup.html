@@ -27,11 +27,7 @@
       method="[[method]]" 
       last-response="{{lastResponse}}">
 
-      <paper-input required name="name" label="[[lUserName]]"></paper-input>
-
       <gold-email-input auto-validate required name="email" label="[[lEmailAddress]]"></gold-email-input>
-
-      <!--paper-input required name ="timezone" label="Timezone"></paper-input-->
 
       <paper-input id="pw" required name="encrypted_password" type="password" label="[[lPassword]]"></paper-input>
 
@@ -47,8 +43,8 @@
       </paper-input>
 
       <paper-button class="btn-submit" raised on-click="_submitMyForm">Submit</paper-button>
-  
       <paper-button raised on-click="_resetMyForm">Reset</paper-button>
+      <paper-button id="closeButton" raised on-click="_signupClose">close</paper-button>
     </form>
   </template>
 
@@ -106,7 +102,11 @@
 
       _passwordValidate: function() {
         return this.$.pw.value === this.$['confirmed-pw'].value;
-      }
+      },
+
+      _signupClose:function(e) {
+        this.fire(this.data + '-close', { title: 'close' });
+      },
     });
   </script>
 </dom-module>
