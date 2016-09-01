@@ -1,0 +1,112 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/gold-email-input/gold-email-input.html">
+
+<link rel="import" href="../bower_components/things-msg-box-behavior/things-msg-box-behavior.html">
+
+<!--
+    회원가입 화면 
+-->
+
+<dom-module id="coffer-signup">
+  <template>
+    <style>
+      
+    </style>
+
+    <form 
+      is="iron-form" 
+      id="form" 
+      action=[[action]] 
+      headers="[[headers]]" 
+      content-type="application/json" 
+      method="[[method]]" 
+      last-response="{{lastResponse}}">
+
+      <paper-input required name="name" label="[[lUserName]]"></paper-input>
+
+      <gold-email-input auto-validate required name="email" label="[[lEmailAddress]]"></gold-email-input>
+
+      <!--paper-input required name ="timezone" label="Timezone"></paper-input-->
+
+      <paper-input id="pw" required name="encrypted_password" type="password" label="[[lPassword]]"></paper-input>
+
+      <paper-input 
+        id="confirmed-pw" 
+        auto-validate 
+        required 
+        name="confirmed-password" 
+        type="password" 
+        label="[[lConfirmedPassword]]" 
+        validator="_passwordValidate" 
+        errorMessage="Password mismatch password and confirmed password">
+      </paper-input>
+
+      <paper-button class="btn-submit" raised on-click="_submitMyForm">Submit</paper-button>
+  
+      <paper-button raised on-click="_resetMyForm">Reset</paper-button>
+    </form>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'coffer-signup',
+
+      properties: {
+      },
+
+      behaviors: [
+        Things.MsgBoxBehavior
+      ],
+
+      listeners: {
+        'iron-form-response': '_successResponseHandler',
+        'iron-form-error': '_errorResponseHandler'
+      },
+
+      _successResponseHandler: function(event) {
+        this.stopSpinner();
+        var me = this;
+
+        this.openConfirmMsg({
+          title: this.tRegInProcess,
+          text: this.tCheckRegInMail
+        }, function() {
+          me.fire("coffer-signup-success", me.serializeMyForm());
+        });
+      },
+
+      _errorResponseHandler: function(event) {
+        this.stopSpinner();
+        var me = this;
+
+        this.openConfirmMsg({
+          type: 'warning',
+          title: this.tInvalidInput,
+          text: this.tInfoInvalid
+        });
+      },
+
+      _submitMyForm: function(event) {
+        if (this._passwordValidate()) {
+          this.$['form'].submit();
+          this.fire('coffer-signup-submited');
+        } else {
+          this.openInfoMsg(this.tPasswordMissmatch);
+        }
+      },
+
+      _resetMyForm: function(event) {
+        this.resetMyForm();
+      },
+
+      _passwordValidate: function() {
+        return this.$.pw.value === this.$['confirmed-pw'].value;
+      }
+    });
+  </script>
+</dom-module>

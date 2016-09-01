@@ -1,0 +1,194 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/gold-email-input/gold-email-input.html">
+<link rel="import" href="../bower_components/things-global-behavior/things-global-behavior.html">
+<link rel="import" href="../bower_components/things-msg-box-behavior/things-msg-box-behavior.html">
+
+<dom-module id="coffer-login">
+  <template>
+    <style>
+    </style>
+
+    <paper-material elevation="1" on-keypress="keypressHandler">
+      <span class="header">
+        <strong>LOGIN</strong>
+      </span>
+
+      <form is="iron-form" id="loginForm" headers="[[headers]]" login-path="[[loginPath]]" action="{{action}}" content-type="[[contentType]]" method="[[method]]" with-credentials=true>
+        <paper-input id="username" name="email" type="text" label="[[lUserId]]" value="{{username}}" required auto-validate>
+        </paper-input>
+        <paper-input id="password" name="password" type="password" label="[[lPassword]]" value="{{password}}" required auto-validate>
+        </paper-input>
+        <paper-input id="token" name="token" hidden></paper-input>
+
+        <div>
+          <paper-button on-tap="_onSignupTap">Sign Up</paper-button>
+          <paper-button id="submitButton" raised disabled on-tap="submitHandler">Sign In</paper-button>
+        </div>
+      </form>
+    </paper-material>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'coffer-login',
+
+      properties: {
+        title: {
+            type: String,
+            value: 'Login'
+        },
+
+        elevation: {
+            type: Number,
+            value: 4
+        },
+
+        successRoute: {
+            type: String,
+            value: '/'
+        },
+
+        headers: {
+            type: Object,
+            value: ""
+        },
+
+        loginPath: {
+            type: String,
+            notify: true
+        },
+
+        action: {
+            type: String,
+            computed: '_computeActionUrl(globals.baseUrl, loginPath)'
+        },
+
+        contentType: {
+            type: String,
+            value: 'application/x-www-form-urlencoded'
+        },
+
+        method: {
+            type: String,
+            value: 'POST'
+        },
+
+        submitLabel: {
+            type: String,
+            value: 'Submit'
+        }
+      },
+
+      behaviors: [
+        Things.GlobalBehavior,
+        Things.MsgBoxBehavior
+      ],
+
+      listeners: {
+        'change': 'onFormChange',
+        'iron-form-submit': '_afterFormSubmit',
+        'iron-form-response': '_successResponse',
+        'iron-form-error': '_failureResponse'
+      },
+
+      onFormChange: function(event) {
+        // Validate the entire form to see if we should enable the `Submit` button.
+        this.$.submitButton.disabled = !this.$.loginForm.validate();
+      },
+
+      _onSignupTap: function(event) {
+        alert('ing...');
+        // var signup = document.createElement("coffer-signup");
+        // signup.title = 'SignUp';
+        // signup.actionUrl = 'users/register';
+        // signup.method = 'POST';
+
+        // signup.addEventListener("coffer-signup-success", function(event) {
+        //     var eventDetail = this;
+        //     var event = new CustomEvent('coffer-close-popup-view', {
+        //         'detail': eventDetail
+        //     });
+        //     document.dispatchEvent(event);
+        // });
+
+        // signup.addEventListener("coffer-signup-failure", function(event) {
+        //     var response = event.detail.request.xhr.response;
+        //     this.openResponseError(response);
+        // })
+
+        // var eventDetail = {
+        //     'view': signup,
+        //     'modal': true,
+        //     'openCallback': null
+        // };
+        // var event = new CustomEvent('things-open-popup-view', {
+        //     'detail': eventDetail
+        // });
+        // document.dispatchEvent(event);
+      },
+
+      submitHandler: function(event) {
+        // spinner.active = true;
+        // spinner.hidden = false;
+        this.$.submitButton.disabled = true;
+
+        var deviceToken = window.localStorage.getItem('setting.deviceToken');
+        if(deviceToken) {
+          this.$.token.value = deviceToken;
+        }
+        this.$.loginForm.submit();
+      },
+
+      resetHandler: function(event) {
+        this.$.loginForm.reset();
+      },
+
+      keypressHandler: function(event, detail, sender) {
+        var code = event.keyCode;
+        if (code == 13) {
+          this.submitHandler(event);
+        }
+      },
+
+      _computeActionUrl: function(baseUrl, url) {
+        return baseUrl + '/' + url;
+      },
+
+      _afterFormSubmit: function(event) {
+        // spinner.active = false;
+        // spinner.hidden = true;
+        submitButton.disabled = false;
+      },
+
+      _successResponse: function(event) {
+        var user = event.detail.__data__.response;
+        delete user['encryptedPassword'];
+        delete user['creator'];
+        delete user['updater'];
+        delete user['creatorId'];
+        delete user['createdAt'];
+        delete user['updaterId'];
+        delete user['updatedAt'];
+
+        // 1. save user information
+        this.set('globals.user', user);
+        // 2. reset login form
+        this.$.loginForm.reset();
+
+        page('/coffer-list');
+        page(this.successRoute);
+      },
+
+      _failureResponse: function(event) {
+        this.openInfoMsg("Login failure");
+      }
+
+    });
+
+  </script>
+</dom-module>
