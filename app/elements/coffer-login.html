@@ -7,7 +7,6 @@
 <link rel="import" href="../bower_components/gold-email-input/gold-email-input.html">
 <link rel="import" href="../bower_components/things-global-behavior/things-global-behavior.html">
 <link rel="import" href="../bower_components/things-msg-box-behavior/things-msg-box-behavior.html">
-<link rel="import" href="../bower_components/things-view-open-behavior/things-view-open-behavior.html">
 
 <dom-module id="coffer-login">
   <template>
@@ -91,15 +90,14 @@
 
       behaviors: [
         Things.GlobalBehavior,
-        Things.MsgBoxBehavior,
-        Things.ViewOpenBehavior
+        Things.MsgBoxBehavior
       ],
 
       listeners: {
-        'change': 'onFormChange',
-        'iron-form-submit': '_afterFormSubmit',
-        'iron-form-response': '_successResponse',
-        'iron-form-error': '_failureResponse',
+        'loginForm.change': 'onFormChange',
+        'loginForm.iron-form-submit': '_afterFormSubmit',
+        'loginForm.iron-form-response': '_successResponse',
+        'loginForm.iron-form-error': '_failureResponse',
         'coffer-signup-close' : '_onClosePopup',
       },
 
@@ -116,10 +114,12 @@
         signup.actionUrl = 'users/register';
         signup.method = 'POST';
         signup.data = 'coffer-signup';
+        var self = this;
 
         signup.addEventListener("coffer-signup-success", function(event) {
             var eventDetail = this;
             console.log(eventDetail);
+            self._onClosePopup();
         });
 
         signup.addEventListener("coffer-signup-failure", function(event) {

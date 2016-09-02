@@ -18,18 +18,22 @@
       
     </style>
 
+    <things-ajax id="get-authentication-number" method="GET" resource-url="coffer_devices/[[authNumber]]/authentication_number" last-response="{{unitResource}}"></things-ajax>
+    <things-ajax id="authentication-confirm-ajax" resource-action="create" resource-url="coffer_devices/authentication_number"></things-ajax>
+
     <form 
       is="iron-form" 
       id="form" 
       action=[[action]] 
       headers="[[headers]]" 
+      action-url="[[actionUrl]]" 
       content-type="application/json" 
       method="[[method]]" 
       last-response="{{lastResponse}}">
 
-      <gold-email-input auto-validate required name="email" label="[[lEmailAddress]]"></gold-email-input>
+      <gold-email-input auto-validate required name="email" label="Email Address"></gold-email-input>
 
-      <paper-input id="pw" required name="encrypted_password" type="password" label="[[lPassword]]"></paper-input>
+      <paper-input id="pw" required name="encrypted_password" type="password" label="Current Password"></paper-input>
 
       <paper-input 
         id="confirmed-pw" 
@@ -37,12 +41,16 @@
         required 
         name="confirmed-password" 
         type="password" 
-        label="[[lConfirmedPassword]]" 
+        label="Confirm Password" 
         validator="_passwordValidate" 
         errorMessage="Password mismatch password and confirmed password">
       </paper-input>
 
-      <paper-button class="btn-submit" raised on-click="_submitMyForm">Submit</paper-button>
+      <paper-input id="authentication_number" validator="_authenticationValidate" required name="authentication_number" type="number" label="Authentication Number"></paper-input>
+      <paper-button raised on-click="_authenticationRequest">Request</paper-button>
+      <paper-button raised on-click="_authenticationConfirm">Authentication</paper-button>
+
+      <paper-button id="submitButton" disabled class="btn-submit" raised on-click="_submitMyForm">Submit</paper-button>
       <paper-button raised on-click="_resetMyForm">Reset</paper-button>
       <paper-button id="closeButton" raised on-click="_signupClose">close</paper-button>
     </form>
@@ -53,31 +61,68 @@
       is: 'coffer-signup',
 
       properties: {
+        headers: {
+            type: Object,
+            value: ""
+        },
+
+        actionUrl: {
+            type: String,
+            notify: true
+        },
+
+        action: {
+            type: String,
+            computed: '_computeActionUrl(globals.baseUrl, actionUrl)'
+        },
+
+        method: {
+            type: String,
+            value: 'POST'
+        },
+
+        auth: {
+          type: Boolean,
+          value: false
+        }
       },
 
       behaviors: [
+        Things.GlobalBehavior,
         Things.MsgBoxBehavior
       ],
 
       listeners: {
-        'iron-form-response': '_successResponseHandler',
-        'iron-form-error': '_errorResponseHandler'
+        'form.change': 'onFormChange',
+        'form.iron-form-response': '_successResponseHandler',
+        'form.iron-form-error': '_errorResponseHandler',
+        'authentication-confirm-ajax.things-ajax-response' : '_handleAuthNumberSuccess',
+        'authentication-confirm-ajax.things-ajax-error' : '_handleAuthNumberFailure',
+      },
+
+      onFormChange: function(event) {
+        // Validate the entire form to see if we should enable the `Submit` button.
+        // this.$.submitButton.disabled = !this.$.form.validate();
+      },
+
+      _computeActionUrl: function(baseUrl, url) {
+        return baseUrl + '/' + url;
       },
 
       _successResponseHandler: function(event) {
-        this.stopSpinner();
+        // this.stopSpinner();
         var me = this;
 
         this.openConfirmMsg({
-          title: this.tRegInProcess,
-          text: this.tCheckRegInMail
+          title: 'User registering is on processing.',
+          text: 'You can check result of acceptance through your email.'
         }, function() {
-          me.fire("coffer-signup-success", me.serializeMyForm());
+          me.fire("coffer-signup-success", me.querySelector('form').serialize());
         });
       },
 
       _errorResponseHandler: function(event) {
-        this.stopSpinner();
+        // this.stopSpinner();
         var me = this;
 
         this.openConfirmMsg({
@@ -89,15 +134,15 @@
 
       _submitMyForm: function(event) {
         if (this._passwordValidate()) {
+          this.$.submitButton.disabled = true;
           this.$['form'].submit();
-          this.fire('coffer-signup-submited');
         } else {
-          this.openInfoMsg(this.tPasswordMissmatch);
+          this.openInfoMsg('Password mismatch password and confirmed password.');
         }
       },
 
       _resetMyForm: function(event) {
-        this.resetMyForm();
+        this.querySelector('form').reset();
       },
 
       _passwordValidate: function() {
@@ -107,6 +152,40 @@
       _signupClose:function(e) {
         this.fire(this.data + '-close', { title: 'close' });
       },
+
+      _authenticationConfirm: function(e) {
+        var row = {
+          'deviceUuid' : device.uuid,//'8802225155ac6367',
+          'number' : this.$['authentication_number'].value
+        };
+
+        var ajax = this.$['authentication-confirm-ajax'];
+        ajax.body = row;
+        ajax.generateRequest();
+      },
+
+      _authenticationRequest: function(e) {
+        this.authNumber = device.uuid;//'8802225155ac6367';
+        this.$['get-authentication-number'].generateRequest();
+      },
+
+      _authenticationValidate: function() {
+        return auth;
+      },
+
+      _handleAuthNumberSuccess: function(e) {
+        if(e.detail) {
+          alert('success');
+          this.$.submitButton.disabled = !e.detail;
+        } else {
+          alert('fail');
+          this.$.submitButton.disabled = !e.detail; 
+        }
+      },
+
+      _handleAuthNumberFailure: function(e) {
+        alert('AuthNumberFailure');
+      }
     });
   </script>
 </dom-module>
